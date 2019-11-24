@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/cookbook.dart';
 import 'dart:async';
 
@@ -46,29 +47,27 @@ List<String> hardcodedIngredientList () {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController editingController = TextEditingController();
   BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
-  List<String> duplicateItems = hardcodedIngredientList();
+  //List<String> duplicateItems = hardcodedIngredientList();
+  List<String> duplicateItems = List<String>();
     //List<String> duplicateItems = new List<String>();
   @override
   void initState() {
-    //ingredientList();
+    _ingredientList();
     //items.addAll(duplicateItems);
     super.initState();
   }
-//   ingredientList() async{
-//    print("Inside IngredientList");
+  _ingredientList() async{
 //    request.getIngredientList().then((list){
-//      print(list);
+//      //print(list);
 //      for(int i = 0; i < list.length; i++) {
-//        print(list[i].name);
+//        //print(list[i].name);
 //        duplicateItems.add(list[i].name);
 //      }
 //    });
-//  }
+  }
 
   var items = List<String>();
   List<String> wordsToSend = List<String>();
-
-
 
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
