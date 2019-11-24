@@ -1,5 +1,7 @@
+import 'package:cookmate/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
 
 void main() => runApp(new MyApp());
 
@@ -20,39 +22,36 @@ class ShoppingList extends StatefulWidget{
 }
 
 class ShoppingListState extends State<ShoppingList>{
-  List<String> ingredients;
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+  Map<String, bool> ingredients = initializeMap();
+
+  static Map<String, bool> initializeMap(){
+    List<String> ingredientList = hardcodedIngredientList();
+    Map<String, bool> ingredients = {};
+    for(int i = 0; i < ingredientList.length; i++){
+      ingredients[ingredientList[i]] = false;
+    }
+    return ingredients;
+  }
 
   @override
   Widget build(BuildContext buildContext){
-    setState(() {
-      ingredients = ['a', 'b', 'c'];
-    });
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Shopping List"),
       ),
-      body: _createIngredientList(),
-    );
-  }
-
-
-  Widget _createIngredientList(){
-    return ListView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: ingredients.length,
-        itemBuilder: (context, i) {
-          return _buildRow(ingredients[i]);
-        }
-    );
-  }
-
-  Widget _buildRow(String ingredient){
-    return ListTile(
-      title: Text(ingredient,
-        style: _biggerFont,
-      )
+      body: new ListView(
+        children: ingredients.keys.map((String key) {
+          return new CheckboxListTile(
+            title: new Text(key),
+            onChanged: (bool value) {
+              setState(() {
+                ingredients[key] = value;
+              });
+            },
+            value: ingredients[key],
+          );
+        }).toList(),
+      ),
     );
   }
 }
