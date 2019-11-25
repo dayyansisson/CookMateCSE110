@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-
 import 'Wave_clipper.dart';
 
 
