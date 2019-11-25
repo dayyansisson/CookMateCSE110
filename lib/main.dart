@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import './util/database_helpers.dart';
 import './util/localStorage.dart';
 import './util/backendRequest.dart';
+import './cookbook.dart' as cookbook;
 
 void main() => runApp(MyApp());
 
@@ -30,7 +31,7 @@ class MyHomePage extends StatelessWidget {
             //mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Login User'),
                   onPressed: () {
@@ -39,7 +40,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Remove Token'),
                   onPressed: () {
@@ -48,7 +49,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Add Allergen'),
                   onPressed: () {
@@ -57,7 +58,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Get Allergens'),
                   onPressed: () {
@@ -66,7 +67,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Remove Allergen'),
                   onPressed: () {
@@ -75,7 +76,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Clear Allergens'),
                   onPressed: () {
@@ -84,7 +85,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Add Recipe'),
                   onPressed: () {
@@ -93,7 +94,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Get Recipes'),
                   onPressed: () {
@@ -102,7 +103,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Remove Recipe'),
                   onPressed: () {
@@ -111,11 +112,47 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Clear Recipes'),
                   onPressed: () {
                     _clearRecipes();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: RaisedButton(
+                  child: Text('Clear Calendar'),
+                  onPressed: () {
+                    _clearCalendar();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: RaisedButton(
+                  child: Text('Add Calendar'),
+                  onPressed: () {
+                    _addCalendar();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: RaisedButton(
+                  child: Text('Get Calendars'),
+                  onPressed: () {
+                    _getCalendar();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: RaisedButton(
+                  child: Text('Remove Calendar'),
+                  onPressed: () {
+                    _removeCalendar();
                   },
                 ),
               ),
@@ -124,7 +161,7 @@ class MyHomePage extends StatelessWidget {
           Column(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Add Shopping Item'),
                   onPressed: () {
@@ -133,7 +170,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Get Shopping List'),
                   onPressed: () {
@@ -142,7 +179,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Purchase Shopping Item'),
                   onPressed: () {
@@ -151,7 +188,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Remove shopping item'),
                   onPressed: () {
@@ -160,7 +197,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Clear Shopping List'),
                   onPressed: () {
@@ -169,7 +206,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Get Ingredients'),
                   onPressed: () {
@@ -178,7 +215,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Clear Ingredients'),
                   onPressed: () {
@@ -187,7 +224,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Add Ingredient'),
                   onPressed: () {
@@ -196,11 +233,20 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2),
                 child: RaisedButton(
                   child: Text('Add Server Ingredients'),
                   onPressed: () {
                     _addAllIngredients();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: RaisedButton(
+                  child: Text('Add Server Calendars'),
+                  onPressed: () {
+                    _addCalendarsFromServer();
                   },
                 ),
               ),
@@ -212,6 +258,54 @@ class MyHomePage extends StatelessWidget {
   }
 
   // Examples on how to use local db and local storage
+
+  _addCalendar() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    Calendar cal = Calendar(date: '2019-11-23', recipe_id: 323244);//creates a calendar use actual id and date
+    await helper.insertCalendar(cal);//adds a calendar locally
+    print(await helper.calendars());//returns a list of all calendars the user has
+  }
+
+  _getCalendar() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    print(await helper.calendars());//returns a list of all calendars the user has
+  }
+
+  _removeCalendar() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    await helper.deleteCalendar(1);// removes calendar with id 1 locally
+    print('removed calendar: 1');
+    print(await helper.calendars());//returns a list of all calendars the user has
+  }
+
+  _clearCalendar() async {
+    DatabaseHelper helper = DatabaseHelper.instance;
+    await helper.clearCalendars();// removes all local calendars
+    print(await helper.calendars());//returns a list of all calendars the user has
+  }
+
+  _addCalendarsFromServer() async {
+    String token = await LocalStorage.getAuthToken();
+    
+    if(token == '-1') {
+      print("User is not logged in.");
+    } else {
+      print(token);
+      BackendRequest br = new BackendRequest(token, 2);
+      DatabaseHelper helper = DatabaseHelper.instance;
+      var sDay = cookbook.Date(2019,11,02);
+      var eDay = cookbook.Date(2019,11,30);
+
+      await br.getMeals(startDate: sDay, endDate: eDay).then((mealList) {
+        for (cookbook.Meal meal in mealList) {
+          Calendar newMeal = Calendar(id: meal.getID(), recipe_id: meal.getRecipeID(), date: meal.getDate());
+          helper.insertCalendar(newMeal);
+        }
+      });
+      // show the list of calendars now
+      _getCalendar();
+    }
+  }
 
   _loginUser() async {
     String token = await BackendRequest.login('dayyan', 'coolpassword123');// login user from db
@@ -328,6 +422,8 @@ class MyHomePage extends StatelessWidget {
 
   _addAllIngredients() async {
     String token = await LocalStorage.getAuthToken();
+    int id = await LocalStorage.getUserID();
+    print (id);
     if (token != '-1') {
       int userID = 2; // should grab this from local storage too...
       // or ideally change backendRequest to not need userID
