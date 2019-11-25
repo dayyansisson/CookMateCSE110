@@ -279,7 +279,9 @@ class MyHomePage extends StatelessWidget {
     DatabaseHelper helper = DatabaseHelper.instance;
     //creates a shopping list item, use actual ingredient name and quantity
     ShoppingList sl = ShoppingList(ingredient: 'Oranges', quantity: 3, purchased: false);
+    ShoppingList sl2 = ShoppingList(ingredient: 'Apples', quantity: 3, purchased: false);
     await helper.insertShoppingListItem(sl);//adds a shopping list item locally
+    await helper.insertShoppingListItem(sl2);//adds a shopping list item locally
     print(await helper.shoppingListItems());//returns a list of all shopping list items
   }
 
