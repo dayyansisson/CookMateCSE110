@@ -69,6 +69,10 @@ class Recipe {
   List<String> getInstructions(){
     List<String> instructions = new List<String>();
 
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
+
     var instructionList = json["analyzedInstructions"][0][
       "steps"];
     
