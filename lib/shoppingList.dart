@@ -62,6 +62,10 @@ class ShoppingListState extends State<ShoppingListWidget>{
         color: Colors.red,
         child: Row(
           children:[
+//            Padding(
+//              padding: EdgeInsets.only(top: 22),
+//              chi
+//            ),
             Expanded(
               child: Text("  Items",
                 style: TextStyle(fontSize: bottomFontSize, color: Colors.white),
