@@ -395,7 +395,7 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/diets", 
+      "https://thecookmate.com/api/recipe/diet",
       headers: { "Authorization":"Token $_authToken" }
     );
 
@@ -419,6 +419,44 @@ class BackendRequest {
     }
 
     return diets;
+  }
+  /* Method: getCuisineList
+   * Arg(s):
+   *
+   * Return:
+   *    - success: A list of cuisines
+   *    - failure: null
+   */
+  Future<List<Cuisine>> getCuisineList () async {
+
+    print("Getting full list of cuisines...");
+
+    // Make API call
+    final response = await http.get(
+        "https://thecookmate.com/api/recipe/cuisine",
+        headers: { "Authorization":"Token $_authToken" }
+    );
+
+    // Validate return
+    int statusCode = response.statusCode ~/ 100;
+    if(statusCode != _SUCCESS)
+    {
+      print("Request for cuisine list failed");
+      print(_interpretStatus(statusCode, response.statusCode, response.body));
+      return null;
+    }
+
+    // Parse JSON & build ingredient list
+    List<dynamic> data = jsonDecode(response.body);
+    List<Cuisine> cuisines = new List<Cuisine>();
+    Cuisine cuisine;
+    for(int i = 0; i < data.length; i++)
+    {
+      cuisine = Cuisine.fromJSON(data[i]);
+      cuisines.add(cuisine);
+    }
+
+    return cuisines;
   }
 
   /* Method: getBreadcrumbs
