@@ -33,7 +33,7 @@ class Recipe {
 
     apiID = json['id'];
     title = json['title'];
-    imageURL = json['image'];
+    imageURL = json['imageURL'];
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
     price = (servings * json['pricePerServings']).roundToDouble() / 100;
