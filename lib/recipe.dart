@@ -42,72 +42,102 @@ class recipeDisplay extends StatelessWidget{
                       child: recipe.image,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Column(
                           children: <Widget>[
-                            Text(
-                              "Prep Time",
-
+                           Container(
+                            padding: EdgeInsets.symmetric(vertical: 6.0),
+                            child: Column(  
+                              children: <Widget>[
+                                Text(
+                                  "Prep Time",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                    "${recipe.cookTime}",
+                                    style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                                "${recipe.cookTime}"
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5.0),
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  "Servings",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                    "${recipe.servings}",
+                                    style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5.0),
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  "Cost",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                    '\$' + "${recipe.price}",
+                                    style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           ],
                         ),
                         Column(
                           children: <Widget>[
-                            Text(
-                              "Servings",
-
+                            IconButton(
+                              icon: Icon(Icons.shopping_cart),
+                              padding: EdgeInsets.symmetric(vertical: 15.0),
+                              color: Colors.black,
+                              iconSize: 35.0,
+                              onPressed: () {
+                                print('pressed');
+                              },
                             ),
-                            Text(
-                                "${recipe.servings}"
+                            IconButton(
+                              icon: Icon(Icons.calendar_today),
+                              padding: EdgeInsets.symmetric(vertical: 15.0),
+                              color: Colors.black,
+                              iconSize: 35.0,
+                              onPressed: () {
+                                print('pressed');
+                              },
                             ),
+                            IconButton(
+                              icon: Icon(Icons.star_border),
+                              padding: EdgeInsets.symmetric(vertical: 15.0),
+                              color: Colors.black,
+                              iconSize: 35.0,
+                              onPressed: () {
+                                print('pressed');
+                              },
+                            )
                           ],
-                        ),
-                        Column(
-                          children: <Widget>[
-                            Text(
-                              "Cost",
-
-                            ),
-                            Text(
-                                "${recipe.price}"
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.shopping_cart),
-                          padding: EdgeInsets.symmetric(horizontal: 30.0),
-                          color: Colors.black,
-                          iconSize: 50.0,
-                          onPressed: () {
-                            print('pressed');
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.calendar_today),
-                          padding: EdgeInsets.symmetric(horizontal: 30.0),
-                          color: Colors.black,
-                          iconSize: 50.0,
-                          onPressed: () {
-                            print('pressed');
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.star_border),
-                          padding: EdgeInsets.symmetric(horizontal: 30.0),
-                          color: Colors.black,
-                          iconSize: 50.0,
-                          onPressed: () {
-                            print('pressed');
-                          },
                         )
                       ],
                     ),

@@ -32,12 +32,19 @@ class Recipe {
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
+    print("here");
     title = json['title'];
+        print("here1");
     imageURL = json['image'];
+    print("here2");
     servings = json['servings'];
+    print("here3");
     cookTime = json['readyInMinutes'];
-    price = (servings * json['pricePerServings']).roundToDouble() / 100;
-    calories = json['calories'].toDouble();
+    print("here4");
+    price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    print("here5");
+    //calories = json['calories'].toDouble();
+    print("here6");
     _complete = true;
   }
 
@@ -61,7 +68,7 @@ class Recipe {
     for(int i =0; i < ingredientList.length; i++){
       ingredients.add(ingredientList[i]["originalString"]);
     }
-    print(ingredients.toString());
+    //print(ingredients.toString());
     return ingredients;
   }
 
@@ -80,7 +87,9 @@ class Recipe {
       instructions.add(step["step"]);
     }
 
-    print(instructions.toString());
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
