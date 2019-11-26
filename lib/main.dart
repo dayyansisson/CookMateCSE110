@@ -22,14 +22,13 @@ void main()  {
   Recipe AppleTart;
   Recipe Strudel;
   Recipe Pasta;
-  // request.getRecipe("632660").then((recipe){
-  //   AppleTart = recipe;
-  //   runApp(new recipeDisplay(AppleTart));
+  
+ 
+  runApp(new recipeDisplay(request.getRecipe("632660")));
+  // request.getRecipe("73420").then((recipe){
+  //   Strudel = recipe;
+  //   runApp(new recipeDisplay(Strudel));
   // });
-  request.getRecipe("73420").then((recipe){
-    Strudel = recipe;
-    runApp(new recipeDisplay(Strudel));
-  });
   // request.getRecipe("716429").then((recipe){
   //   Pasta = recipe;
   //   runApp(new recipeDisplay(Pasta));

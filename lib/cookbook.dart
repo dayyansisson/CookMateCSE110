@@ -119,6 +119,9 @@ class Ingredient {
   
   final int id;
   final String name;
+  int quantity;
+  String units;
+  
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -130,6 +133,7 @@ class Cuisine {
   
   final int id;
   final String name;
+
 
   Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -249,12 +253,5 @@ class Meal {
   int get id => _id;
   Recipe get recipe => _recipe;
   Date get date => _date;
-
-  String getDate() => this._date.toString();
-
-  int getRecipeID() => this._recipe.apiID;
-
-  int getID() => this._id;
-
   @override String toString() => "Meal $_id is a ${_recipe.title} on ${_date.getDate}";
 }

@@ -42,11 +42,7 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   shared_preferences: 430726339841afefe5142b9c1f50cb6bd7793e01
-<<<<<<< HEAD
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
-=======
-  sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
->>>>>>> 32bbf1a849def061afbaad3d8b2115c463fe4f06
 
 PODFILE CHECKSUM: b05571f7f464f5ab3b9237a144577536fc1dd185
 
