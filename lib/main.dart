@@ -8,6 +8,7 @@ import 'package:cookmate/search.dart' as prefix0;
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
+
 void main()  {
 
   BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
