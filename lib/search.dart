@@ -35,9 +35,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController editingController = TextEditingController();
+
+  // User Data
   String token;
   int userID;
+
+  // Backend controller
   BackendRequest request;
+
+  // Data containers
+  var items = List<String>();
   List<String> duplicateItems = new List<String>();
   List<String> cuisines = new List<String>();
   List<String> diets = new List<String>();
@@ -54,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _initData();
-    _recipeSearc();
+    _recipeSearch();
     super.initState();
   }
 
@@ -63,12 +70,18 @@ class _MyHomePageState extends State<MyHomePage> {
     //userID = await LocalStorage.getUserID();
     token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
     userID = 2;
+    request = BackendRequest(token, userID);
+    cuisineQuery ="Italian";
+    maxCalories = 800;
+    //ingredientQuery.add("apple");
     _addAllIngredients();
     _getDiets();
     _getCuisines();
     _getIngredients();
   }
-  _recipeSearc() async {
+  _recipeSearch() async {
+    if(ingredientQuery.length == 0) ingredientQuery = null;
+
     request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
                           ingredients: ingredientQuery).then((recipeList){
                             recipes.addAll(recipeList);
@@ -77,11 +90,33 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           });
   }
+
+  _routeRecipePage(BuildContext context) async {
+    _recipeSearch();
+//    final result = await Navigator.push((
+//      context,
+//        MaterialPageRoute(
+//          builder: (context) => MyHomePage(
+//          : recipes,
+//
+//    ));
+  }
+
   _getCuisines() async {
     request.getCuisineList().then((cuisineList){
+      final x = [];
       for(int i  = 0; i < cuisineList.length; i++){
+
         cuisines.add(cuisineList[i].name);
+        //print(cuisines[i]);
+        final cuisine = {
+          "display": cuisineList[i].name,
+          "value": i
+        };
+        x.add(cuisine);
+
       }
+      print(x);
     });
   }
   _getDiets() async {
@@ -100,7 +135,6 @@ class _MyHomePageState extends State<MyHomePage> {
         duplicateItems.add(list[i].name);
       }
     });
-    //print(await helper.ingredients());// returns a list of all ingredients
   }
   _addAllIngredients() async {
     //String token = await LocalStorage.getAuthToken();
@@ -118,16 +152,22 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
       // display all ingredients...
-      print(await helper.ingredients());// returns a list of all ingredients
-
+//      print(await helper.ingredients());// returns a list of all ingredients
     } else {
       print("User is not logged in.");
     }
   }
 
-
-  var items = List<String>();
-  List<String> wordsToSend = List<String>();
+  // Setters
+  _setMaxCalories(int maxCaloriesQuery) {
+    maxCalories = maxCaloriesQuery;
+  }
+  _setCuisine(String cuisine){
+    if(cuisine != null) cuisineQuery = cuisine;
+  }
+  _addIngredientQuery(String ingredient){
+    if(ingredient != null) ingredientQuery.add(ingredient);
+  }
 
 
 
@@ -315,11 +355,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
   void _onSearchButtonPressed(String keyWord) {
-    wordsToSend.add(keyWord);
-    print('LIST BEING RETURNED');
-    for (int i =0; i < wordsToSend.length; i++) {
-      print(wordsToSend[i]);
-    }
-    print('FINAL LIST');
+//    wordsToSend.add(keyWord);
+//    print('LIST BEING RETURNED');
+//    for (int i =0; i < wordsToSend.length; i++) {
+//      print(wordsToSend[i]);
+//    }
+//    print('FINAL LIST');
   }
 }
