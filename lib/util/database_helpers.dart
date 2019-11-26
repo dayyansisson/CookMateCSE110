@@ -26,20 +26,22 @@ class ShoppingList {
   String ingredient;
   int quantity;
   bool purchased = false;
+  String measurement;
 
-  ShoppingList({this.ingredient, this.quantity, this.purchased});
+  ShoppingList({this.ingredient, this.quantity, this.purchased, this.measurement});
 
   Map<String, dynamic> toMap() {
     return {
       'ingredient': ingredient,
       'quantity': quantity,
-      'purchased': purchased == false ? 0 : 1
+      'purchased': purchased == false ? 0 : 1,
+      'measurement': measurement
     };
   }
 
   @override
   String toString() {
-    return 'ShoppingList{ingredient: $ingredient, quantity: $quantity, purchased: $purchased}';
+    return 'ShoppingList{ingredient: $ingredient, quantity: $quantity, purchased: $purchased}, measurement: $measurement';
   }
 }
 
@@ -145,7 +147,8 @@ class DatabaseHelper {
       create table shopping_list (
         ingredient text primary key not null UNIQUE,
         quantity integer not null,
-        purchased integer default 0
+        purchased integer default 0,
+        measurement text
       )''');
     await db.execute('''
       create table calendar (
@@ -294,6 +297,7 @@ class DatabaseHelper {
         ingredient: maps[i]['ingredient'],
         quantity: maps[i]['quantity'],
         purchased: maps[i]['purchased'] == 0 ? false : true,
+        measurement: maps[i]['measurement']
       );
     });
   }
