@@ -593,7 +593,7 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/diets", 
+      "https://thecookmate.com/api/recipe/diet",
       headers: { "Authorization":"Token $_authToken" }
     );
 
@@ -618,6 +618,7 @@ class BackendRequest {
 
     return diets;
   }
+
 
   /* Method: getBreadcrumbs
    * Arg(s):
@@ -711,13 +712,19 @@ class BackendRequest {
 
       ingredientList = ingredientList.substring(0, ingredientList.length - 2);
     }
-
+    //"diet":_userProfile.diet.name,
+    //"intolerances":_userProfile.allergenList(),
     final body = {
       "cuisine":cuisine,
-      "diet":_userProfile.diet.name,
+
       "maxCalories":maxCalories.toString(),
+<<<<<<< HEAD
       "intolerances":_userProfile.allergenList(),
       "number":"20",
+=======
+
+      "number":"10",
+>>>>>>> 5274ac229b795714f0c645f20ec7f8188e784240
       "includeIngredients":ingredientList
     };
 
