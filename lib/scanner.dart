@@ -16,7 +16,7 @@ class ScanButton extends StatefulWidget {
 class ScanButtonState extends State<ScanButton> {
   String _scanBarcode = 'Unknown';
   String _itemName = 'Name';
-  List<String> test;
+  List<String> ingredientsForSearch;
   BackendRequest be = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
 
   Future<List<String>> scanBarcodeNormal(BuildContext context) async {
@@ -52,10 +52,10 @@ class ScanButtonState extends State<ScanButton> {
     }
     else{
      //Check the breadcrumbs for usable ingredients
-     test = await getIngredients(breadCrumbs, "42e96d88b6684215c9e260273b5e56b0522de18e");
+     ingredients = await getIngredients(breadCrumbs, "42e96d88b6684215c9e260273b5e56b0522de18e");
 
      setState(() {
-       test = ingredients;
+       ingredientsForSearch = ingredients;
      });
     }
   }
@@ -102,7 +102,7 @@ class ScanButtonState extends State<ScanButton> {
   // }
 
   List<String> getList(){
-    return this.test;
+    return this.ingredientsForSearch;
   }
 
   @override
