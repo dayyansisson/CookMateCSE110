@@ -24,7 +24,7 @@ void main()  {
   Recipe Pasta;
   
  
-  runApp(new recipeDisplay(request.getRecipe("632660")));
+  runApp(new recipeDisplay(request.getRecipe("219667")));
   // request.getRecipe("73420").then((recipe){
   //   Strudel = recipe;
   //   runApp(new recipeDisplay(Strudel));

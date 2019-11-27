@@ -32,19 +32,12 @@ class Recipe {
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
-    print("here");
     title = json['title'];
-        print("here1");
     imageURL = json['image'];
-    print("here2");
     servings = json['servings'];
-    print("here3");
     cookTime = json['readyInMinutes'];
-    print("here4");
     price = (servings * json['pricePerServing']).roundToDouble() / 100;
-    print("here5");
     //calories = json['calories'].toDouble();
-    print("here6");
     _complete = true;
   }
 
