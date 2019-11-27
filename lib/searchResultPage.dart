@@ -1,3 +1,5 @@
+import 'package:cookmate/recipe.dart';
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 import 'cookbook.dart';
 
@@ -24,6 +26,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
   int _totalRecipesDisplayed = 0;
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   List<Recipe> recipeList;
+
+  final BackendRequest _request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
 
   @override
   void initState() {
@@ -370,7 +374,10 @@ class _SearchResultPageState extends State<SearchResultPage> {
               )
             ),
             onPressed: () {
-              print("pressed this new issshhh");
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => RecipeDisplay(_request.getRecipe("${recipe.apiID}")))
+              );
             },
           ),
         ),

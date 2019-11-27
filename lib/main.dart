@@ -3,7 +3,10 @@ import 'package:cookmate/searchResultPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
-main() => runApp(MyApp());
+main() {
+  
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
 
@@ -37,6 +40,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     
     BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
+    request.getRecipe("201298");
+
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Lato'),
       home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),

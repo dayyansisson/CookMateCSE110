@@ -33,11 +33,23 @@ class Recipe {
 
     apiID = json['id'];
     title = json['title'];
-    imageURL = json['imageURL'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
-    price = (servings * json['pricePerServings']).roundToDouble() / 100;
-    calories = json['calories'].toDouble();
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
     _complete = true;
   }
 
@@ -61,13 +73,17 @@ class Recipe {
     for(int i =0; i < ingredientList.length; i++){
       ingredients.add(ingredientList[i]["originalString"]);
     }
-    print(ingredients.toString());
+    //print(ingredients.toString());
     return ingredients;
   }
 
   //Returns the instructions in a list
   List<String> getInstructions(){
     List<String> instructions = new List<String>();
+
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
 
     var instructionList = json["analyzedInstructions"][0][
       "steps"];
@@ -76,7 +92,9 @@ class Recipe {
       instructions.add(step["step"]);
     }
 
-    print(instructions.toString());
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
@@ -106,6 +124,9 @@ class Ingredient {
   
   final int id;
   final String name;
+  int quantity;
+  String units;
+  
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -117,6 +138,7 @@ class Cuisine {
   
   final int id;
   final String name;
+
 
   Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
