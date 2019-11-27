@@ -7,6 +7,8 @@ import 'dart:async';
 import 'package:cookmate/util/database_helpers.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/main.dart';
+import 'package:flutter_multiselect/flutter_multiselect.dart';
+
 
 void main() => runApp(new MyApp());
 
@@ -35,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController editingController = TextEditingController();
-
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   // User Data
   String token;
   int userID;
@@ -46,24 +48,28 @@ class _MyHomePageState extends State<MyHomePage> {
   // Data containers
   var items = List<String>();
   List<String> duplicateItems = new List<String>();
-  List<String> cuisines = new List<String>();
   List<String> diets = new List<String>();
-
+  final cuisines = [];
   // Queries for recipe search
-  List<String> ingredientQuery = new List<String>();
-  int maxCalories = 0;
-  String cuisineQuery;
+  List<String> ingredientQuery = null;
+  int maxCalories = null;
+  String cuisineQuery = null;
   String dietQuery;
 
   // Recipe List results
   List<CB.Recipe> recipes = List<CB.Recipe>();
 
+//**********Rayhan Code **********//
+  int _value = 2100;
+  List cuisine = [];
+//********************************//
+
   @override
   void initState() {
     _initData();
-    _recipeSearch();
     super.initState();
   }
+
 
   _initData() async {
     //token = await LocalStorage.getAuthToken();
@@ -71,24 +77,21 @@ class _MyHomePageState extends State<MyHomePage> {
     token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
     userID = 2;
     request = BackendRequest(token, userID);
-    cuisineQuery ="Italian";
-    maxCalories = 800;
-    //ingredientQuery.add("apple");
+    ingredientQuery;
     _addAllIngredients();
     _getDiets();
     _getCuisines();
     _getIngredients();
   }
   _recipeSearch() async {
-    if(ingredientQuery.length == 0) ingredientQuery = null;
 
-    request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
-                          ingredients: ingredientQuery).then((recipeList){
-                            recipes.addAll(recipeList);
-                            for(CB.Recipe recipe in recipes) {
-                              print(recipe.toString());
-                            }
-                          });
+      request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
+          ingredients: ingredientQuery).then((recipeList){
+        recipes.addAll(recipeList);
+        for(CB.Recipe recipe in recipes) {
+          print(recipe.toString());
+        }
+      });
   }
 
   _routeRecipePage(BuildContext context) async {
@@ -100,23 +103,25 @@ class _MyHomePageState extends State<MyHomePage> {
 //          : recipes,
 //
 //    ));
+    _clearQueries();
+  }
+  _clearQueries() {
+    recipes.clear();
+    if(ingredientQuery != null )ingredientQuery.clear();
+    ingredientQuery = null;
+    cuisineQuery = null;
+    maxCalories = _value;
   }
 
   _getCuisines() async {
     request.getCuisineList().then((cuisineList){
-      final x = [];
       for(int i  = 0; i < cuisineList.length; i++){
-
-        cuisines.add(cuisineList[i].name);
-        //print(cuisines[i]);
         final cuisine = {
           "display": cuisineList[i].name,
           "value": i
         };
-        x.add(cuisine);
-
+        cuisines.add(cuisine);
       }
-      print(x);
     });
   }
   _getDiets() async {
@@ -161,15 +166,27 @@ class _MyHomePageState extends State<MyHomePage> {
   // Setters
   _setMaxCalories(int maxCaloriesQuery) {
     maxCalories = maxCaloriesQuery;
+    print("MaxCalories: " + maxCalories.toString());
   }
-  _setCuisine(String cuisine){
-    if(cuisine != null) cuisineQuery = cuisine;
+  _setCuisine(){
+//    if(cuisine != null) cuisineQuery = cuisine;
+    print( cuisine);
   }
   _addIngredientQuery(String ingredient){
-    if(ingredient != null) ingredientQuery.add(ingredient);
+    print(ingredient);
+    if(ingredientQuery == null) ingredientQuery = new List<String>();
+    if(ingredient != null) {
+      print(ingredientQuery);
+      ingredientQuery.add(ingredient.toString());
+      print(ingredientQuery);
+    }
   }
 
 
+//************Rayhan Code**********************//
+  List<String> wordsToSend = List<String>();
+  List<String> cusineToSend = List<String>();
+//**********************************************//
 
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
@@ -178,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if(query.isNotEmpty) {
       List<String> dummyListData = List<String>();
       dummySearchList.forEach((item) {
-        if(item.contains(query) && counter < 6) {
+        if(item.contains(query) && counter < 5) {
           dummyListData.add(item);
           counter++;
         }
@@ -203,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: new AppBar(
-        title: new Text('Navbar'),
+        title: new Text('Recipe Search'),
       ),
       body: Container(
         child: Column(
@@ -224,91 +241,42 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
               ),
             ),
-            Row (
-              children:<Widget>[
-                new Container(
-                  width: 10.0,
+            Slider.adaptive(
+                    value: _value.toDouble(),
+                    min: 500,
+                    max: 5000,
+                    divisions: 10,
+                    activeColor: Colors.red,
+                    inactiveColor: Colors.black,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _value = newValue.round();
+                        _setMaxCalories(newValue.round());
+                      }
+                      );
+                    },
+                  label: 'Max Calories: $_value',
                 ),
-                RaisedButton(
-                  onPressed: () {_onSearchButtonPressed('Vegetarian');},
-                  textColor: Colors.white,
-                  padding: const EdgeInsets.all(0.0),
-                  child: Container(
-                    decoration: const BoxDecoration (
-//                      border: Border(
-//                        top: BorderSide(width: 1.0, color: Color(0xFFFFFFFFFF)),
-//                        left: BorderSide(width: 1.0, color: Color(0xFFFFFFFFFF)),
-//                        right: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
-//                        bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
-//                      ),
-                      gradient: LinearGradient(
-                        colors: <Color>[
-                          Color(0xFFcc0000),
-                          Color(0xFFff3333),
-                          Color(0xFFff8080),
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-                    child: const Text(
-                        'Vegetarian',
-                        style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
-                new Container(
-                  width: 25.0,
-                ),
-                RaisedButton(
-                  onPressed: () {_onSearchButtonPressed('Vegan');},
-                  textColor: Colors.white,
-                  padding: const EdgeInsets.all(0.0),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: <Color>[
-                          Color(0xFFcc0000),
-                          Color(0xFFff3333),
-                          Color(0xFFff8080),
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10.0),
-                    child: const Text(
-                        ' Vegan ',
-                        style: TextStyle(fontSize: 20)
-                    ),
-                  ),
-                ),
-                new Container(
-                  width: 25.0,
-                ),
-                RaisedButton(
-                  onPressed: () {_onSearchButtonPressed('Low Calorie');},
-                  textColor: Colors.white,
-                  padding: const EdgeInsets.all(0.0),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: <Color>[
-                          Color(0xFFcc0000),
-                          Color(0xFFff3333),
-                          Color(0xFFff8080),
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10.0),
-                    child: const Text(
-                        'Low Calorie',
-                        style: TextStyle(fontSize: 20)
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // cuisine, diet, alergens, ingredients,
-            new Divider(
-              color: Colors.grey,
+           MultiSelect(
+                autovalidate: false,
+                titleText: 'Select Cuisine',
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select one or more option(s)';
+                  } else { return '';}
+                },
+                errorText: 'Please select only one option:',
+                dataSource: cuisines,
+                textField: 'display',
+                valueField: 'value',
+                filterable: true,
+                required: true,
+                value: cuisine,
+                onSaved: (value) {
+                  print("The value is $value");
+                  //_setCuisine(value);
+                  //_onCuisineSelection(cuisine);
+                },
             ),
             Expanded(
               child: ListView.builder(
@@ -320,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: new Text('${items[index]}'),
                         trailing: Icon(Icons.add_circle),
                         onTap: () {
-                      _onSearchButtonPressed('${items[index]}');
+                            _addIngredientQuery('${items[index]}');
                       showDialog(context: context, child:
                       new AlertDialog(
                         title: new Text("Ingredient Added:"),
@@ -339,22 +307,38 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
             ),
-              Padding(
+              Container(
                 padding: const EdgeInsets.all(20),
-                  child: FloatingActionButton(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
                 backgroundColor: Colors.redAccent,
                 child: Icon(Icons.navigate_next),
                 elevation: 0,
-                onPressed: () => {},
+                onPressed: ()  {
+                   editingController.clear();
+                  _routeRecipePage(context);
+                },
               ),
             ),
+//            ],
+//            ),
           ],
         ),
 
       ),
     );
   }
+  void _onCuisineSelection(String cuisine) {
+    cusineToSend.add(cuisine);
+    print('CUISINE BEING RETURNED');
+    for (int i =0; i < cusineToSend.length; i++) {
+      print(cusineToSend[i]);
+    }
+    print('FINAL CUISINE');
+  }
+  
   void _onSearchButtonPressed(String keyWord) {
+    print(keyWord);
 //    wordsToSend.add(keyWord);
 //    print('LIST BEING RETURNED');
 //    for (int i =0; i < wordsToSend.length; i++) {
