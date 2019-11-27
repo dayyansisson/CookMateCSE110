@@ -33,11 +33,23 @@ class Recipe {
 
     apiID = json['id'];
     title = json['title'];
-    imageURL = json['image'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
-    price = (servings * json['pricePerServing']).roundToDouble() / 100;
-    //calories = json['calories'].toDouble();
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
     _complete = true;
   }
 
