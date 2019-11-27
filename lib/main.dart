@@ -120,42 +120,6 @@ class MyHomePage extends StatelessWidget {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: RaisedButton(
-                  child: Text('Clear Calendar'),
-                  onPressed: () {
-                    _clearCalendar();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: RaisedButton(
-                  child: Text('Add Calendar'),
-                  onPressed: () {
-                    _addCalendar();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: RaisedButton(
-                  child: Text('Get Calendars'),
-                  onPressed: () {
-                    _getCalendar();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: RaisedButton(
-                  child: Text('Remove Calendar'),
-                  onPressed: () {
-                    _removeCalendar();
-                  },
-                ),
-              ),
             ],
           ),
           Column(
@@ -241,15 +205,6 @@ class MyHomePage extends StatelessWidget {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(2),
-                child: RaisedButton(
-                  child: Text('Add Server Calendars'),
-                  onPressed: () {
-                    _addCalendarsFromServer();
-                  },
-                ),
-              ),
             ],
           ),
         ],
@@ -258,54 +213,6 @@ class MyHomePage extends StatelessWidget {
   }
 
   // Examples on how to use local db and local storage
-
-  _addCalendar() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
-    Calendar cal = Calendar(date: '2019-11-23', recipe_id: 323244);//creates a calendar use actual id and date
-    await helper.insertCalendar(cal);//adds a calendar locally
-    print(await helper.calendars());//returns a list of all calendars the user has
-  }
-
-  _getCalendar() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
-    print(await helper.calendars());//returns a list of all calendars the user has
-  }
-
-  _removeCalendar() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
-    await helper.deleteCalendar(1);// removes calendar with id 1 locally
-    print('removed calendar: 1');
-    print(await helper.calendars());//returns a list of all calendars the user has
-  }
-
-  _clearCalendar() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
-    await helper.clearCalendars();// removes all local calendars
-    print(await helper.calendars());//returns a list of all calendars the user has
-  }
-
-  _addCalendarsFromServer() async {
-    String token = await LocalStorage.getAuthToken();
-    
-    if(token == '-1') {
-      print("User is not logged in.");
-    } else {
-      print(token);
-      BackendRequest br = new BackendRequest(token, 2);
-      DatabaseHelper helper = DatabaseHelper.instance;
-      var sDay = cookbook.Date(2019,11,02);
-      var eDay = cookbook.Date(2019,11,30);
-
-      await br.getMeals(startDate: sDay, endDate: eDay).then((mealList) {
-        for (cookbook.Meal meal in mealList) {
-          Calendar newMeal = Calendar(id: meal.getID(), recipe_id: meal.getRecipeID(), date: meal.getDate());
-          helper.insertCalendar(newMeal);
-        }
-      });
-      // show the list of calendars now
-      _getCalendar();
-    }
-  }
 
   _loginUser() async {
     String token = await BackendRequest.login('dayyan', 'coolpassword123');// login user from db
