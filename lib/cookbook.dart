@@ -64,14 +64,16 @@ class Recipe {
   }
 
   //Returns all the ingredients for a given recipe
-  List<String> getIngredients(){
-    List<String> ingredients = new List<String>();
+  List<Ingredient> getIngredients(){
+    List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
     
     
+    
     for(int i =0; i < ingredientList.length; i++){
-      ingredients.add(ingredientList[i]["originalString"]);
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      ingredients.add(ing);
     }
     //print(ingredients.toString());
     return ingredients;
@@ -122,10 +124,17 @@ class Recipe {
  */
 class Ingredient {
   
-  final int id;
-  final String name;
-  int quantity;
+  int id;
+  String name;
+  double quantity;
   String units;
+
+  Ingredient(int id, String name, double quantity, String units){
+    this.id = id;
+    this.name = name;
+    this.quantity = quantity;
+    this.units = units;
+  }
   
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
