@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
     ]
   );
 
-<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     
@@ -51,14 +50,4 @@ class MyApp extends StatelessWidget {
       //home: ShoppingListPage(),
     );
   }
-=======
-  BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
-//  request.recipeSearch().then(
-//    (recipes) {
-//      for(Recipe recipe in recipes) {
-//        print(recipe.toString());
-//      }
-//    }
-//  );
->>>>>>> 5274ac229b795714f0c645f20ec7f8188e784240
 }

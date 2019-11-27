@@ -48,15 +48,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.7"
-<<<<<<< HEAD
-  flutter_multiselect:
-    dependency: "direct main"
-    description:
-      name: flutter_multiselect
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.1"
-=======
   flutter_speed_dial:
     dependency: "direct main"
     description:
@@ -64,7 +55,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.4"
->>>>>>> 82b1ea999537fbca0849561fdcd3e3259dd63d33
   flutter_test:
     dependency: "direct dev"
     description: flutter
