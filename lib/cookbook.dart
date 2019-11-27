@@ -33,11 +33,23 @@ class Recipe {
 
     apiID = json['id'];
     title = json['title'];
-    imageURL = json['image'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
-    price = (servings * json['pricePerServings']).roundToDouble() / 100;
-    calories = json['calories'].toDouble();
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
     _complete = true;
   }
 
@@ -52,22 +64,26 @@ class Recipe {
   }
 
   //Returns all the ingredients for a given recipe
-  List<String> getIngredients(){
-    List<String> ingredients = new List<String>();
+  List<Ingredient> getIngredients(){
+    List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
-    
-    
+
     for(int i =0; i < ingredientList.length; i++){
-      ingredients.add(ingredientList[i]["originalString"]);
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      ingredients.add(ing);
     }
-    print(ingredients.toString());
+    //print(ingredients.toString());
     return ingredients;
   }
 
   //Returns the instructions in a list
   List<String> getInstructions(){
     List<String> instructions = new List<String>();
+
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
 
     var instructionList = json["analyzedInstructions"][0][
       "steps"];
@@ -76,7 +92,9 @@ class Recipe {
       instructions.add(step["step"]);
     }
 
-    print(instructions.toString());
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
@@ -104,8 +122,18 @@ class Recipe {
  */
 class Ingredient {
   
-  final int id;
-  final String name;
+  int id;
+  String name;
+  double quantity;
+  String units;
+
+  Ingredient(int id, String name, double quantity, String units){
+    this.id = id;
+    this.name = name;
+    this.quantity = quantity;
+    this.units = units;
+  }
+  
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -117,6 +145,7 @@ class Cuisine {
   
   final int id;
   final String name;
+
 
   Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -236,12 +265,5 @@ class Meal {
   int get id => _id;
   Recipe get recipe => _recipe;
   Date get date => _date;
-
-  String getDate() => this._date.toString();
-
-  int getRecipeID() => this._recipe.apiID;
-
-  int getID() => this._id;
-
   @override String toString() => "Meal $_id is a ${_recipe.title} on ${_date.getDate}";
 }

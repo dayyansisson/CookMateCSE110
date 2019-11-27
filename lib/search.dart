@@ -9,6 +9,7 @@ import 'package:cookmate/util/database_helpers.dart' as DB;
 import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/main.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
+import 'package:cookmate/searchResultPage.dart';
 
 
 void main() => runApp(new MyApp());
@@ -59,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Recipe List results
   List<CB.Recipe> recipes = List<CB.Recipe>();
-
+  Future<List<CB.Recipe>> recipesResult;
 //**********Rayhan Code **********//
   int _value = 2100;
   List cuisine = [];
@@ -71,8 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _initData();
     super.initState();
   }
-
-
 
   _initData() async {
     //token = await LocalStorage.getAuthToken();
@@ -87,25 +86,20 @@ class _MyHomePageState extends State<MyHomePage> {
     _getIngredients();
   }
   _recipeSearch() async {
+      recipesResult = request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
+          ingredients: ingredientQuery);
 
-      request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
-          ingredients: ingredientQuery).then((recipeList){
-        recipes.addAll(recipeList);
-        for(CB.Recipe recipe in recipes) {
-          print(recipe.toString());
-        }
-      });
   }
 
   _routeRecipePage(BuildContext context) async {
     _recipeSearch();
-//    final result = await Navigator.push((
-//      context,
-//        MaterialPageRoute(
-//          builder: (context) => MyHomePage(
-//          : recipes,
-//
-//    ));
+    if(recipesResult != null) {
+      print(recipesResult);
+      final result = await Navigator.push(
+          context, MaterialPageRoute(
+          builder: (context) => SearchResultPage(recipesResult)
+      ));
+    }
     _clearQueries();
   }
   _clearQueries() {
@@ -179,7 +173,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print(ingredient);
     if(ingredientQuery == null) ingredientQuery = new List<String>();
     if(ingredient != null) {
-      print(ingredientQuery);
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
@@ -332,23 +325,5 @@ class _MyHomePageState extends State<MyHomePage> {
 
       ),
     );
-  }
-  void _onCuisineSelection(String cuisine) {
-    cusineToSend.add(cuisine);
-    print('CUISINE BEING RETURNED');
-    for (int i =0; i < cusineToSend.length; i++) {
-      print(cusineToSend[i]);
-    }
-    print('FINAL CUISINE');
-  }
-  
-  void _onSearchButtonPressed(String keyWord) {
-    print(keyWord);
-//    wordsToSend.add(keyWord);
-//    print('LIST BEING RETURNED');
-//    for (int i =0; i < wordsToSend.length; i++) {
-//      print(wordsToSend[i]);
-//    }
-//    print('FINAL LIST');
   }
 }
