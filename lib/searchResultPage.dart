@@ -1,5 +1,6 @@
 import 'package:cookmate/recipe.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'cookbook.dart';
 
@@ -47,7 +48,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.redAccent,
           bottom: TabBar(
             tabs: <Widget>[
               Tab(icon: Icon(Icons.restaurant_menu)),
@@ -63,18 +63,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
-                    return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            Container(
-                              child: Text("Loading recipes..."),
-                              padding: EdgeInsets.all(30)
-                            ),
-                          ],
-                        )
-                      );
+                    return CookmateStyle.loadingIcon("Loading recipes...");
                   case ConnectionState.done:
                     return ListView(children: _searchResults(snapshot.data));
                   default:
@@ -87,6 +76,93 @@ class _SearchResultPageState extends State<SearchResultPage> {
         )
       ),
     );
+  }
+
+  List<Widget> _searchResults(List<Recipe> data) {
+
+    List<Widget> results = List<Widget>();
+    List<Widget> recipes = List<Widget>();
+
+    _totalRecipesDisplayed = 0;
+
+    for (Recipe recipe in data) {
+      if(passFilters(recipe)) {
+        recipes.add(Divider());
+        recipes.add(_recipeCard(recipe));
+        _totalRecipesDisplayed++;
+      }
+    }
+    recipes.add(Divider());
+
+    Widget topBar = Row(
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            print("pressed this ish");
+          },
+        ),
+        Text("Back"),
+        Spacer(flex: 2),
+        Text(
+          "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w300,
+            color: Color.fromRGBO(128, 128, 128, 1)
+          ),
+        ),
+        Spacer()
+      ],
+    );
+
+    results.add(topBar);
+    results.addAll(recipes);
+    
+    return results;
+  }
+
+  void initializePreferences(List<Recipe> recipes) {
+
+    if(_initPrefs) {
+      return;
+    }
+
+    recipeList = recipes;
+
+    _minPrepTime = 10000000;
+    _maxPrepTime = 0;
+    _minPrice = 10000000;
+    _maxPrice = 0;
+    _minCalories = 10000000;
+    _maxCalories = 0;
+
+    for(Recipe recipe in recipes) {
+      if(recipe.cookTime < _minPrepTime) {
+        _minPrepTime = recipe.cookTime;
+      }
+      if(recipe.cookTime > _maxPrepTime){
+        _maxPrepTime = recipe.cookTime;
+      }
+      if(recipe.price < _minPrice) {
+        _minPrice = recipe.price;
+      }
+      if(recipe.price > _maxPrice){
+        _maxPrice = recipe.price;
+      }
+      if(recipe.calories < _minCalories) {
+        _minCalories = recipe.calories.toInt();
+      }
+      if(recipe.calories > _maxCalories){
+        _maxCalories = recipe.calories.toInt();
+      }
+    }
+
+    _timeLimit = _maxPrepTime.toDouble();
+    _priceLimit = _maxPrice;
+    _calLimit = _maxCalories.toDouble();
+
+    _initPrefs = true;
   }
 
   Widget preferences(List<Recipe> data) {
@@ -253,93 +329,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  void initializePreferences(List<Recipe> recipes) {
-
-    if(_initPrefs) {
-      return;
-    }
-
-    recipeList = recipes;
-
-    _minPrepTime = 10000000;
-    _maxPrepTime = 0;
-    _minPrice = 10000000;
-    _maxPrice = 0;
-    _minCalories = 10000000;
-    _maxCalories = 0;
-
-    for(Recipe recipe in recipes) {
-      if(recipe.cookTime < _minPrepTime) {
-        _minPrepTime = recipe.cookTime;
-      }
-      if(recipe.cookTime > _maxPrepTime){
-        _maxPrepTime = recipe.cookTime;
-      }
-      if(recipe.price < _minPrice) {
-        _minPrice = recipe.price;
-      }
-      if(recipe.price > _maxPrice){
-        _maxPrice = recipe.price;
-      }
-      if(recipe.calories < _minCalories) {
-        _minCalories = recipe.calories.toInt();
-      }
-      if(recipe.calories > _maxCalories){
-        _maxCalories = recipe.calories.toInt();
-      }
-    }
-
-    _timeLimit = _maxPrepTime.toDouble();
-    _priceLimit = _maxPrice;
-    _calLimit = _maxCalories.toDouble();
-
-    _initPrefs = true;
-  }
-
-  List<Widget> _searchResults(List<Recipe> data) {
-
-    List<Widget> results = List<Widget>();
-    List<Widget> recipes = List<Widget>();
-
-    _totalRecipesDisplayed = 0;
-
-    for (Recipe recipe in data) {
-      if(passFilters(recipe)) {
-        recipes.add(Divider());
-        recipes.add(_recipeCard(recipe));
-        _totalRecipesDisplayed++;
-      }
-    }
-    recipes.add(Divider());
-
-    Widget topBar = Row(
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            print("pressed this ish");
-          },
-        ),
-        Text("Back"),
-        Spacer(flex: 2),
-        Text(
-          "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w300,
-            color: Color.fromRGBO(128, 128, 128, 1)
-          ),
-        ),
-        Spacer()
-      ],
-    );
-
-    results.add(topBar);
-    results.addAll(recipes);
-    
-    return results;
-  }
-
   void countValidRecipes (List<Recipe> data) {
 
     _totalRecipesDisplayed = 0;
@@ -395,7 +384,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     overflow: TextOverflow.fade,
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: _titleColor,
                     ),
                   ),

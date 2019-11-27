@@ -1,4 +1,5 @@
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -15,10 +16,13 @@ class RecipeDisplay extends StatefulWidget {
 }
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
+
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
   Recipe pageRecipe;
+
+  GlobalKey _tabBarKey = GlobalKey();
 
   _RecipeDisplayState(Future<Recipe> recipe) {
     recipeFuture = recipe;
@@ -46,18 +50,8 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
             future: recipeFuture,
             builder: (futureContext, snapshot) {
               switch (snapshot.connectionState) {
-                case ConnectionState
-                    .waiting: // this handles waiting for the async call
-                  return Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CircularProgressIndicator(),
-                      Container(
-                          child: Text("Loading recipe..."),
-                          padding: EdgeInsets.all(30)),
-                    ],
-                  ));
+                case ConnectionState.waiting: // this handles waiting for the async call
+                  return CookmateStyle.loadingIcon("Loading recipe...");
                 case ConnectionState.done:
                   return DefaultTabController(
                       length: 2,
@@ -184,6 +178,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                           padding: EdgeInsets.all(7),
                         ),
                         TabBar(
+                          key: _tabBarKey,
                           tabs: <Widget>[
                             Tab(
                                 child: Text("Ingredients",
@@ -193,8 +188,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                                     style: TextStyle(color: _titleColor))),
                           ],
                         ),
-                        Container(
-                          constraints: BoxConstraints.expand(height: 416),
+                        Expanded(
                           child: TabBarView(
                             children: <Widget>[
                               getIngredientWidgets(ingredients),
@@ -202,7 +196,9 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                             ],
                           ),
                         ),
-                      ]));
+                      ]
+                    )
+                  );
                 default:
                   return Text("error");
               }
@@ -282,7 +278,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
         ),
       ));
     }
-    return ListView(children: list, padding: EdgeInsets.only(top: 10));
+    return ListView(children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
   }
 
   Widget getIngredientWidgets(List<Ingredient> strings) {
@@ -325,7 +321,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
         ),
       ));
     }
-    return ListView(children: list, padding: EdgeInsets.only(top: 10));
+    return ListView(children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
   }
 
   String formatTitle(String input) {
