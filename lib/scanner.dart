@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'dart:developer' as logger;
+
 
 import 'dialog.dart';
 
@@ -19,7 +21,7 @@ class ScanButtonState extends State<ScanButton> {
   List<String> ingredientsForSearch;
   BackendRequest be = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
 
-  Future<List<String>> scanBarcodeNormal(BuildContext context) async {
+  Future<List<String>> scanBarcodeNormal() async {
     String barcodeScanRes;
     List<String> ingredients;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -36,6 +38,7 @@ class ScanButtonState extends State<ScanButton> {
     if (!mounted) return null;
 
     //Call the backend with the barcode to return the Bread Crumb list
+    logger.log("here");
     List<String> breadCrumbs = await be.getBreadcrumbs(barcodeScanRes);
 
     //If the backend does not return us anything this displays a popup
@@ -107,11 +110,11 @@ class ScanButtonState extends State<ScanButton> {
 
   @override
   Widget build(BuildContext context)  {
-    return IconButton(
-      icon: Icon(Icons.camera),
-      onPressed: (){
-        scanBarcodeNormal(context);
-      }
-    );
+    // return IconButton(
+    //   icon: Icon(Icons.camera),
+    //   onPressed: (){
+    //     scanBarcodeNormal();
+    //   }
+    // );
   }
 }

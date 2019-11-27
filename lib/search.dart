@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:developer' as logger;
 
+import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/cookbook.dart' as CB;
@@ -9,7 +11,6 @@ import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/main.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 
-
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -17,11 +18,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: 'Flutter Demo',
-        theme: new ThemeData(
+      title: 'Flutter Demo',
+      theme: new ThemeData(
         primarySwatch: Colors.red,
-    ),
-    home: new MyHomePage(title: 'NAVBAR SHOULD BE HERE'),
+      ),
+      home: new MyHomePage(title: 'NAVBAR SHOULD BE HERE'),
     );
   }
 }
@@ -34,8 +35,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-
 class _MyHomePageState extends State<MyHomePage> {
+  ScanButtonState scanButt = new ScanButtonState();
   TextEditingController editingController = TextEditingController();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   // User Data
@@ -70,7 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-
   _initData() async {
     //token = await LocalStorage.getAuthToken();
     //userID = await LocalStorage.getUserID();
@@ -83,15 +83,19 @@ class _MyHomePageState extends State<MyHomePage> {
     _getCuisines();
     _getIngredients();
   }
-  _recipeSearch() async {
 
-      request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
-          ingredients: ingredientQuery).then((recipeList){
-        recipes.addAll(recipeList);
-        for(CB.Recipe recipe in recipes) {
-          print(recipe.toString());
-        }
-      });
+  _recipeSearch() async {
+    request
+        .recipeSearch(
+            cuisine: cuisineQuery,
+            maxCalories: maxCalories,
+            ingredients: ingredientQuery)
+        .then((recipeList) {
+      recipes.addAll(recipeList);
+      for (CB.Recipe recipe in recipes) {
+        print(recipe.toString());
+      }
+    });
   }
 
   _routeRecipePage(BuildContext context) async {
@@ -105,28 +109,27 @@ class _MyHomePageState extends State<MyHomePage> {
 //    ));
     _clearQueries();
   }
+
   _clearQueries() {
     recipes.clear();
-    if(ingredientQuery != null )ingredientQuery.clear();
+    if (ingredientQuery != null) ingredientQuery.clear();
     ingredientQuery = null;
     cuisineQuery = null;
     maxCalories = _value;
   }
 
   _getCuisines() async {
-    request.getCuisineList().then((cuisineList){
-      for(int i  = 0; i < cuisineList.length; i++){
-        final cuisine = {
-          "display": cuisineList[i].name,
-          "value": i
-        };
+    request.getCuisineList().then((cuisineList) {
+      for (int i = 0; i < cuisineList.length; i++) {
+        final cuisine = {"display": cuisineList[i].name, "value": i};
         cuisines.add(cuisine);
       }
     });
   }
+
   _getDiets() async {
-    request.getDietList().then((dietList){
-      for(int i  = 0; i < dietList.length; i++){
+    request.getDietList().then((dietList) {
+      for (int i = 0; i < dietList.length; i++) {
         diets.add(dietList[i].name);
       }
     });
@@ -134,13 +137,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _getIngredients() async {
     DatabaseHelper helper = DatabaseHelper.instance;
-    List<String>  ingredients;
-    helper.ingredients().then((list){
-      for(int i  = 0; i < list.length; i++){
+    List<String> ingredients;
+    helper.ingredients().then((list) {
+      for (int i = 0; i < list.length; i++) {
         duplicateItems.add(list[i].name);
       }
     });
   }
+
   _addAllIngredients() async {
     //String token = await LocalStorage.getAuthToken();
     if (token != '-1') {
@@ -168,20 +172,27 @@ class _MyHomePageState extends State<MyHomePage> {
     maxCalories = maxCaloriesQuery;
     print("MaxCalories: " + maxCalories.toString());
   }
-  _setCuisine(){
+
+  _setCuisine() {
 //    if(cuisine != null) cuisineQuery = cuisine;
-    print( cuisine);
+    print(cuisine);
   }
-  _addIngredientQuery(String ingredient){
+
+  _addIngredientQuery(String ingredient) {
     print(ingredient);
-    if(ingredientQuery == null) ingredientQuery = new List<String>();
-    if(ingredient != null) {
+    if (ingredientQuery == null) ingredientQuery = new List<String>();
+    if (ingredient != null) {
       print(ingredientQuery);
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
   }
-
+  _getIngredientBarCode(List<String> ingredients){
+    if(ingredientQuery == null) ingredientQuery = new List<String>();
+    if(ingredientQuery != null){
+      ingredientQuery.addAll(ingredients);
+    }
+  }
 
 //************Rayhan Code**********************//
   List<String> wordsToSend = List<String>();
@@ -192,10 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
     List<String> dummySearchList = List<String>();
     dummySearchList.addAll(duplicateItems);
     int counter = 0;
-    if(query.isNotEmpty) {
+    if (query.isNotEmpty) {
       List<String> dummyListData = List<String>();
       dummySearchList.forEach((item) {
-        if(item.contains(query) && counter < 5) {
+        if (item.contains(query) && counter < 5) {
           dummyListData.add(item);
           counter++;
         }
@@ -212,7 +223,6 @@ class _MyHomePageState extends State<MyHomePage> {
         //items.addAll(duplicateItems);
       });
     }
-
   }
 
   @override
@@ -236,47 +246,54 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: "Input an Ingredient",
                     hintText: "Search",
                     prefixIcon: Icon(Icons.search),
-                    suffixIcon: Icon(Icons.camera),
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.camera),
+                        onPressed: () {
+                          scanButt.scanBarcodeNormal();
+                          logger.log(scanButt.getList().toString());
+                          _getIngredientBarCode(scanButt.getList());
+                        }),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
               ),
             ),
             Slider.adaptive(
-                    value: _value.toDouble(),
-                    min: 500,
-                    max: 5000,
-                    divisions: 10,
-                    activeColor: Colors.red,
-                    inactiveColor: Colors.black,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _value = newValue.round();
-                        _setMaxCalories(newValue.round());
-                      }
-                      );
-                    },
-                  label: 'Max Calories: $_value',
-                ),
-           MultiSelect(
-                autovalidate: false,
-                titleText: 'Select Cuisine',
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select one or more option(s)';
-                  } else { return '';}
-                },
-                errorText: 'Please select only one option:',
-                dataSource: cuisines,
-                textField: 'display',
-                valueField: 'value',
-                filterable: true,
-                required: true,
-                value: cuisine,
-                onSaved: (value) {
-                  print("The value is $value");
-                  //_setCuisine(value);
-                  //_onCuisineSelection(cuisine);
-                },
+              value: _value.toDouble(),
+              min: 500,
+              max: 5000,
+              divisions: 10,
+              activeColor: Colors.red,
+              inactiveColor: Colors.black,
+              onChanged: (newValue) {
+                setState(() {
+                  _value = newValue.round();
+                  _setMaxCalories(newValue.round());
+                });
+              },
+              label: 'Max Calories: $_value',
+            ),
+            MultiSelect(
+              autovalidate: false,
+              titleText: 'Select Cuisine',
+              validator: (value) {
+                if (value == null) {
+                  return 'Please select one or more option(s)';
+                } else {
+                  return '';
+                }
+              },
+              errorText: 'Please select only one option:',
+              dataSource: cuisines,
+              textField: 'display',
+              valueField: 'value',
+              filterable: true,
+              required: true,
+              value: cuisine,
+              onSaved: (value) {
+                print("The value is $value");
+                //_setCuisine(value);
+                //_onCuisineSelection(cuisine);
+              },
             ),
             Expanded(
               child: ListView.builder(
@@ -285,37 +302,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (context, index) {
                   return new Container(
                       child: new ListTile(
-                          title: new Text('${items[index]}'),
+                        title: new Text('${items[index]}'),
                         trailing: Icon(Icons.add_circle),
                         onTap: () {
-                            _addIngredientQuery('${items[index]}');
-                      showDialog(context: context, child:
-                      new AlertDialog(
-                        title: new Text("Ingredient Added:"),
-                        content: new Text("${items[index]}"),
-                      )
-                      );
-                    },
+                          _addIngredientQuery('${items[index]}');
+                          showDialog(
+                              context: context,
+                              child: new AlertDialog(
+                                title: new Text("Ingredient Added:"),
+                                content: new Text("${items[index]}"),
+                              ));
+                        },
                       ),
-                      decoration:
-                      new BoxDecoration(
-                          border: new Border(
-                              bottom: new BorderSide()
-                          )
-                      )
-                  );
+                      decoration: new BoxDecoration(
+                          border: new Border(bottom: new BorderSide())));
                 },
               ),
             ),
-              Container(
-                padding: const EdgeInsets.all(20),
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
+            Container(
+              padding: const EdgeInsets.all(20),
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
                 backgroundColor: Colors.redAccent,
                 child: Icon(Icons.navigate_next),
                 elevation: 0,
-                onPressed: ()  {
-                   editingController.clear();
+                onPressed: () {
+                  editingController.clear();
                   _routeRecipePage(context);
                 },
               ),
@@ -324,19 +336,19 @@ class _MyHomePageState extends State<MyHomePage> {
 //            ),
           ],
         ),
-
       ),
     );
   }
+
   void _onCuisineSelection(String cuisine) {
     cusineToSend.add(cuisine);
     print('CUISINE BEING RETURNED');
-    for (int i =0; i < cusineToSend.length; i++) {
+    for (int i = 0; i < cusineToSend.length; i++) {
       print(cusineToSend[i]);
     }
     print('FINAL CUISINE');
   }
-  
+
   void _onSearchButtonPressed(String keyWord) {
     print(keyWord);
 //    wordsToSend.add(keyWord);
@@ -346,4 +358,6 @@ class _MyHomePageState extends State<MyHomePage> {
 //    }
 //    print('FINAL LIST');
   }
+
+
 }
