@@ -5,6 +5,8 @@ import 'package:cookmate/inspirationPage.dart';
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/homePage.dart';
 
+import 'cookbook.dart';
+
 
 void main(){
   runApp(MaterialApp(
@@ -24,6 +26,10 @@ class HomePageState extends State<HomePage> {
   String _authToken ="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
   int id = 6;
   BackendRequest br = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+  Recipe recipe1 = new Recipe(
+      716429,
+      "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+      "https://spoonacular.com/recipeImages/716429-312x231.jpg");
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +46,7 @@ class HomePageState extends State<HomePage> {
                 title: Text("Calendar"),
                 onTap: (){
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyCalendar( )));
+                      MaterialPageRoute(builder: (context) => new MyCalendar( recipe: recipe1,)));
                 },
               ),
               ListTile(

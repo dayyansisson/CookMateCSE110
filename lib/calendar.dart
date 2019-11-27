@@ -88,28 +88,28 @@ class Calendar extends State<MyCalendar> {
                 onDaySelected: (date, events) {
                   //print("A ${widget.recipe.title}");
                     if (widget.recipe != null && add){
-
-                      dayML.add(new Meal(12231, widget.recipe, new Date(date.year, date.month, date.day)));
+                      /*setState(() {
+                        dayML.add(new Meal(12231, widget.recipe, new Date(date.year, date.month, date.day)));
+                      });*/
                       backendRequest.addMealToCalendar(widget.recipe, new Date(date.year, date.month, date.day)).then((meal){
-                        setState(() {
-                          ml.clear();
                           backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-                            for (int i = 0; i < list.length; i++) {
-                              Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
-                              ml.add(m);
-                            }
-                            add = false;
-                            this.dayML.clear();
-                            selectedDayString =
-                            "${date.year}-${date.month}-${date.day}";
-                            for (Meal meal in ml) {
-                              if (meal.date.getDate.compareTo(selectedDayString) == 0) {
-                                this.dayML.add(meal);
+                            setState(() {
+                              ml.clear();
+                              for (int i = 0; i < list.length; i++) {
+                                Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
+                                ml.add(m);
                               }
-                            }
-                            addToCalendar = null;
+                              add = false;
+                              this.dayML.clear();
+                              selectedDayString =
+                              "${date.year}-${date.month}-${date.day}";
+                              for (Meal meal in ml) {
+                                if (meal.date.getDate.compareTo(selectedDayString) == 0) {
+                                  this.dayML.add(meal);
+                                }
+                              }
+                            });
                           });
-                        });
                       });
                     }
                     else {
