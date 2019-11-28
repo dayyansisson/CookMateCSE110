@@ -1,3 +1,4 @@
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
 /* Class: Recipe
@@ -123,7 +124,7 @@ class Recipe {
  * Description: Ingredient object containing its name, and id.
  */
 class Ingredient {
-  
+
   int id;
   String name;
   double quantity;
@@ -164,7 +165,7 @@ class Diet {
   Diet ({int id, String name, String summary}) : this.id = id, this.name = name, this.summary = summary;
 
   Diet.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     name = json['name'];
     summary = json['summary'];
