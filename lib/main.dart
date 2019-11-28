@@ -1,11 +1,10 @@
 import 'package:cookmate/util/backendRequest.dart';
 //import 'package:cookmate/search.dart';
 import 'package:flutter/material.dart';
-import 'package:cookmate/inspirationPage.dart';
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/homePage.dart';
 
-import 'cookbook.dart';
+import 'cookbook.dart' as cb;
 
 
 void main(){
@@ -26,10 +25,11 @@ class HomePageState extends State<HomePage> {
   String _authToken ="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
   int id = 6;
   BackendRequest br = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
-  Recipe recipe1 = new Recipe(
-      716429,
-      "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-      "https://spoonacular.com/recipeImages/716429-312x231.jpg");
+  cb.Recipe recipe1 = new cb.Recipe(716429);
+  // Recipe recipe1 = new Recipe(
+  //     716429,
+  //     "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+  //     "https://spoonacular.com/recipeImages/716429-312x231.jpg");
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +47,6 @@ class HomePageState extends State<HomePage> {
                 onTap: (){
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => new MyCalendar( recipe: recipe1,)));
-                },
-              ),
-              ListTile(
-                title: Text("Inspiration"),
-                onTap: (){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Inspiration(authToken: this._authToken, id: this.id,)));
                 },
               ),
               ListTile(

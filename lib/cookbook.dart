@@ -15,11 +15,14 @@ class Recipe {
   String imageURL;
   int servings;
   int cookTime;
+  double price;
+  double calories; 
+  int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id, String name, String url ) : this.id = id, _complete = false;
+  Recipe(int id) : this.id = id, _complete = false;
   Recipe.forCalendar(Map<String, dynamic> json) {
-
+    
     id = json['id'];
     apiID = json['api_id'];
     title = json['name'];
@@ -29,21 +32,92 @@ class Recipe {
 
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
+    apiID = json['id'];
+    title = json['title'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
+    servings = json['servings'];
+    cookTime = json['readyInMinutes'];
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
+    _complete = true;
+  }
+
+  Recipe.forPopularList(Map<String, dynamic> json) {
+
     id = json['id'];
     apiID = json['api_id'];
-    title = json['title'];
+    title = json['name'];
     imageURL = json['url'];
-    servings = json['servings'];
-    cookTime = json['cookTime'];
-    _complete = true;
+    popularity = json['popular_count'];
+    _complete = false;
+  }
+
+  //Returns all the ingredients for a given recipe
+  List<Ingredient> getIngredients(){
+    List<Ingredient> ingredients = new List<Ingredient>();
+
+    List<dynamic> ingredientList = json["extendedIngredients"];
+    
+    
+    
+    for(int i =0; i < ingredientList.length; i++){
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      ingredients.add(ing);
+    }
+    //print(ingredients.toString());
+    return ingredients;
+  }
+
+  //Returns the instructions in a list
+  List<String> getInstructions(){
+    List<String> instructions = new List<String>();
+
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
+
+    var instructionList = json["analyzedInstructions"][0][
+      "steps"];
+    
+    for(Map<String,dynamic> step in instructionList){
+      instructions.add(step["step"]);
+    }
+
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
   Map<String, dynamic> get json => _json;
   bool get isComplete => _complete;
 
-// TODO: Implement toString()
-
+  @override
+  String toString() => """\n
+      $title
+      ----------------------------
+      id:         $id
+      api:        $apiID
+      image:      $imageURL
+      servings:   $servings
+      cook time:  $cookTime
+      price:      $price 
+      calories:   $calories
+      popularity: $popularity
+      hasJson:    $_complete
+    """;
 }
 
 /* Class: Ingredient
@@ -53,12 +127,30 @@ class Ingredient {
 
   int id;
   String name;
+  double quantity;
+  String units;
 
-  Ingredient.fromJSON(Map<String, dynamic> json) {
-
-    id = json['id'];
-    name = json['name'];
+  Ingredient(int id, String name, double quantity, String units){
+    this.id = id;
+    this.name = name;
+    this.quantity = quantity;
+    this.units = units;
   }
+  
+
+  Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
+}
+
+/* Class: Cuisine
+ * Description: Cuisine object containing its name, and id.
+ */
+class Cuisine {
+  
+  final int id;
+  final String name;
+
+
+  Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
 
 /* Class: Diet
@@ -70,11 +162,19 @@ class Diet {
   String name;
   String summary;
 
+  Diet ({int id, String name, String summary}) : this.id = id, this.name = name, this.summary = summary;
+
   Diet.fromJSON(Map<String, dynamic> json) {
 
     id = json['id'];
     name = json['name'];
     summary = json['summary'];
+  }
+
+  Diet.forUP(Map<String, dynamic> json) {
+
+    id = json['id'];
+    name = json['name'];
   }
 }
 
@@ -84,19 +184,20 @@ class Diet {
 class UserProfile {
 
   int id;
-  Map<String, dynamic> diet;
+  Diet diet;
   List<Map<String, dynamic>> allergens;
+  List<Map<String, dynamic>> favorites;
 
-  UserProfile(int id, Map<String, dynamic> diet, List<Map<String, dynamic>> allergens) : this.allergens = allergens, this.diet = diet, this.id = id;
+  UserProfile({ int id, Diet diet, List<Map<String, dynamic>> allergens, List<Map<String, dynamic>> favorites }) : this.allergens = allergens, this.diet = diet, this.id = id;
   UserProfile.fromJSON(Map<String, dynamic> json) {
-
+    
     id = json['id'];
     var diet = json['diet'];
     if(diet != null)
     {
-      this.diet = diet;
+      this.diet = Diet.forUP(diet);
     } else {
-      this.diet = Map<String, dynamic>();
+      this.diet = null;
     }
     var allergens = json['allergens'];
     if(allergens != null)
@@ -105,6 +206,23 @@ class UserProfile {
     } else {
       this.allergens = List<Map<String, dynamic>>();
     }
+    var favorites = json['favorites'];
+    if(favorites != null)
+    {
+      this.favorites = List<Map<String, dynamic>>.from(favorites);
+    } else {
+      this.favorites = List<Map<String, dynamic>>();
+    }
+  }
+
+  String allergenList () {
+
+    String list = "";
+    for(Map<String, dynamic> allergen in allergens) {
+      list += "${allergen['name']}, ";
+    }
+
+    return list.substring(0, list.length - 2);
   }
 
   @override String toString() {
@@ -116,6 +234,11 @@ class UserProfile {
     {
       string += "(${allergens[i]["name"]}, ${allergens[i]["id"]}), ";
     }
+    string += "\nFavorites: ";
+    for(int i = 0; i < favorites.length; i++)
+    {
+      string += "(${favorites[i]["name"]}, ${favorites[i]["api_id"]}), ";
+    }
     return string;
   }
 }
@@ -124,10 +247,10 @@ class Date {
 
   final int _year, _month, _day;
   Date(int year, int month, int day) : _year = year, _month = month, _day = day;
-  Date.fromJSON(String json) :
-        _year = int.tryParse(json.substring(0, 4)),
-        _month = int.tryParse(json.substring(5, 7)),
-        _day = int.tryParse(json.substring(8, 10));
+  Date.fromJSON(String json) : 
+    _year = int.tryParse(json.substring(0, 4)),
+    _month = int.tryParse(json.substring(5, 7)),
+    _day = int.tryParse(json.substring(8, 10));
 
   String get getDate => "$_year-$_month-$_day";
   @override String toString() => getDate;

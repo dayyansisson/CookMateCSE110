@@ -1,11 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalStorage {
+class LocStorage {
 
   /* Method: storeAuthToken
    * Arg(s):
    *    - authToken: The auth token associated with a user after login
-   *
+   * 
    * Return: n/a
    */
   static void storeAuthToken (String authToken) async {
@@ -16,7 +16,7 @@ class LocalStorage {
 
   /* Method: getAuthToken
    * Arg(s): n/a
-   *
+   * 
    * Return:
    *  - success: The locally stored auth token
    *  - failure: "-1"
@@ -40,7 +40,7 @@ class LocalStorage {
   /* Method: storeUserID
    * Arg(s):
    *    - userID: The ID of the user
-   *
+   * 
    * Return: n/a
    */
   static void storeUserID (int userID) async {
@@ -51,7 +51,7 @@ class LocalStorage {
 
   /* Method: getUserID
    * Arg(s): n/a
-   *
+   * 
    * Return:
    *  - success: The locally stored user ID
    *  - failure: "-1"
@@ -75,7 +75,7 @@ class LocalStorage {
   /* Method: storeDiet
    * Arg(s):
    *    - diet: The diet set by the user
-   *
+   * 
    * Return: n/a
    */
   static void storeDiet (String diet) async {
@@ -85,7 +85,7 @@ class LocalStorage {
 
   /* Method: getDiet
    * Arg(s): n/a
-   *
+   * 
    * Return:
    *  - success: The locally stored diet
    *  - failure: "-1"

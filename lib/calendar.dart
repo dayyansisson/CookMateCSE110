@@ -167,14 +167,12 @@ class Calendar extends State<MyCalendar> {
               ListTile(
                 title: Text("Add Meals"),
                 onTap: () {
-                  Recipe recipe1 = new Recipe(
-                      716429,
-                      "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-                      "https://spoonacular.com/recipeImages/716429-312x231.jpg");
-                  Recipe recipe2 = new Recipe(73420, "Apple Or Peach Strudel",
-                      "https://spoonacular.com/recipeImages/73420-312x231.jpg");
-                  Recipe recipe3 = new Recipe(73420, "Apple Or Peach Strudel",
-                      "https://spoonacular.com/recipeImages/73420-312x231.jpg");
+                  Recipe recipe1 = new Recipe(716429);
+                  recipe1.title = "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
+                  recipe1.imageURL = "https://spoonacular.com/recipeImages/716429-312x231.jpg";
+                  Recipe recipe2 = new Recipe(73420);
+                  recipe2.title = "Apple Or Peach Strudel";
+                  recipe2.imageURL = "https://spoonacular.com/recipeImages/73420-312x231.jpg";
                   DateTime dt1 = start.add(new Duration(days: 1));
                   DateTime dt2 = start.add(new Duration(days: 2));
                   DateTime dt3 = start.add(new Duration(days: 3));
@@ -184,11 +182,9 @@ class Calendar extends State<MyCalendar> {
 
                   backendRequest.addMealToCalendar(recipe1, d1).then((meal){
                     backendRequest.addMealToCalendar(recipe2, d2).then((meal){
-                      backendRequest.addMealToCalendar(recipe3, d3).then((meal){
-                        setState(() {
+                      setState(() {
                           ml.add(new Meal(recipe1.id, recipe1, d1));
                           ml.add(new Meal(recipe2.id, recipe2, d2));
-                          ml.add(new Meal(recipe3.id, recipe3, d3));
                           backendRequest.getMeals(startDate: st, endDate: en).then((list) {
                             ml.clear();
                             dayML.clear();
@@ -198,7 +194,6 @@ class Calendar extends State<MyCalendar> {
                             }
                           });
                         });
-                      });
                     });
                   });
                 },
