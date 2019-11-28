@@ -1,9 +1,19 @@
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/searchResultPage.dart';
+import 'package:cookmate/shoppingListPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/database_helpers.dart';
+import 'package:flutter/material.dart';
 
-void main() {
+main() {
 
-  UserProfile profile = UserProfile(
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+
+  final UserProfile profile = UserProfile(
       id: -1,
       diet: Diet(
           id: 3,
@@ -29,12 +39,15 @@ void main() {
       ]
   );
 
-  BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
-//  request.recipeSearch().then(
-//    (recipes) {
-//      for(Recipe recipe in recipes) {
-//        print(recipe.toString());
-//      }
-//    }
-//  );
+  @override
+  Widget build(BuildContext context) {
+
+    BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
+
+    return MaterialApp(
+      theme: CookmateStyle.theme,
+      home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+      //home: ShoppingListPage(),
+    );
+  }
 }
