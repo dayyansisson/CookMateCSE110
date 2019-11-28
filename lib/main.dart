@@ -1,92 +1,54 @@
+import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/searchResultPage.dart';
+import 'package:cookmate/shoppingListPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
-//import 'package:cookmate/search.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:cookmate/calendar.dart';
-import 'package:cookmate/homePage.dart';
 
-import 'cookbook.dart' as cb;
-
-
-void main(){
-  runApp(MaterialApp(
-    title: 'Home',
-    home: HomePage(),
-  ));
+main() {
+  
+  runApp(MyApp());
 }
-class HomePage extends StatefulWidget{
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return HomePageState();
-  }
 
-}
-class HomePageState extends State<HomePage> {
-  String _authToken ="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
-  int id = 6;
-  BackendRequest br = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
-  cb.Recipe recipe1 = new cb.Recipe(716429);
-  // Recipe recipe1 = new Recipe(
-  //     716429,
-  //     "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-  //     "https://spoonacular.com/recipeImages/716429-312x231.jpg");
+class MyApp extends StatelessWidget {
+
+  final UserProfile profile = UserProfile(
+    id: -1, 
+    diet: Diet(
+      id: 3, 
+      name: "gluten free"
+    ),
+    allergens: [
+      // {
+      //   "id": 1,
+      //   "name": "Dairy"
+      // },
+      {
+        "id": 8,
+        "name": "Shellfish"
+      },
+    ],
+    favorites: [
+      {
+        "id": 1,
+        "api_id": 716429,
+        "name": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+        "url": "https://spoonacular.com/recipeImages/716429-312x231.jpg"
+      }
+    ]
+  );
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-        backgroundColor: Colors.lightBlue,
-      ),
-      body: Container(
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                title: Text("Calendar"),
-                onTap: (){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => new MyCalendar( recipe: recipe1,)));
-                },
-              ),
-              ListTile(
-                title: Text("Create User"),
-                onTap: (){
-                  setState(() {
-                   /* br.createUser("Hatef.nabili@gmail.com", "hatef88" , "G0lPe3ar").then((id){
-                      this.id = id;
-                      print("id: " + this.id.toString());
-                    });*/
-                  });
-                },
-              ),
-              ListTile(
-                title: Text("Log in"),
-                onTap: (){
-                  setState(() {
-                      BackendRequest.login("hatef88", "G0lPe3ar").then((_authToken){
-                      this._authToken = _authToken;
-                      this.br = new BackendRequest(this._authToken, id);
-                      print("Token: " + _authToken);
-                    });
-                  });
-                },
-              ),
+    
+    BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
 
-              /*ListTile(
-                title: Text("Search"),
-                onTap: (){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()));
-                },
-              )*/
-
-
-
-            ],
-          )
-      )
-
+    return MaterialApp(
+      theme: CookmateStyle.theme,
+      home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+      //home: ShoppingListPage(),
     );
   }
+
 }

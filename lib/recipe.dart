@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/cupertino.dart';
@@ -121,7 +122,12 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                 backgroundColor: Colors.redAccent,
                 label: 'Add to Calendar',
                 labelStyle: TextStyle(fontSize: 18.0),
-                onTap: () => print('SECOND CHILD'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => new MyCalendar(recipe: pageRecipe))
+                  );
+                },
               ),
             ],
           ),
