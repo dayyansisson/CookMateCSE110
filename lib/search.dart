@@ -1,3 +1,6 @@
+/*
+ * Coders: Rayhan, Luis
+ */
 import 'dart:convert';
 import 'dart:developer' as logger;
 import 'package:cookmate/scanner.dart';
