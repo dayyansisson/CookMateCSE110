@@ -152,8 +152,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.star_border),
-                padding:
-                    EdgeInsets.symmetric(horizontal: 10.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
                 color: isPressedFave(),
                 iconSize: 35.0,
                 onPressed: () {

@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       theme: CookmateStyle.theme,
-      home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-      //home: ShoppingListPage(),
+      //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 0)),
+      home: ShoppingListPage(),
     );
   }
 }
