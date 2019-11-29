@@ -68,7 +68,27 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
     List<Widget> items = List<Widget>();
     for(DB.ShoppingList item in list) {
-      // TODO: Create shopping list items
+      Widget shoppingItem = Row (
+        children: <Widget>[
+          Checkbox(
+            value: item.purchased,
+            activeColor: CookmateStyle.standardRed,
+            checkColor: Colors.white,
+            onChanged: (newValue) {
+              setState(() {
+                item.purchased = newValue;
+              });
+            },
+          ),
+          Text(
+            item.quantity.toString() + item.measurement
+          ),
+          Text(
+            item.ingredient
+          ),
+        ],
+      );
+      items.add(shoppingItem);
     }
 
     return ListView(children: items);
