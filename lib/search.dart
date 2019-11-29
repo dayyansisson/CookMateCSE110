@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer' as logger;
-
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +7,6 @@ import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/cookbook.dart' as CB;
 import 'dart:async';
 import 'package:cookmate/util/database_helpers.dart' as DB;
-import 'package:cookmate/util/localStorage.dart';
-import 'package:cookmate/main.dart';
-import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:cookmate/searchResultPage.dart';
 
 void main() => runApp(new MyApp());
@@ -18,6 +14,7 @@ void main() => runApp(new MyApp());
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   Future<List<String>> list;
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -32,7 +29,9 @@ class MyApp extends StatelessWidget {
 
 class SearchPage extends StatefulWidget {
   final Future<List<String>> ingredientsBC;
+
   SearchPage(Future<List<String>> ingredients) : ingredientsBC = ingredients;
+
   @override
   _SearchPageState createState() => new _SearchPageState();
 }
@@ -41,6 +40,7 @@ class _SearchPageState extends State<SearchPage> {
   ScanButtonState scanButt = new ScanButtonState();
   TextEditingController editingController = TextEditingController();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
   // User Data
   String token;
   int userID;
@@ -54,6 +54,7 @@ class _SearchPageState extends State<SearchPage> {
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
   List<DropdownMenuItem<String>> dropDownCuisines = [];
+
   // Queries for recipe search
   List<String> ingredientQuery = null;
   int maxCalories = null;
@@ -63,11 +64,11 @@ class _SearchPageState extends State<SearchPage> {
   // Recipe List results
   List<CB.Recipe> recipes = List<CB.Recipe>();
   Future<List<CB.Recipe>> recipesResult;
+
 //**********Rayhan Code **********//
   int _value = 2100;
-  List cuisine = [];
-//********************************//
 
+//********************************//
 
   @override
   void initState() {
@@ -85,23 +86,25 @@ class _SearchPageState extends State<SearchPage> {
     ingredientQuery;
     _addAllIngredients();
     _getDiets();
-   // _getCuisines();
+    // _getCuisines();
     _getIngredients();
   }
 
   _recipeSearch() async {
-      recipesResult = request.recipeSearch(cuisine: cuisineQuery, maxCalories: maxCalories,
-          ingredients: ingredientQuery);
+    recipesResult = request.recipeSearch(
+        cuisine: cuisineQuery,
+        maxCalories: maxCalories,
+        ingredients: ingredientQuery);
   }
 
   _routeRecipePage(BuildContext context) async {
     _recipeSearch();
-    if(recipesResult != null) {
+    if (recipesResult != null) {
       print(recipesResult);
       final result = await Navigator.push(
-          context, MaterialPageRoute(
-          builder: (context) => SearchResultPage(recipesResult)
-      ));
+          context,
+          MaterialPageRoute(
+              builder: (context) => SearchResultPage(recipesResult)));
     }
     _clearQueries();
   }
@@ -114,11 +117,10 @@ class _SearchPageState extends State<SearchPage> {
     maxCalories = _value;
   }
 
-   _getCuisines() async {
+  _getCuisines() async {
     request.getCuisineList().then((cuisineList) {
       for (int i = 0; i < cuisineList.length; i++) {
         cuisines.add(cuisineList[i].name);
-
       }
     });
   }
@@ -136,11 +138,10 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _getIngredients() async {
-
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
-    List<String>  ingredients;
-    helper.ingredients().then((list){
-      for(int i  = 0; i < list.length; i++){
+    List<String> ingredients;
+    helper.ingredients().then((list) {
+      for (int i = 0; i < list.length; i++) {
         duplicateItems.add(list[i].name);
       }
     });
@@ -175,30 +176,25 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _setCuisine(String cuisine) {
-    if(cuisine != null) cuisineQuery = cuisine;
+    if (cuisine != null) cuisineQuery = cuisine;
     print(cuisine);
   }
 
   _addIngredientQuery(String ingredient) {
     print(ingredient);
-    if(ingredientQuery == null) ingredientQuery = new List<String>();
-    if(ingredient != null) {
+    if (ingredientQuery == null) ingredientQuery = new List<String>();
+    if (ingredient != null) {
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
   }
-  _getIngredientBarCode(List<String> ingredients){
-    if(ingredientQuery == null) ingredientQuery = new List<String>();
-    if(ingredientQuery != null){
+
+  _getIngredientBarCode(List<String> ingredients) {
+    if (ingredientQuery == null) ingredientQuery = new List<String>();
+    if (ingredientQuery != null) {
       ingredientQuery.addAll(ingredients);
     }
   }
-
-
-//************Rayhan Code**********************//
-  List<String> wordsToSend = List<String>();
-  List<String> cusineToSend = List<String>();
-//**********************************************//
 
 
   void filterSearchResults(String query) {
@@ -221,28 +217,26 @@ class _SearchPageState extends State<SearchPage> {
     } else {
       setState(() {
         items.clear();
-        //items.add('No Items Match Inputted Ingredient');
-        //items.addAll(duplicateItems);
       });
     }
   }
 
-  DropdownButton<String> cuisineButton(List<CB.Cuisine> data){
+  DropdownButton<String> cuisineButton(List<CB.Cuisine> data) {
     List<String> cuisines = new List<String>();
-    for(int i = 0; i < data.length; i++){
+    for (int i = 0; i < data.length; i++) {
       cuisines.add(data[i].name);
     }
     return DropdownButton<String>(
       hint: Text("Cuisines"),
-      onChanged: (value){
-        setState((){
+      onChanged: (value) {
+        setState(() {
           _setCuisine(value);
         });
       },
       isExpanded: true,
       iconSize: 35,
       value: cuisineQuery,
-      items: cuisines.map<DropdownMenuItem<String>>((String value){
+      items: cuisines.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -303,51 +297,49 @@ class _SearchPageState extends State<SearchPage> {
 
             FutureBuilder(
                 future: _loadCusines(),
-                builder: (context,
-                          snapshot){
-                  if(!snapshot.hasData) return CircularProgressIndicator();
-                  switch(snapshot.connectionState){
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Text("Loading cuisines");
                     case ConnectionState.done:
                       return cuisineButton(snapshot.data);
-                      default:
-                        return Text("Error");
+                    default:
+                      return Text("Error");
                   }
-                }
-              ),
+                }),
             Expanded(
-            child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-            return new Container(
-            child: new ListTile(
-            title: new Text('${items[index]}'),
-            trailing: Icon(Icons.add_circle),
-            onTap: () {
-            _addIngredientQuery('${items[index]}');
-            showDialog(
-            context: context,
-            child: new AlertDialog(
-            title: new Text("Ingredient Added:"),
-            content: new Text("${items[index]}"),
-            ));
-            },
-            ),
-            decoration: new BoxDecoration(
-            border: new Border(bottom: new BorderSide())));
-            },
-            ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return new Container(
+                      child: new ListTile(
+                        title: new Text('${items[index]}'),
+                        trailing: Icon(Icons.add_circle),
+                        onTap: () {
+                          _addIngredientQuery('${items[index]}');
+                          showDialog(
+                              context: context,
+                              child: new AlertDialog(
+                                title: new Text("Ingredient Added:"),
+                                content: new Text("${items[index]}"),
+                              ));
+                        },
+                      ),
+                      decoration: new BoxDecoration(
+                          border: new Border(bottom: new BorderSide())));
+                },
+              ),
             ),
             Container(
-            padding: const EdgeInsets.all(20),
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-            backgroundColor: Colors.redAccent,
-            child: Icon(Icons.navigate_next),
-            elevation: 0,
-            onPressed: () {
+              padding: const EdgeInsets.all(20),
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                backgroundColor: Colors.redAccent,
+                child: Icon(Icons.navigate_next),
+                elevation: 0,
+                onPressed: () {
                   editingController.clear();
                   _routeRecipePage(context);
                 },
