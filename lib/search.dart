@@ -52,7 +52,8 @@ class _SearchPageState extends State<SearchPage> {
   var items = List<String>();
   List<String> duplicateItems = new List<String>();
   List<String> diets = new List<String>();
-  final cuisines = [];
+  List<String> cuisines = new List<String>();
+  List<DropdownMenuItem<String>> dropDownCuisines = [];
   // Queries for recipe search
   List<String> ingredientQuery = null;
   int maxCalories = null;
@@ -77,13 +78,14 @@ class _SearchPageState extends State<SearchPage> {
   _initData() async {
     //token = await LocalStorage.getAuthToken();
     //userID = await LocalStorage.getUserID();
+
     token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
     userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
     _getDiets();
-    _getCuisines();
+   // _getCuisines();
     _getIngredients();
   }
 
@@ -112,13 +114,17 @@ class _SearchPageState extends State<SearchPage> {
     maxCalories = _value;
   }
 
-  _getCuisines() async {
+   _getCuisines() async {
     request.getCuisineList().then((cuisineList) {
       for (int i = 0; i < cuisineList.length; i++) {
-        final cuisine = {"display": cuisineList[i].name, "value": i};
-        cuisines.add(cuisine);
+        cuisines.add(cuisineList[i].name);
+
       }
     });
+  }
+
+  Future<List<CB.Cuisine>> _loadCusines() async {
+    return request.getCuisineList();
   }
 
   _getDiets() async {
@@ -168,8 +174,8 @@ class _SearchPageState extends State<SearchPage> {
     print("MaxCalories: " + maxCalories.toString());
   }
 
-  _setCuisine() {
-//    if(cuisine != null) cuisineQuery = cuisine;
+  _setCuisine(String cuisine) {
+    if(cuisine != null) cuisineQuery = cuisine;
     print(cuisine);
   }
 
@@ -221,6 +227,30 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
+  DropdownButton<String> cuisineButton(List<CB.Cuisine> data){
+    List<String> cuisines = new List<String>();
+    for(int i = 0; i < data.length; i++){
+      cuisines.add(data[i].name);
+    }
+    return DropdownButton<String>(
+      hint: Text("Cuisines"),
+      onChanged: (value){
+        setState((){
+          _setCuisine(value);
+        });
+      },
+      isExpanded: true,
+      iconSize: 35,
+      value: cuisineQuery,
+      items: cuisines.map<DropdownMenuItem<String>>((String value){
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -270,61 +300,54 @@ class _SearchPageState extends State<SearchPage> {
               },
               label: 'Max Calories: $_value',
             ),
-            MultiSelect(
-              autovalidate: false,
-              titleText: 'Select Cuisine',
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select one or more option(s)';
-                } else {
-                  return '';
+
+            FutureBuilder(
+                future: _loadCusines(),
+                builder: (context,
+                          snapshot){
+                  if(!snapshot.hasData) return CircularProgressIndicator();
+                  switch(snapshot.connectionState){
+                    case ConnectionState.waiting:
+                      return Text("Loading cuisines");
+                    case ConnectionState.done:
+                      return cuisineButton(snapshot.data);
+                      default:
+                        return Text("Error");
+                  }
                 }
-              },
-              errorText: 'Please select only one option:',
-              dataSource: cuisines,
-              textField: 'display',
-              valueField: 'value',
-              filterable: true,
-              required: true,
-              value: cuisine,
-              onSaved: (value) {
-                print("The value is $value");
-                //_setCuisine(value);
-                //_onCuisineSelection(cuisine);
-              },
-            ),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  return new Container(
-                      child: new ListTile(
-                        title: new Text('${items[index]}'),
-                        trailing: Icon(Icons.add_circle),
-                        onTap: () {
-                          _addIngredientQuery('${items[index]}');
-                          showDialog(
-                              context: context,
-                              child: new AlertDialog(
-                                title: new Text("Ingredient Added:"),
-                                content: new Text("${items[index]}"),
-                              ));
-                        },
-                      ),
-                      decoration: new BoxDecoration(
-                          border: new Border(bottom: new BorderSide())));
-                },
               ),
+            Expanded(
+            child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+            return new Container(
+            child: new ListTile(
+            title: new Text('${items[index]}'),
+            trailing: Icon(Icons.add_circle),
+            onTap: () {
+            _addIngredientQuery('${items[index]}');
+            showDialog(
+            context: context,
+            child: new AlertDialog(
+            title: new Text("Ingredient Added:"),
+            content: new Text("${items[index]}"),
+            ));
+            },
+            ),
+            decoration: new BoxDecoration(
+            border: new Border(bottom: new BorderSide())));
+            },
+            ),
             ),
             Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.navigate_next),
-                elevation: 0,
-                onPressed: () {
+            padding: const EdgeInsets.all(20),
+            alignment: Alignment.bottomRight,
+            child: FloatingActionButton(
+            backgroundColor: Colors.redAccent,
+            child: Icon(Icons.navigate_next),
+            elevation: 0,
+            onPressed: () {
                   editingController.clear();
                   _routeRecipePage(context);
                 },

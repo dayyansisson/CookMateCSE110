@@ -48,10 +48,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.7"
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a2d9fa8fcb6ba1984e63a2482024a11f76123b1e
   flutter_multiselect:
     dependency: "direct main"
     description:
@@ -66,10 +62,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.4"
-<<<<<<< HEAD
-=======
->>>>>>> 82b1ea999537fbca0849561fdcd3e3259dd63d33
->>>>>>> a2d9fa8fcb6ba1984e63a2482024a11f76123b1e
   flutter_test:
     dependency: "direct dev"
     description: flutter
