@@ -9,7 +9,7 @@ class Recipe {
 
   bool _complete;
 
-  int id;
+  //int id;
   int apiID;
   String title;
   String imageURL;
@@ -20,10 +20,10 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.id = id, _complete = false;
+  Recipe(int apiId) : this.apiID = apiId, _complete = false;
   Recipe.forCalendar(Map<String, dynamic> json) {
     
-    id = json['id'];
+    //id = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -56,7 +56,7 @@ class Recipe {
 
   Recipe.forPopularList(Map<String, dynamic> json) {
 
-    id = json['id'];
+    //id = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -108,7 +108,6 @@ class Recipe {
   String toString() => """\n
       $title
       ----------------------------
-      id:         $id
       api:        $apiID
       image:      $imageURL
       servings:   $servings

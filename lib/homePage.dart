@@ -1,3 +1,5 @@
+import 'package:cookmate/calendar.dart';
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
 import 'Wave_clipper.dart';
@@ -21,6 +23,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _authToken; //="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
+  int id; //= 6;
+  BackendRequest br;// = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+  _MyHomePageState(){
+    this.id = 6;
+    BackendRequest.login("hatef88", "G0lPe3ar").then((_authToken) {
+      this._authToken = _authToken;
+      this.br = new BackendRequest(this._authToken, id);
+      print("Token: " + _authToken);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,11 +62,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Row(
                   children: <Widget>[
                     IconButton(
-                      icon: Icon(Icons.home),
+                      icon: Icon(Icons.calendar_today),
                       color: Colors.white,
                       iconSize: 50.0,
                       onPressed: () {
                         print('pressed');
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => MyCalendar()));
                       },
                     ),
                   ],
@@ -223,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     IconButton(
                       icon: Icon(Icons.calendar_today),
-                      color: Color(0xFFD50000),
+                      color: Color(0xFFF50000),
                       iconSize: 50.0,
                       onPressed: () {
                         print('Pressed');
