@@ -15,7 +15,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -31,10 +30,12 @@ class _LoginPageState extends State<LoginPage> {
       
       Future<String> potentialToken = BackendRequest.login(_username, _password);
       potentialToken.then((token) {
+
         LocStorage.storeAuthToken(token);
         _token = token;
         if( _token != null && _token != "Unable to log in with provided credentials.") { 
-          Future<int> userId = BackendRequest.getUser(_token);
+          BackendRequest backend = new BackendRequest(_token, null);
+          Future<int> userId = backend.getUser();
           userId.then((id) {
             LocStorage.storeUserID(id);
           });

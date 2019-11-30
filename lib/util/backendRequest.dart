@@ -13,7 +13,7 @@ class BackendRequest {
   static const String _FAIL_LOGIN = "Unable to log in with provided credentials.";
 
   final String _authToken;
-  final String _userID;
+  String _userID;
   UserProfile _userProfile;
   BackendRequest (String authToken, int userID, { UserProfile userProfile }) : _authToken = authToken, _userID = userID.toString(), _userProfile = userProfile;
 
@@ -83,6 +83,7 @@ class BackendRequest {
     }
 
     var data = jsonDecode(response.body);
+    _userID = data;
     print("User found, returning user ID ${data["id"]}");
     return data["id"];
   }
