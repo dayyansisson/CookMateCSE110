@@ -9,7 +9,6 @@ class Recipe {
 
   bool _complete;
 
-  int id;
   int apiID;
   String title;
   String imageURL;
@@ -20,10 +19,10 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.id = id, _complete = false;
+  Recipe(int id) : this.apiID = id, _complete = false;
   Recipe.forCalendar(Map<String, dynamic> json) {
     
-    id = json['id'];
+    apiID = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];

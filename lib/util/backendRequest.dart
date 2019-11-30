@@ -334,7 +334,7 @@ class BackendRequest {
    */
   Future<bool> addFavorite(Recipe recipe) async {
 
-    print("Adding recipe ${recipe.id} to favorites...");
+    print("Adding recipe ${recipe.apiID} to favorites...");
 
     // Make API call
     final response = await http.post(
@@ -817,7 +817,7 @@ class BackendRequest {
       headers: { "Authorization":"Token $_authToken" },
       body: {
         "user":"$_userID",
-        "recipe":recipe.id.toString(),
+        "recipe":recipe.apiID.toString(),
         "date":"${date.getDate}"
       }
     );
@@ -913,7 +913,7 @@ class BackendRequest {
   Future<bool> updateMealInCalendar (Meal meal, { Recipe newRecipe, Date newDate }) async {
 
     if(newRecipe != null) {
-      print("Changing meal ${meal.id} from ${meal.recipe.id} to ${newRecipe.id}");
+      print("Changing meal ${meal.id} from ${meal.recipe.apiID} to ${newRecipe.apiID}");
     }
 
     if(newDate != null) {
@@ -921,10 +921,10 @@ class BackendRequest {
     }
 
     String dateToPass = meal.date.getDate;
-    String recipeToPass = meal.recipe.id.toString();
+    String recipeToPass = meal.recipe.apiID.toString();
 
     if(newRecipe != null) {
-      recipeToPass = newRecipe.id.toString();
+      recipeToPass = newRecipe.apiID.toString();
     }
 
     if(newDate != null) {
