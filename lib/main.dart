@@ -1,15 +1,19 @@
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 //import 'package:cookmate/search.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/homePage.dart';
 
-import 'cookbook.dart' as cb;
+import 'cookbook.dart';
+
+//import 'cookbook.dart' as cb;
 
 
 void main(){
   runApp(MaterialApp(
     title: 'Home',
+    theme: CookmateStyle.theme,
     home: HomePage(),
   ));
 }
@@ -25,7 +29,12 @@ class HomePageState extends State<HomePage> {
   String _authToken ="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
   int id = 6;
   BackendRequest br = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
-  cb.Recipe recipe1 = new cb.Recipe(716429);
+  Recipe recipe1 = new Recipe(221886);
+  HomePageState(){
+    this.recipe1.title = "Red pepper, ham & cheese tart";
+    this.recipe1.imageURL = "https://spoonacular.com/recipeImages/221886-312x231.jpg";
+  }
+
   // Recipe recipe1 = new Recipe(
   //     716429,
   //     "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
@@ -46,7 +55,7 @@ class HomePageState extends State<HomePage> {
                 title: Text("Calendar"),
                 onTap: (){
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => new MyCalendar( recipe: recipe1,)));
+                      MaterialPageRoute(builder: (context) => MyCalendar()));
                 },
               ),
               ListTile(
