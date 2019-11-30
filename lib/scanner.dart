@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:developer' as logger;
 import 'package:cookmate/search.dart';
-
+import 'package:cookmate/util/localStorage.dart' as LS;
 
 import 'dialog.dart';
 
@@ -20,9 +20,16 @@ class ScanButtonState extends State<ScanButton> {
   String _scanBarcode = 'Unknown';
   String _itemName = 'Name';
   List<String> ingredientsForSearch;
+  int userID;
+  String token;
+
   BackendRequest be = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
 
   Future<List<String>> scanBarcodeNormal() async {
+//    userID = await LS.LocalStorage.getUserID();
+//    token = await LS.LocalStorage.getAuthToken();
+//    br = new BackendRequest(token, userID);
+
     String barcodeScanRes;
     List<String> ingredients;
 

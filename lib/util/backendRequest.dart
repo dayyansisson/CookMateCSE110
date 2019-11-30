@@ -791,6 +791,8 @@ class BackendRequest {
       recipes.add(Recipe.forPopularList(recipe));
     }
 
+    print("Return ${recipes.length} recipes!");
+
     return recipes;
   }
 

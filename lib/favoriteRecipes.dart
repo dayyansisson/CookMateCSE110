@@ -37,8 +37,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   colors: [ Color(0xFFB71C1C), Color(0xFFE53935),Color(0xFFD50000)],
                 ),
               ),
-
-
             ),
           ),
           Stack(

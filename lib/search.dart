@@ -75,11 +75,11 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    //token = await LocalStorage.getAuthToken();
-    //userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
 
-    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    userID = 2;
+//    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+//    userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
