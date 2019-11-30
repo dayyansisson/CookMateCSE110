@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart' as prefix0;
 import 'package:flutter/cupertino.dart';
@@ -21,6 +22,7 @@ class RecipeDisplay extends StatefulWidget {
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
   prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
+  BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
@@ -165,6 +167,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                 color: isPressedFave(),
                 iconSize: 35.0,
                 onPressed: () {
+                  helper.clearRecipes();
                   setState(() {
                     if (isPressed) {
                       isPressed = false;
@@ -172,6 +175,13 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                       isPressed = true;
                     }
                   });
+
+                  if(!isPressed){
+                    _addToFavorites();
+                  }
+                  else{
+                    _removeFromFavorites();
+                  }
                 },
               )
             ],
@@ -397,6 +407,26 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     print(await helper.shoppingListItems());
   }
 
+  _addToFavorites() async {
+    prefix0.Recipe fave = new prefix0.Recipe(
+      id: pageRecipe.apiID,
+      name: pageRecipe.title,
+      img: pageRecipe.imageURL
+    );
+
+    print(pageRecipe.toString());
+    backend.removeFavorite(pageRecipe.apiID);
+
+    backend.addFavorite(pageRecipe);
+
+    await helper.insertRecipe(fave);
+  }
+
+  _removeFromFavorites() async {
+    await helper.deleteRecipe(pageRecipe.apiID);
+    backend.removeFavorite(pageRecipe.apiID);
+  }
+
   // Widget unitsCheck(String units) {
   //   if (units != "") {
   //     return Flexible(
@@ -415,6 +445,8 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   // }
 
   Color isPressedFave() {
+
+
     if (this.isPressed) {
       return Colors.yellow;
     }
