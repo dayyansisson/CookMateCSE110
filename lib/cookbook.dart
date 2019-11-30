@@ -23,7 +23,7 @@ class Recipe {
   Recipe.forCalendar(Map<String, dynamic> json) {
     
     apiID = json['id'];
-    apiID = json['api_id'];
+    //apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
     _complete = false;
@@ -68,9 +68,7 @@ class Recipe {
     List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
-    
-    
-    
+
     for(int i =0; i < ingredientList.length; i++){
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
       ingredients.add(ing);

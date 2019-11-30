@@ -31,13 +31,13 @@ class _LoginPageState extends State<LoginPage> {
       Future<String> potentialToken = BackendRequest.login(_username, _password);
       potentialToken.then((token) {
 
-        LocStorage.storeAuthToken(token);
+        LocalStorage.storeAuthToken(token);
         _token = token;
         if( _token != null && _token != "Unable to log in with provided credentials.") { 
           BackendRequest backend = new BackendRequest(_token, null);
           Future<int> userId = backend.getUser();
           userId.then((id) {
-            LocStorage.storeUserID(id);
+            LocalStorage.storeUserID(id);
           });
           Navigator.push(
             context,

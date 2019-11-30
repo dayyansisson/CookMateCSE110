@@ -130,7 +130,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
     results.add(topBar);
     results.addAll(recipes);
-    
+
     return results;
   }
 

@@ -717,9 +717,7 @@ class BackendRequest {
     //"intolerances":_userProfile.allergenList(),
     final body = {
       "cuisine":cuisine,
-
       "maxCalories":maxCalories.toString(),
-
       "number":"10",
       "includeIngredients":ingredientList
     };

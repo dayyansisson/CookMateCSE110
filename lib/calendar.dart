@@ -43,9 +43,10 @@ class Calendar extends State<MyCalendar> {
 
   Calendar(Recipe recipe) {
     if (recipe != null){
-      this.addRecipe = new Recipe(recipe.apiID);
-      this.addRecipe.title = recipe.title;
-      this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";
+      this.addRecipe = recipe;
+      // this.addRecipe = new Recipe(recipe.apiID);
+      // this.addRecipe.title = recipe.title;
+      // this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";
       //this.addRecipe.image =
       //this.addRecipe.apiID = null;
     }

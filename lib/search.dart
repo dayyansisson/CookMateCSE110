@@ -1,20 +1,22 @@
+/*
+ * Coders: Rayhan, Luis
+ */
 import 'dart:convert';
 import 'dart:developer' as logger;
-
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/cookbook.dart' as CB;
 import 'dart:async';
-import 'package:cookmate/util/database_helpers.dart';
-import 'package:cookmate/util/localStorage.dart';
-import 'package:cookmate/main.dart';
-import 'package:flutter_multiselect/flutter_multiselect.dart';
+import 'package:cookmate/util/database_helpers.dart' as DB;
+import 'package:cookmate/searchResultPage.dart';
 
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -22,23 +24,21 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: new MyHomePage(title: 'NAVBAR SHOULD BE HERE'),
+      home: new SearchPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
+class SearchPage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _SearchPageState createState() => new _SearchPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SearchPageState extends State<SearchPage> {
   ScanButtonState scanButt = new ScanButtonState();
   TextEditingController editingController = TextEditingController();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
   // User Data
   String token;
   int userID;
@@ -50,7 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
   var items = List<String>();
   List<String> duplicateItems = new List<String>();
   List<String> diets = new List<String>();
-  final cuisines = [];
+  List<String> cuisines = new List<String>();
+  List<DropdownMenuItem<String>> dropDownCuisines = [];
+
   // Queries for recipe search
   List<String> ingredientQuery = null;
   int maxCalories = null;
@@ -59,10 +61,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Recipe List results
   List<CB.Recipe> recipes = List<CB.Recipe>();
+  Future<List<CB.Recipe>> recipesResult;
 
 //**********Rayhan Code **********//
   int _value = 2100;
-  List cuisine = [];
+
 //********************************//
 
   @override
@@ -74,39 +77,33 @@ class _MyHomePageState extends State<MyHomePage> {
   _initData() async {
     //token = await LocalStorage.getAuthToken();
     //userID = await LocalStorage.getUserID();
+
     token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
     userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
     _getDiets();
-    _getCuisines();
+    // _getCuisines();
     _getIngredients();
   }
 
   _recipeSearch() async {
-    request
-        .recipeSearch(
-            cuisine: cuisineQuery,
-            maxCalories: maxCalories,
-            ingredients: ingredientQuery)
-        .then((recipeList) {
-      recipes.addAll(recipeList);
-      for (CB.Recipe recipe in recipes) {
-        print(recipe.toString());
-      }
-    });
+    recipesResult = request.recipeSearch(
+        cuisine: cuisineQuery,
+        maxCalories: maxCalories,
+        ingredients: ingredientQuery);
   }
 
   _routeRecipePage(BuildContext context) async {
     _recipeSearch();
-//    final result = await Navigator.push((
-//      context,
-//        MaterialPageRoute(
-//          builder: (context) => MyHomePage(
-//          : recipes,
-//
-//    ));
+    if (recipesResult != null) {
+      print(recipesResult);
+      final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SearchResultPage(recipesResult)));
+    }
     _clearQueries();
   }
 
@@ -121,10 +118,13 @@ class _MyHomePageState extends State<MyHomePage> {
   _getCuisines() async {
     request.getCuisineList().then((cuisineList) {
       for (int i = 0; i < cuisineList.length; i++) {
-        final cuisine = {"display": cuisineList[i].name, "value": i};
-        cuisines.add(cuisine);
+        cuisines.add(cuisineList[i].name);
       }
     });
+  }
+
+  Future<List<CB.Cuisine>> _loadCusines() async {
+    return request.getCuisineList();
   }
 
   _getDiets() async {
@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _getIngredients() async {
-    DatabaseHelper helper = DatabaseHelper.instance;
+    DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     List<String> ingredients;
     helper.ingredients().then((list) {
       for (int i = 0; i < list.length; i++) {
@@ -150,13 +150,13 @@ class _MyHomePageState extends State<MyHomePage> {
     if (token != '-1') {
       //int userID= await LocalStorage.getUserID();
       // or ideally change backendRequest to not need userID
-      DatabaseHelper helper = DatabaseHelper.instance;
+      DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
 
       // gets ingredient list from server
       // adds them to locally if not exist
       await request.getIngredientList().then((ingList) {
         for (dynamic ing in ingList) {
-          Ingredient newIng = Ingredient(name: ing.name, id: ing.id);
+          DB.Ingredient newIng = DB.Ingredient(name: ing.name, id: ing.id);
           helper.insertIngredient(newIng);
         }
       });
@@ -173,8 +173,8 @@ class _MyHomePageState extends State<MyHomePage> {
     print("MaxCalories: " + maxCalories.toString());
   }
 
-  _setCuisine() {
-//    if(cuisine != null) cuisineQuery = cuisine;
+  _setCuisine(String cuisine) {
+    if (cuisine != null) cuisineQuery = cuisine;
     print(cuisine);
   }
 
@@ -182,22 +182,18 @@ class _MyHomePageState extends State<MyHomePage> {
     print(ingredient);
     if (ingredientQuery == null) ingredientQuery = new List<String>();
     if (ingredient != null) {
-      print(ingredientQuery);
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
   }
-  _getIngredientBarCode(List<String> ingredients){
-    if(ingredientQuery == null) ingredientQuery = new List<String>();
-    if(ingredientQuery != null){
+
+  _getIngredientBarCode(List<String> ingredients) {
+    if (ingredientQuery == null) ingredientQuery = new List<String>();
+    if (ingredientQuery != null) {
       ingredientQuery.addAll(ingredients);
     }
   }
 
-//************Rayhan Code**********************//
-  List<String> wordsToSend = List<String>();
-  List<String> cusineToSend = List<String>();
-//**********************************************//
 
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
@@ -219,9 +215,41 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       setState(() {
         items.clear();
-        //items.add('No Items Match Inputted Ingredient');
-        //items.addAll(duplicateItems);
       });
+    }
+  }
+
+  DropdownButton<String> cuisineButton(List<CB.Cuisine> data) {
+    List<String> cuisines = new List<String>();
+    for (int i = 0; i < data.length; i++) {
+      cuisines.add(data[i].name);
+    }
+    return DropdownButton<String>(
+      hint: Text("Cuisines"),
+      onChanged: (value) {
+        setState(() {
+          _setCuisine(value);
+        });
+      },
+      isExpanded: true,
+      iconSize: 35,
+      value: cuisineQuery,
+      items: cuisines.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+  _getBCList() async{
+    List<String> bcList = await scanButt.scanBarcodeNormal();
+    if(bcList != null){
+      if(ingredientQuery == null) ingredientQuery = new List<String>();
+      for(int i = 0; i < bcList.length; i++){
+        ingredientQuery.add(bcList[i]);
+        print(bcList[i]);
+      }
     }
   }
 
@@ -249,9 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     suffixIcon: IconButton(
                         icon: Icon(Icons.camera),
                         onPressed: () {
-                          scanButt.scanBarcodeNormal();
-                          logger.log(scanButt.getList().toString());
-                          _getIngredientBarCode(scanButt.getList());
+                          _getBCList();
                         }),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
@@ -272,29 +298,19 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               label: 'Max Calories: $_value',
             ),
-            MultiSelect(
-              autovalidate: false,
-              titleText: 'Select Cuisine',
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select one or more option(s)';
-                } else {
-                  return '';
-                }
-              },
-              errorText: 'Please select only one option:',
-              dataSource: cuisines,
-              textField: 'display',
-              valueField: 'value',
-              filterable: true,
-              required: true,
-              value: cuisine,
-              onSaved: (value) {
-                print("The value is $value");
-                //_setCuisine(value);
-                //_onCuisineSelection(cuisine);
-              },
-            ),
+            FutureBuilder(
+                future: _loadCusines(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Text("Loading cuisines");
+                    case ConnectionState.done:
+                      return cuisineButton(snapshot.data);
+                    default:
+                      return Text("Error");
+                  }
+                }),
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -332,32 +348,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
             ),
-//            ],
-//            ),
           ],
         ),
       ),
     );
   }
-
-  void _onCuisineSelection(String cuisine) {
-    cusineToSend.add(cuisine);
-    print('CUISINE BEING RETURNED');
-    for (int i = 0; i < cusineToSend.length; i++) {
-      print(cusineToSend[i]);
-    }
-    print('FINAL CUISINE');
-  }
-
-  void _onSearchButtonPressed(String keyWord) {
-    print(keyWord);
-//    wordsToSend.add(keyWord);
-//    print('LIST BEING RETURNED');
-//    for (int i =0; i < wordsToSend.length; i++) {
-//      print(wordsToSend[i]);
-//    }
-//    print('FINAL LIST');
-  }
-
-
 }

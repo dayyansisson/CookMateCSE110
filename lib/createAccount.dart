@@ -30,7 +30,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           potentialID.then((id) {
             _id = id;
             if( _id != null) {
-              LocStorage.storeUserID(_id);
+              LocalStorage.storeUserID(_id);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MyHomePage()),

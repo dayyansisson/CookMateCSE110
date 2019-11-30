@@ -1,3 +1,4 @@
+import 'package:cookmate/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -49,70 +50,101 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Stack(
+            // Stack(
+            //   children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(25.0),
-                  left: ScreenUtil.instance.setWidth(30.0),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.home),
-                        color: Colors.white,
-                        iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {
-                          print('pressed');
-                        },
-                      ),
-                    ],
-                  ),
+                IconButton(
+                  icon: Icon(Icons.home),
+                  color: Colors.white,
+                  iconSize: ScreenUtil.instance.setWidth(50.0),
+                  onPressed: () {
+                    print('pressed');
+                  },
                 ),
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(25.0),
-                  left: ScreenUtil.instance.setWidth(120.0),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.search),
-                        color: Colors.white,
-                        iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
+                IconButton(
+                  icon: Icon(Icons.search),
+                  color: Colors.white,
+                  iconSize: ScreenUtil.instance.setWidth(50.0),
+                  onPressed: () {
+                    print("Pressed");
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => SearchPage()));
+                  },
                 ),
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(25.0),
-                  left: ScreenUtil.instance.setWidth(210.0),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.shopping_cart),
-                        color: Colors.white,
-                        iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
+                IconButton(
+                  icon: Icon(Icons.shopping_cart),
+                  color: Colors.white,
+                  iconSize: ScreenUtil.instance.setWidth(50.0),
+                  onPressed: () {
+                    print("pressed");
+                  },
                 ),
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(25.0),
-                  left: ScreenUtil.instance.setWidth(310.0),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.menu),
-                        color: Colors.white,
-                        iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {
-                          print('Pressed');
-                        },
-                      ),
-                    ],
-                  ),
+                IconButton(
+                  icon: Icon(Icons.menu),
+                  color: Colors.white,
+                  iconSize: ScreenUtil.instance.setWidth(50.0),
+                  onPressed: () {
+                    print('Pressed');
+                  },
                 ),
               ],
             ),
+
+            // Positioned(
+            //   top: ScreenUtil.instance.setWidth(25.0),
+            //   left: ScreenUtil.instance.setWidth(120.0),
+            //   child: Row(
+            //     children: <Widget>[
+            //       IconButton(
+            //         icon: Icon(Icons.search),
+            //         color: Colors.white,
+            //         iconSize: ScreenUtil.instance.setWidth(50.0),
+            //         onPressed: () {
+            //           print("Pressed");
+            //           Navigator.push(context, MaterialPageRoute(
+            //             builder: (context) => SearchPage()
+            //           ));
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // Positioned(
+            //   top: ScreenUtil.instance.setWidth(25.0),
+            //   left: ScreenUtil.instance.setWidth(210.0),
+            //   child: Row(
+            //     children: <Widget>[
+            //       IconButton(
+            //         icon: Icon(Icons.shopping_cart),
+            //         color: Colors.white,
+            //         iconSize: ScreenUtil.instance.setWidth(50.0),
+            //         onPressed: () {
+            //           print("pressed");
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // Positioned(
+            //   top: ScreenUtil.instance.setWidth(25.0),
+            //   left: ScreenUtil.instance.setWidth(310.0),
+            //   child: Row(
+            //     children: <Widget>[
+            //       IconButton(
+            //         icon: Icon(Icons.menu),
+            //         color: Colors.white,
+            //         iconSize: ScreenUtil.instance.setWidth(50.0),
+            //         onPressed: () {
+            //           print('Pressed');
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            //   ],
+            // ),
             Stack(
               children: <Widget>[
                 Positioned(
