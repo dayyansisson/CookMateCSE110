@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'Wave_clipper.dart';
 
 
 void main() => runApp(MyApp());
@@ -27,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: <Widget>[
           ClipPath(
-            clipper: WaveClipper(),
+            //clipper: WaveClipper(),
             child: Container(
               height: 220.0,
               decoration: BoxDecoration(
