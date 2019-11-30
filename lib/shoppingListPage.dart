@@ -13,15 +13,33 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
   @override void initState() {
 
+    _initializeSL();
+    super.initState();
+  }
+
+  _initializeSL () {
+    
     DB.DatabaseHelper db = DB.DatabaseHelper.instance;
     _slFuture = db.shoppingListItems();
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            print("pressed this ish");
+          },
+        ),
+        title: Text(
+          "Shopping List",
+          style: TextStyle(
+            fontWeight: FontWeight.w700
+          ),
+        ),
+      ),
       body: FutureBuilder(
         future: _slFuture,
         builder: (futureContext, snapshot) {
@@ -67,9 +85,20 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     }
 
     List<Widget> items = List<Widget>();
+    String quantityDisplay;
+    int purchasedItems = 0;
+
     for(DB.ShoppingList item in list) {
-      Widget shoppingItem = Row (
+      quantityDisplay = item.quantity.toString();
+      if(item.measurement != null) {
+        quantityDisplay += " ${item.measurement}";
+      }
+      if(item.purchased) {
+        purchasedItems++;
+      }
+      Widget shoppingItem = Row(
         children: <Widget>[
+          Padding(padding: EdgeInsets.only(left: 15)),
           Checkbox(
             value: item.purchased,
             activeColor: CookmateStyle.standardRed,
@@ -77,20 +106,172 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
             onChanged: (newValue) {
               setState(() {
                 item.purchased = newValue;
+                _updateShoppingItem(item);
               });
             },
           ),
-          Text(
-            item.quantity.toString() + item.measurement
+          Padding(padding: EdgeInsets.only(left: 10)),
+          Container(
+            width: 140,
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(
+                  width: 20,
+                  child: IconButton(
+                    alignment: Alignment.centerRight,
+                    iconSize: 12,
+                    color: item.purchased == true ? Color.fromRGBO(230, 230, 230, 1) : CookmateStyle.iconGrey,
+                    disabledColor: Color.fromRGBO(230, 230, 230, 1),
+                    icon: Icon(Icons.arrow_back_ios),
+                    onPressed: item.quantity == 0 ? null : () {
+                      setState(() {
+                        item.quantity--;
+                        _updateShoppingItem(item);
+                      });
+                    },
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  quantityDisplay,
+                  style: item.purchased == true ? 
+                  TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w300,
+                    color: CookmateStyle.standardRed,
+                    decoration: TextDecoration.lineThrough
+                  ) :
+                  TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w300,
+                    color: CookmateStyle.textGrey,
+                  ),
+                ),
+                Spacer(),
+                SizedBox(
+                  width: 20,
+                  child: IconButton(
+                    alignment: Alignment.centerLeft,
+                    iconSize: 12,
+                    color: item.purchased == true ? Color.fromRGBO(230, 230, 230, 1) : CookmateStyle.iconGrey,
+                    disabledColor: Color.fromRGBO(230, 230, 230, 1),
+                    icon: Icon(Icons.arrow_forward_ios),
+                    onPressed: item.purchased == true ? null : () {
+                      setState(() {
+                        item.quantity++;
+                        _updateShoppingItem(item);
+                      });
+                    },
+                  ),
+                ),
+              ]
+            ),
           ),
+          Spacer(),
           Text(
-            item.ingredient
+            item.ingredient,
+            style: item.purchased == true ? 
+            TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w400,
+              color: CookmateStyle.standardRed,
+              decoration: TextDecoration.lineThrough
+            ) :
+            TextStyle(
+              fontSize: 17,
+              color: CookmateStyle.textGrey,
+            ),
           ),
+          Spacer(),
+          SizedBox(
+            width: 10,
+            child: IconButton(
+              alignment: Alignment.centerLeft,
+              iconSize: 10,
+              icon: Icon(Icons.clear),
+              color: Color.fromRGBO(230, 100, 100, 1),
+              onPressed: () {
+                setState(() {
+                  _removeShoppingItem(item);
+                  _initializeSL();
+                });
+              },
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(right: 40)),
         ],
       );
       items.add(shoppingItem);
+      items.add(Divider());
     }
 
-    return ListView(children: items);
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 50,
+          color: Color.fromRGBO(240, 240, 240, 1),
+          child: Row(
+            children: <Widget>[
+              Padding(padding: EdgeInsets.only(left: 30)),
+              Text(
+                "$purchasedItems/${list.length}",
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: CookmateStyle.iconGrey
+                ),
+              ),
+              // Padding(padding: EdgeInsets.only(left: 60)),
+              // Text(
+              //   "INGREDIENTS",
+              //   style: TextStyle(
+              //     fontSize: 15,
+              //     fontWeight: FontWeight.w800,
+              //     color: CookmateStyle.iconGrey
+              //   ),
+              // ),
+              Spacer(),
+              FlatButton(
+                child: Text(
+                  "CLEAR",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: CookmateStyle.iconGrey
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _clearShoppingList();
+                    _initializeSL();
+                  });
+                },
+              ),
+              Padding(padding: EdgeInsets.only(right: 20)),
+            ],
+          ),
+        ),
+        Flexible(child: ListView(children: items))
+      ],
+    );
+  }
+
+  _clearShoppingList() {
+
+    DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
+    helper.clearShoppingList(); // removes all local shopping list items
+  }
+
+  _removeShoppingItem(DB.ShoppingList sl) {
+
+    DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
+    helper.deleteShoppingListItem(sl.ingredient); // removes all local shopping list items
+  }
+
+  _updateShoppingItem(DB.ShoppingList sl) {
+
+    DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
+    helper.updateShoppingListItem(sl);
   }
 }
