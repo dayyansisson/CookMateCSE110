@@ -48,6 +48,18 @@ class _SearchResultPageState extends State<SearchResultPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            "Search Results",
+            style: TextStyle(
+              fontWeight: FontWeight.w700
+            ),
+          ),
           bottom: TabBar(
             tabs: <Widget>[
               Tab(icon: Icon(Icons.restaurant_menu)),
@@ -65,6 +77,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
                   case ConnectionState.waiting:
                     return CookmateStyle.loadingIcon("Loading recipes...");
                   case ConnectionState.done:
+                    if(snapshot.data.length == 0) {
+                      return noRecipesError();
+                    }
                     return ListView(children: _searchResults(snapshot.data));
                   default:
                     return Text("error");
@@ -94,26 +109,23 @@ class _SearchResultPageState extends State<SearchResultPage> {
     }
     recipes.add(Divider());
 
-    Widget topBar = Row(
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            print("pressed this ish");
-          },
-        ),
-        Text("Back"),
-        Spacer(flex: 2),
-        Text(
-          "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w300,
-            color: Color.fromRGBO(128, 128, 128, 1)
+    Widget topBar = 
+    Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: <Widget>[
+          Spacer(),
+          Text(
+            "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+              color: Color.fromRGBO(128, 128, 128, 1)
+            ),
           ),
-        ),
-        Spacer()
-      ],
+          Spacer()
+        ],
+      )
     );
 
     results.add(topBar);
@@ -165,10 +177,45 @@ class _SearchResultPageState extends State<SearchResultPage> {
     _initPrefs = true;
   }
 
+  Widget noRecipesError () {
+
+    return Center (
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "Sorry! We couldn't find any recipes.\nTry a more general search!",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w300,
+                color: CookmateStyle.textGrey
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Icon(
+                Icons.restaurant_menu,
+                color: CookmateStyle.iconGrey,
+                size: 40,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget preferences(List<Recipe> data) {
 
     if(!_initPrefs) {
       return Center(child: CircularProgressIndicator());
+    }
+
+    if(data.length == 0) {
+      return noRecipesError();
     }
 
     setState(() {

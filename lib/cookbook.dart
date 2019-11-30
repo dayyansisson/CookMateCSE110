@@ -1,3 +1,4 @@
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
 /* Class: Recipe
@@ -8,7 +9,6 @@ class Recipe {
 
   bool _complete;
 
-  int id;
   int apiID;
   String title;
   String imageURL;
@@ -19,11 +19,11 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.id = id, _complete = false;
+  Recipe(int id) : this.apiID = id, _complete = false;
   Recipe.forCalendar(Map<String, dynamic> json) {
     
-    id = json['id'];
-    apiID = json['api_id'];
+    apiID = json['id'];
+    //apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
     _complete = false;
@@ -55,7 +55,7 @@ class Recipe {
 
   Recipe.forPopularList(Map<String, dynamic> json) {
 
-    id = json['id'];
+    apiID = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -105,7 +105,6 @@ class Recipe {
   String toString() => """\n
       $title
       ----------------------------
-      id:         $id
       api:        $apiID
       image:      $imageURL
       servings:   $servings
@@ -121,7 +120,7 @@ class Recipe {
  * Description: Ingredient object containing its name, and id.
  */
 class Ingredient {
-  
+
   int id;
   String name;
   double quantity;
@@ -162,7 +161,7 @@ class Diet {
   Diet ({int id, String name, String summary}) : this.id = id, this.name = name, this.summary = summary;
 
   Diet.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     name = json['name'];
     summary = json['summary'];

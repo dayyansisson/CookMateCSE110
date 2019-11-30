@@ -13,7 +13,7 @@ class BackendRequest {
   static const String _FAIL_LOGIN = "Unable to log in with provided credentials.";
 
   final String _authToken;
-  final String _userID;
+  String _userID;
   UserProfile _userProfile;
   BackendRequest (String authToken, int userID, { UserProfile userProfile }) : _authToken = authToken, _userID = userID.toString(), _userProfile = userProfile;
 
@@ -22,26 +22,26 @@ class BackendRequest {
    *    - email: the user's email
    *    - username: the user's username
    *    - password: the user's password
-   * 
+   *
    * Return:
    *    - success: ID of the new user
    *    - failure: null
-   * 
+   *
    * Notes: This method does not do any validation except checking if a username
    *        is unique or not. All other validation must be done beforehand.
    */
   static Future<int> createUser (String email, String username, String password) async {
 
     print("Creating new user...");
-      
+
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/users/", 
-      body: {
-        "email":email,
-        "username":username,
-        "password":password
-      }
+        "https://thecookmate.com/auth/users/",
+        body: {
+          "email":email,
+          "username":username,
+          "password":password
+        }
     );
 
     // Validate return
@@ -64,14 +64,14 @@ class BackendRequest {
    *    - success: ID of the new user
    *    - failure: null
    */
-  static Future<int> getUser (String authToken) async {
+  Future<int> getUser () async {
 
-    print("Getting user info ($authToken)...");
-      
+    print("Getting user info ($_authToken)...");
+
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/auth/users/me", 
-      headers: { "Authorization":"Token $authToken" }
+        "https://thecookmate.com/auth/users/me",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -83,6 +83,7 @@ class BackendRequest {
     }
 
     var data = jsonDecode(response.body);
+    _userID = data;
     print("User found, returning user ID ${data["id"]}");
     return data["id"];
   }
@@ -90,7 +91,7 @@ class BackendRequest {
   /* Method: deleteUser
    * Arg(s):
    *    - password: the user's password
-   * 
+   *
    * Return:
    *    - success: true
    *    - failure: false
@@ -133,7 +134,7 @@ class BackendRequest {
     // Update username
     if(currentUsername != null && newUsername != null) {
       print("Updating username from $currentUsername to $newUsername...");
-      
+
       // Make API call
       final response = await http.post(
         "https://thecookmate.com/auth/users/set_username/", 
@@ -168,7 +169,7 @@ class BackendRequest {
     // Update password
     if(currentPassword != null && newPassword != null) {
       print("Updating password from $currentPassword to $newPassword...");
-      
+
       // Make API call
       final response = await http.post(
         "https://thecookmate.com/auth/users/set_password/", 
@@ -227,7 +228,7 @@ class BackendRequest {
    * Arg(s):
    *    - username: the user's username
    *    - password: the user's password
-   * 
+   *
    * Return:
    *    - success: the auth token
    *    - failure: the error message
@@ -235,14 +236,14 @@ class BackendRequest {
   static Future<String> login (String username, String password) async {
 
     print("Logging in ($username, $password)...");
-      
+
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/token/login", 
-      body: {
-        "username":username,
-        "password":password
-      }
+        "https://thecookmate.com/auth/token/login",
+        body: {
+          "username":username,
+          "password":password
+        }
     );
 
     // Validate return
@@ -334,7 +335,7 @@ class BackendRequest {
    */
   Future<bool> addFavorite(Recipe recipe) async {
 
-    print("Adding recipe ${recipe.id} to favorites...");
+    print("Adding recipe ${recipe.apiID} to favorites...");
 
     // Make API call
     final response = await http.post(
@@ -508,12 +509,12 @@ class BackendRequest {
    * Arg(s):
    * 
    * Return:
-   *    - success: A list of ingredients
+   *    - success: The UserProfile associated with the userID
    *    - failure: null
    */
   Future<List<Ingredient>> getIngredientList () async {
 
-    print("Getting ingredient list...");
+    print("Getting user profile (User ID: $_userID, $_authToken)...");
 
     // Make API call
     final response = await http.get(
@@ -817,7 +818,7 @@ class BackendRequest {
       headers: { "Authorization":"Token $_authToken" },
       body: {
         "user":"$_userID",
-        "recipe":recipe.id.toString(),
+        "recipe":recipe.apiID.toString(),
         "date":"${date.getDate}"
       }
     );
@@ -913,7 +914,7 @@ class BackendRequest {
   Future<bool> updateMealInCalendar (Meal meal, { Recipe newRecipe, Date newDate }) async {
 
     if(newRecipe != null) {
-      print("Changing meal ${meal.id} from ${meal.recipe.id} to ${newRecipe.id}");
+      print("Changing meal ${meal.id} from ${meal.recipe.apiID} to ${newRecipe.apiID}");
     }
 
     if(newDate != null) {
@@ -921,10 +922,10 @@ class BackendRequest {
     }
 
     String dateToPass = meal.date.getDate;
-    String recipeToPass = meal.recipe.id.toString();
+    String recipeToPass = meal.recipe.apiID.toString();
 
     if(newRecipe != null) {
-      recipeToPass = newRecipe.id.toString();
+      recipeToPass = newRecipe.apiID.toString();
     }
 
     if(newDate != null) {
@@ -943,7 +944,6 @@ class BackendRequest {
         "date":dateToPass
       }
     );
-
     // Validate return
     int statusCode = response.statusCode ~/ 100;
     if(statusCode != _SUCCESS) {
@@ -1003,7 +1003,7 @@ class BackendRequest {
    * Arg(s):
    *    - statusSode: The reduced code to determine error type
    *    - responseCode: The actual status code produced by the response
-   * 
+   *
    * Return: the appropriate status notification/error message
    */
   static String _interpretStatus (int statusCode, int responseCode, String error) {
@@ -1012,7 +1012,7 @@ class BackendRequest {
 
     switch(statusCode) {
       case _INFORMATIONAL:
-        statusReport = "\n\n\t--- Backend Request In Progress ---\n\tStatus code $statusCode, "; 
+        statusReport = "\n\n\t--- Backend Request In Progress ---\n\tStatus code $statusCode, ";
         break;
       case _REDIRECT:
         statusReport += "\tRedirect Error";

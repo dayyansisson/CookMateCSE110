@@ -1,7 +1,10 @@
 import 'dart:math';
 
+import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/database_helpers.dart' as prefix0;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -18,7 +21,8 @@ class RecipeDisplay extends StatefulWidget {
 }
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
-
+  prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
+  BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
@@ -52,13 +56,13 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
             future: recipeFuture,
             builder: (futureContext, snapshot) {
               switch (snapshot.connectionState) {
-                case ConnectionState.waiting: // this handles waiting for the async call
+                case ConnectionState
+                    .waiting: // this handles waiting for the async call
                   return CookmateStyle.loadingIcon("Loading recipe...");
                 case ConnectionState.done:
-                  return DefaultTabController (
-                    length: 2,
-                    child: CustomScrollView(
-                      slivers: <Widget>[
+                  return DefaultTabController(
+                      length: 2,
+                      child: CustomScrollView(slivers: <Widget>[
                         SliverAppBar(
                           backgroundColor: Color.fromRGBO(250, 250, 250, 1),
                           expandedHeight: 231.5,
@@ -78,10 +82,12 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                                 tabs: <Widget>[
                                   Tab(
                                       child: Text("Ingredients",
-                                          style: TextStyle(color: _titleColor))),
+                                          style:
+                                              TextStyle(color: _titleColor))),
                                   Tab(
                                       child: Text("Instructions",
-                                          style: TextStyle(color: _titleColor))),
+                                          style:
+                                              TextStyle(color: _titleColor))),
                                 ],
                               ),
                               Expanded(
@@ -95,9 +101,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                             ],
                           ),
                         )
-                      ]
-                    )
-                  );
+                      ]));
                 default:
                   return Text("error");
               }
@@ -115,36 +119,43 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                   backgroundColor: Colors.redAccent,
                   label: 'Add to Shopping List',
                   labelStyle: TextStyle(fontSize: 18.0),
-                  onTap: () => print(pageRecipe.toString())),
+                  onTap: () {
+                    _addIngredients(ingredients);
+                  }),
               SpeedDialChild(
                 child: Icon(Icons.calendar_today),
                 backgroundColor: Colors.redAccent,
                 label: 'Add to Calendar',
                 labelStyle: TextStyle(fontSize: 18.0),
-                onTap: () => print('SECOND CHILD'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              new MyCalendar(recipe: pageRecipe)));
+                },
               ),
             ],
           ),
         ));
   }
 
-  Widget header (Image image) {
+  Widget header(Image image) {
     return Stack(
       children: <Widget>[
         image,
         Positioned(
-          top: 50,
-          left: 10,
-          child: FlatButton(
-            shape: CircleBorder(),
-            color: Colors.white,
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.redAccent,
-            ),
-            onPressed: () => Navigator.pop(context),
-          )
-        ),
+            top: 50,
+            left: 10,
+            child: FlatButton(
+              shape: CircleBorder(),
+              color: Colors.white,
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.redAccent,
+              ),
+              onPressed: () => Navigator.pop(context),
+            )),
         Positioned(
           top: 45,
           right: 20,
@@ -152,11 +163,11 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.star_border),
-                padding:
-                    EdgeInsets.symmetric(horizontal: 10.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
                 color: isPressedFave(),
                 iconSize: 35.0,
                 onPressed: () {
+                  helper.clearRecipes();
                   setState(() {
                     if (isPressed) {
                       isPressed = false;
@@ -164,6 +175,13 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                       isPressed = true;
                     }
                   });
+
+                  if(!isPressed){
+                    _addToFavorites();
+                  }
+                  else{
+                    _removeFromFavorites();
+                  }
                 },
               )
             ],
@@ -222,76 +240,71 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
         ),
       ));
     }
-    return ListView(children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
+    return ListView(
+        children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
   }
 
-  Widget infoBar (Recipe data) {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(left: 15, top: 15),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              formatTitle(data.title),
-              style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 22,
-                  color: _titleColor
-                ),
-            ),
+  Widget infoBar(Recipe data) {
+    return Column(children: <Widget>[
+      Container(
+        padding: EdgeInsets.only(left: 15, top: 15),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            formatTitle(data.title),
+            style: TextStyle(
+                fontWeight: FontWeight.w700, fontSize: 22, color: _titleColor),
           ),
-          constraints: BoxConstraints.expand(height: 45),
-          decoration: BoxDecoration(
-              color: Color.fromRGBO(250, 250, 250, 1),
-              /*boxShadow: [
+        ),
+        constraints: BoxConstraints.expand(height: 45),
+        decoration: BoxDecoration(
+          color: Color.fromRGBO(250, 250, 250, 1),
+          /*boxShadow: [
                 BoxShadow(
                     offset: Offset(0, -6),
                     color: Colors.black12,
                     spreadRadius: 0,
                     blurRadius: 2)
               ]*/
-            ),
         ),
-        Container(
-          padding:
-              EdgeInsets.only(left: 15, top: 5, bottom: 10),
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.timer, color: _iconColor),
-              Spacer(flex: 1),
-              Text(
-                formatPrepTime(data.cookTime),
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w200,
-                    color: _titleColor),
-              ),
-              Spacer(flex: 3),
-              Icon(Icons.restaurant, color: _iconColor),
-              Spacer(flex: 1),
-              Text(
-                "${data.servings}",
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w200,
-                    color: _titleColor),
-              ),
-              Spacer(flex: 3),
-              Icon(Icons.attach_money, color: _iconColor),
-              Text(
-                formatPrice(data.price),
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w200,
-                    color: _titleColor),
-              ),
-              Spacer(flex: 50),
-            ],
-          ),
-        )
-      ]
-    );
+      ),
+      Container(
+        padding: EdgeInsets.only(left: 15, top: 5, bottom: 10),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.timer, color: _iconColor),
+            Spacer(flex: 1),
+            Text(
+              formatPrepTime(data.cookTime),
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w200,
+                  color: _titleColor),
+            ),
+            Spacer(flex: 3),
+            Icon(Icons.restaurant, color: _iconColor),
+            Spacer(flex: 1),
+            Text(
+              "${data.servings}",
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w200,
+                  color: _titleColor),
+            ),
+            Spacer(flex: 3),
+            Icon(Icons.attach_money, color: _iconColor),
+            Text(
+              formatPrice(data.price),
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w200,
+                  color: _titleColor),
+            ),
+            Spacer(flex: 50),
+          ],
+        ),
+      )
+    ]);
   }
 
   Widget getIngredientWidgets(List<Ingredient> strings) {
@@ -334,7 +347,8 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
         ),
       ));
     }
-    return ListView(children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
+    return ListView(
+        children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
   }
 
   String formatTitle(String input) {
@@ -379,6 +393,40 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     return "${formattedString[0]}.${formattedString[1]}";
   }
 
+  _addIngredients(List<Ingredient> ingredients) async {
+    await helper.clearShoppingList();
+    for (int i = 0; i < ingredients.length; i++) {
+      prefix0.ShoppingList sl = new prefix0.ShoppingList(
+          ingredient: ingredients[i].name,
+          quantity: ingredients[i].quantity.round(),
+          purchased: false,
+          measurement: ingredients[i].units);
+      await helper.insertShoppingListItem(sl);
+      
+    }
+    print(await helper.shoppingListItems());
+  }
+
+  _addToFavorites() async {
+    prefix0.Recipe fave = new prefix0.Recipe(
+      id: pageRecipe.apiID,
+      name: pageRecipe.title,
+      img: pageRecipe.imageURL
+    );
+
+    //print(pageRecipe.toString());
+    backend.removeFavorite(pageRecipe.apiID);
+
+    backend.addFavorite(pageRecipe);
+
+    await helper.insertRecipe(fave);
+  }
+
+  _removeFromFavorites() async {
+    await helper.deleteRecipe(pageRecipe.apiID);
+    backend.removeFavorite(pageRecipe.apiID);
+  }
+
   // Widget unitsCheck(String units) {
   //   if (units != "") {
   //     return Flexible(
@@ -397,6 +445,8 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   // }
 
   Color isPressedFave() {
+
+
     if (this.isPressed) {
       return Colors.yellow;
     }
@@ -418,7 +468,6 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  
   _SliverAppBarDelegate({
     @required this.minHeight,
     @required this.maxHeight,
@@ -433,12 +482,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => max(maxHeight, minHeight);
   @override
   Widget build(
-      BuildContext context, 
-      double shrinkOffset, 
-      bool overlapsContent) 
-  {
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return new SizedBox.expand(child: child);
   }
+
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return maxHeight != oldDelegate.maxHeight ||
