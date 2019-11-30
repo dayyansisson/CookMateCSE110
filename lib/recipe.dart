@@ -25,6 +25,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   List<String> instructions;
   List<Ingredient> ingredients;
   Recipe pageRecipe;
+  Recipe rp;
 
   GlobalKey _tabBarKey = GlobalKey();
 
