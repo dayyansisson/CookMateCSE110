@@ -30,7 +30,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-            print("pressed this ish");
+            Navigator.pop(context);
           },
         ),
         title: Text(

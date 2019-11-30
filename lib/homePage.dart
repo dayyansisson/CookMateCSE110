@@ -1,4 +1,6 @@
 import 'package:cookmate/search.dart';
+import 'package:cookmate/shoppingListPage.dart';
+import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -31,306 +33,191 @@ class _MyHomePageState extends State<MyHomePage> {
       allowFontScaling: true,
     )..init(context);
 
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            ClipPath(
-              //clipper: WaveClipper(),
-              child: Container(
-                height: ScreenUtil.instance.setWidth(180.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFFB71C1C),
-                      Color(0xFFE53935),
-                      Color(0xFFD50000)
-                    ],
-                  ),
-                ),
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.home),
+                color: Colors.white,
+                iconSize: ScreenUtil.instance.setWidth(50.0),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => MyHomePage()
+                  ));
+                },
               ),
-            ),
-            // Stack(
-            //   children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.home),
-                  color: Colors.white,
-                  iconSize: ScreenUtil.instance.setWidth(50.0),
-                  onPressed: () {
-                    print('pressed');
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.search),
-                  color: Colors.white,
-                  iconSize: ScreenUtil.instance.setWidth(50.0),
-                  onPressed: () {
-                    print("Pressed");
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => SearchPage()));
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.shopping_cart),
-                  color: Colors.white,
-                  iconSize: ScreenUtil.instance.setWidth(50.0),
-                  onPressed: () {
-                    print("pressed");
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.menu),
-                  color: Colors.white,
-                  iconSize: ScreenUtil.instance.setWidth(50.0),
-                  onPressed: () {
-                    print('Pressed');
-                  },
-                ),
-              ],
-            ),
-
-            // Positioned(
-            //   top: ScreenUtil.instance.setWidth(25.0),
-            //   left: ScreenUtil.instance.setWidth(120.0),
-            //   child: Row(
-            //     children: <Widget>[
-            //       IconButton(
-            //         icon: Icon(Icons.search),
-            //         color: Colors.white,
-            //         iconSize: ScreenUtil.instance.setWidth(50.0),
-            //         onPressed: () {
-            //           print("Pressed");
-            //           Navigator.push(context, MaterialPageRoute(
-            //             builder: (context) => SearchPage()
-            //           ));
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // Positioned(
-            //   top: ScreenUtil.instance.setWidth(25.0),
-            //   left: ScreenUtil.instance.setWidth(210.0),
-            //   child: Row(
-            //     children: <Widget>[
-            //       IconButton(
-            //         icon: Icon(Icons.shopping_cart),
-            //         color: Colors.white,
-            //         iconSize: ScreenUtil.instance.setWidth(50.0),
-            //         onPressed: () {
-            //           print("pressed");
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // Positioned(
-            //   top: ScreenUtil.instance.setWidth(25.0),
-            //   left: ScreenUtil.instance.setWidth(310.0),
-            //   child: Row(
-            //     children: <Widget>[
-            //       IconButton(
-            //         icon: Icon(Icons.menu),
-            //         color: Colors.white,
-            //         iconSize: ScreenUtil.instance.setWidth(50.0),
-            //         onPressed: () {
-            //           print('Pressed');
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            //   ],
-            // ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(90.0),
-                  child: SizedBox(
-                    height: ScreenUtil.instance.setWidth(10.0),
-                    width: ScreenUtil.instance.setWidth(500.0),
-                    child: Divider(
-                      color: Colors.white,
-                      thickness: ScreenUtil.instance.setWidth(1.5),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(100.0),
-                  left: ScreenUtil.instance.setWidth(20.0),
-                  child: Row(
-                    children: <Widget>[
-                      FlatButton(
-                        child: Text(
-                          'Today',
-                          style: TextStyle(
-                              shadows: <Shadow>[
-                                Shadow(
-                                  offset: Offset(5.0, 5.0),
-                                  blurRadius: 15.0,
-                                  color: Color.fromARGB(78, 79, 79, 79),
-                                ),
-                                Shadow(
-                                  offset: Offset(5.0, 5.0),
-                                  blurRadius: 5.0,
-                                  color: Color.fromARGB(78, 79, 79, 79),
-                                ),
-                              ],
-                              fontWeight: FontWeight.bold,
-                              fontSize: ScreenUtil.instance.setWidth(25.0),
-                              color: Colors.white),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(100.0),
-                  left: ScreenUtil.instance.setWidth(130.0),
-                  child: Row(
-                    children: <Widget>[
-                      FlatButton(
-                        child: Text(
-                          'Popular',
-                          style: TextStyle(
-                              shadows: <Shadow>[
-                                Shadow(
-                                  offset: Offset(5.0, 5.0),
-                                  blurRadius: 15.0,
-                                  color: Color.fromARGB(78, 79, 79, 79),
-                                ),
-                                Shadow(
-                                  offset: Offset(5.0, 5.0),
-                                  blurRadius: 5.0,
-                                  color: Color.fromARGB(78, 79, 79, 79),
-                                ),
-                              ],
-                              fontWeight: FontWeight.bold,
-                              fontSize: ScreenUtil.instance.setWidth(25.0),
-                              color: Colors.white),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(100.0),
-                  left: ScreenUtil.instance.setWidth(265.0),
-                  child: Row(children: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        'Favorite',
-                        style: TextStyle(
-                            shadows: <Shadow>[
-                              Shadow(
-                                offset: Offset(5.0, 5.0),
-                                blurRadius: 15.0,
-                                color: Color.fromARGB(78, 79, 79, 79),
-                              ),
-                              Shadow(
-                                offset: Offset(5.0, 5.0),
-                                blurRadius: 5.0,
-                                color: Color.fromARGB(78, 79, 79, 79),
-                              ),
-                            ],
-                            fontWeight: FontWeight.bold,
-                            fontSize: ScreenUtil.instance.setWidth(25.0),
-                            color: Colors.white),
-                      ),
-                      onPressed: () {},
-                    ),
-                  ]),
-                ),
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Positioned(
-                  top: ScreenUtil.instance.setWidth(180.0),
-                  left: ScreenUtil.instance.setWidth(325.0),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.calendar_today),
-                        color: Color(0xFFD50000),
-                        iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {
-                          print('Pressed');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-//
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(
-                    height: ScreenUtil.instance.setWidth(228.0),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      'Today Meals'.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ScreenUtil.instance.setWidth(22.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
-                  Container(
-                    height: ScreenUtil.instance.setWidth(250.0),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: _buildItem,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.instance.setWidth(7.0),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      'Popular Today !'.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ScreenUtil.instance.setWidth(22.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.instance.setWidth(7.0),
-                  ),
-                  Container(
-                    height: ScreenUtil.instance.setWidth(250.0),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) =>
-                          _buildItem(context, index),
-                    ),
-                  ),
-                ],
+              IconButton(
+                icon: Icon(Icons.search),
+                color: Colors.white,
+                iconSize: ScreenUtil.instance.setWidth(50.0),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SearchPage()));
+                },
               ),
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                color: Colors.white,
+                iconSize: ScreenUtil.instance.setWidth(50.0),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => ShoppingListPage()
+                  ));
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.menu),
+                color: Colors.white,
+                iconSize: ScreenUtil.instance.setWidth(50.0),
+                onPressed: () {
+                  print('Pressed');
+                },
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              FlatButton(
+                child: Text(
+                  'Today',
+                  style: TextStyle(
+                      shadows: <Shadow>[
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 15.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 5.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                      ],
+                      fontWeight: FontWeight.bold,
+                      fontSize: ScreenUtil.instance.setWidth(25.0),
+                      color: Colors.white),
+                ),
+                onPressed: () {},
+              ),
+              FlatButton(
+                child: Text(
+                  'Popular',
+                  style: TextStyle(
+                      shadows: <Shadow>[
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 15.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 5.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                      ],
+                      fontWeight: FontWeight.bold,
+                      fontSize: ScreenUtil.instance.setWidth(25.0),
+                      color: Colors.white),
+                ),
+                onPressed: () {},
+              ),
+              FlatButton(
+                child: Text(
+                  'Favorite',
+                  style: TextStyle(
+                      shadows: <Shadow>[
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 15.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                        Shadow(
+                          offset: Offset(5.0, 5.0),
+                          blurRadius: 5.0,
+                          color: Color.fromARGB(78, 79, 79, 79),
+                        ),
+                      ],
+                      fontWeight: FontWeight.bold,
+                      fontSize: ScreenUtil.instance.setWidth(25.0),
+                      color: Colors.white),
+                ),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.calendar_today),
+                color: Color(0xFFD50000),
+                iconSize: ScreenUtil.instance.setWidth(50.0),
+                onPressed: () {
+                  print('Pressed');
+                },
+              ),
+            ],
+          ),
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // SizedBox(
+                //   height: ScreenUtil.instance.setWidth(228.0),
+                // ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    'Today Meals'.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: ScreenUtil.instance.setWidth(22.0),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
+                Container(
+                  height: ScreenUtil.instance.setWidth(250.0),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: _buildItem,
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil.instance.setWidth(7.0),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    'Popular Today !'.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: ScreenUtil.instance.setWidth(22.0),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil.instance.setWidth(7.0),
+                ),
+                Container(
+                  height: ScreenUtil.instance.setWidth(250.0),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => _buildItem(context, index),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

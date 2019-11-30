@@ -51,7 +51,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () {
-              print("pressed this ish");
+              Navigator.pop(context);
             },
           ),
           title: Text(
