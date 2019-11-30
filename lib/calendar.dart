@@ -1,4 +1,3 @@
-
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/recipe.dart';
 import 'package:cookmate/searchResultPage.dart';
