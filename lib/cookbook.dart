@@ -55,7 +55,7 @@ class Recipe {
 
   Recipe.forPopularList(Map<String, dynamic> json) {
 
-    id = json['id'];
+    apiID = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -107,7 +107,6 @@ class Recipe {
   String toString() => """\n
       $title
       ----------------------------
-      id:         $id
       api:        $apiID
       image:      $imageURL
       servings:   $servings

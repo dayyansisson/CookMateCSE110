@@ -414,7 +414,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
       img: pageRecipe.imageURL
     );
 
-    print(pageRecipe.toString());
+    //print(pageRecipe.toString());
     backend.removeFavorite(pageRecipe.apiID);
 
     backend.addFavorite(pageRecipe);
