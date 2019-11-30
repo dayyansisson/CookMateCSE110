@@ -16,7 +16,6 @@ void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-  Future<List<String>> list;
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +24,12 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: new SearchPage(list),
+      home: new SearchPage(),
     );
   }
 }
 
 class SearchPage extends StatefulWidget {
-  final Future<List<String>> ingredientsBC;
-
-  SearchPage(Future<List<String>> ingredients) : ingredientsBC = ingredients;
-
   @override
   _SearchPageState createState() => new _SearchPageState();
 }
@@ -247,6 +242,16 @@ class _SearchPageState extends State<SearchPage> {
       }).toList(),
     );
   }
+  _getBCList() async{
+    List<String> bcList = await scanButt.scanBarcodeNormal();
+    if(bcList != null){
+      if(ingredientQuery == null) ingredientQuery = new List<String>();
+      for(int i = 0; i < bcList.length; i++){
+        ingredientQuery.add(bcList[i]);
+        print(bcList[i]);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,11 +277,7 @@ class _SearchPageState extends State<SearchPage> {
                     suffixIcon: IconButton(
                         icon: Icon(Icons.camera),
                         onPressed: () {
-                          //scanButt.scanBarcodeNormal();
-                          //Navigator.pop(context);
-//                          scanButt.scanBarcodeNormal();
-//                          logger.log(scanButt.getList().toString());
-//                          _getIngredientBarCode(scanButt.getList());
+                          _getBCList();
                         }),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
@@ -297,7 +298,6 @@ class _SearchPageState extends State<SearchPage> {
               },
               label: 'Max Calories: $_value',
             ),
-
             FutureBuilder(
                 future: _loadCusines(),
                 builder: (context, snapshot) {
@@ -348,8 +348,6 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
-//            ],
-//            ),
           ],
         ),
       ),

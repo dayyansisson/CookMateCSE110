@@ -24,7 +24,8 @@ class ScanButtonState extends State<ScanButton> {
 
   Future<List<String>> scanBarcodeNormal() async {
     String barcodeScanRes;
-    Future<List<String>> ingredients;
+    List<String> ingredients;
+
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -32,16 +33,18 @@ class ScanButtonState extends State<ScanButton> {
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
-
+    print("after opening barcode");
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
-    if (!mounted) return null;
+    //if (!mounted) return null;
 
     //Call the backend with the barcode to return the Bread Crumb list
     logger.log("here");
-    List<String> breadCrumbs = await be.getBreadcrumbs("089836187635");
+    List<String> breadCrumbs = await be.getBreadcrumbs(barcodeScanRes);
 
+    // For testing uncoment this line of code below
+   // List<String> breadCrumbs = await be.getBreadcrumbs("089836187635");
     //If the backend does not return us anything this displays a popup
     if(breadCrumbs == null){
         showDialog(
@@ -56,19 +59,12 @@ class ScanButtonState extends State<ScanButton> {
     }
     else{
      //Check the breadcrumbs for usable ingredients
-     ingredients =  getIngredients(breadCrumbs, "42e96d88b6684215c9e260273b5e56b0522de18e");
-      final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context)=>SearchPage(ingredients))
-      );
-
-//     setState(() {
-//       ingredientsForSearch = ingredients;
-//     });
+     ingredients = await getIngredients(breadCrumbs);
      return ingredients;
     }
   }
 
-  Future<List<String>> getIngredients(List<String> breadCrumbs, String authToken) async {
+  Future<List<String>> getIngredients(List<String> breadCrumbs) async {
       //get the indredient list
       List<Ingredient> ingredients = await be.getIngredientList();
       List<String> matched = new List<String>();
