@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:cookmate/search.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -59,9 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       IconButton(
                         icon: Icon(Icons.home),
                         color: Colors.white,
+
                         iconSize: ScreenUtil.instance.setWidth(50.0),
                         onPressed: () {
-                          print('pressed');
                         },
                       ),
                     ],
@@ -75,8 +75,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       IconButton(
                         icon: Icon(Icons.search),
                         color: Colors.white,
+                        tooltip: 'Action Tool Tip',
                         iconSize: ScreenUtil.instance.setWidth(50.0),
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            print("Inside search");
+                             Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SearchPage()));
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -155,7 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               fontSize: ScreenUtil.instance.setWidth(25.0),
                               color: Colors.white),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          print("today");
+                        },
                       ),
                     ],
                   ),
@@ -185,7 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               fontSize: ScreenUtil.instance.setWidth(25.0),
                               color: Colors.white),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          print("popular");
+                        },
                       ),
                     ],
                   ),
@@ -214,7 +227,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             fontSize: ScreenUtil.instance.setWidth(25.0),
                             color: Colors.white),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          print("Favorite");
+                        });
+
+                      },
                     ),
                   ]),
                 ),
