@@ -1,5 +1,5 @@
-
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/recipe.dart';
 import 'package:cookmate/searchResultPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,9 +23,9 @@ class Calendar extends State<MyCalendar> {
   Future<Meal> mealListFuture;
   Future<bool> deleteFuture;
   List<Meal> ml;
-  List<Meal> temp;
+  //List<Meal> temp;
+  List<Meal> todayMeals;
   List<Meal> dayML;
-  //List<int> idL;
   bool isDateSet;
   Date st;
   Date en;
@@ -33,8 +33,6 @@ class Calendar extends State<MyCalendar> {
   Recipe addToCalendar;
   Date selectedDay;
   String selectedDayString;
-  bool isDeleted;
-  bool add;
   DateTime today;
   DateTime start;
   DateTime end;
@@ -43,10 +41,10 @@ class Calendar extends State<MyCalendar> {
 
   Calendar(Recipe recipe) {
     if (recipe != null){
-      this.addRecipe = recipe;
-      // this.addRecipe = new Recipe(recipe.apiID);
-      // this.addRecipe.title = recipe.title;
-      // this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";
+      this.addRecipe = new Recipe(recipe.apiID);
+      this.addRecipe.title = recipe.title;
+      this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";
+      //this.addRecipe.image =
       //this.addRecipe.image =
       //this.addRecipe.apiID = null;
     }
@@ -65,6 +63,14 @@ class Calendar extends State<MyCalendar> {
         ml.add(m);
       }
     });
+    /*this.dayML.clear();
+    selectedDayString =
+    "${today.year}-${today.month}-${today.day}";
+    for (Meal meal in ml) {
+      if (meal.date.getDate.compareTo(selectedDayString) == 0) {
+        this.dayML.add(meal);
+      }
+    }*/
   }
   @override
   void initState() {
@@ -97,11 +103,11 @@ class Calendar extends State<MyCalendar> {
                 ),
                 onDaySelected: (date, events) {
                     if (addRecipe != null){
-                      print("ID:" + addRecipe.apiID.toString());
-                      print("Image: " + addRecipe.imageURL);
-                      print("Title: " +addRecipe.title);
-                      print("apiID: " + addRecipe.apiID.toString());
-                      print("Image: " +((addRecipe.image == null) ? "Null" : "Not Null"));
+                      //print("ID:" + addRecipe.id.toString());
+                      //print("ImageURL: " + addRecipe.imageURL);
+                      //print("Title: " +addRecipe.title);
+                      //print("apiID: " + addRecipe.apiID.toString());
+                      //print("Image: " +((addRecipe.image == null) ? "Null" : "Not Null"));
                       //print("Calories: " + this.addRecipe.calories.toString());
                       //print("cookTime: " +this.addRecipe.cookTime.toString());
                       //print("Ingredients: " + (addRecipe.getIngredients() == null ? "Null" : "Not Null"));
@@ -168,7 +174,7 @@ class Calendar extends State<MyCalendar> {
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 5.00),
-                height: 300,
+                height: 250,
                 color: Colors.white,
                 child: dayML.isNotEmpty
                     ? ListView.builder(
@@ -178,20 +184,25 @@ class Calendar extends State<MyCalendar> {
                           print(dayML[index].recipe.imageURL);
                           print(dayML[index].recipe.title);
                           return Container(
-                              padding: EdgeInsets.all(7),
-                              height: 100,
-                              width: 100,
+                              padding: EdgeInsets.all(4.00),
+                              height: 180,
+                              width: 160,
                               child: Wrap(
                                 children: <Widget>[
-                                  /*SliverAppBar(
-                                    flexibleSpace: FlexibleSpaceBar(
-                                      title: Text(dayML[index].recipe.title) ,
-                                      background: dayML[index].recipe.image,
-                                      centerTitle: true,
-                                    ) ,
-                                  ),*/
                                   //Image.network(dayML[index].recipe.imageURL),
-                                  dayML[index].recipe.image,
+                                  FlatButton(
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+
+                                        child: Image.network(
+                                            dayML[index].recipe.imageURL,
+                                            width: 160
+                                        )
+                                    ),
+                                    onPressed: () {
+                                    },
+                                  ),
+                                  //dayML[index].recipe.image,
                                   Text(dayML[index].recipe.title),
                                   FloatingActionButton(
                                     child: Icon(Icons.remove),
@@ -206,18 +217,6 @@ class Calendar extends State<MyCalendar> {
                                       });
                                     },
                                   ),
-                                  /*FlatButton(
-                                    child: Text("X"),
-                                    onPressed: () {
-                                      backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
-                                        print("deleted");
-                                        setState(() {
-                                          ml.remove(dayML[index]);
-                                          dayML.removeAt(index);
-                                        });
-                                      });
-                                    },
-                                  ),*/
                                 ],
                               ));
                         },
@@ -228,7 +227,7 @@ class Calendar extends State<MyCalendar> {
                         title: Text("No Meals"),
                       )),
               ),
-              ListTile(
+              /*ListTile(
                 title: Text("Add Meals"),
                 onTap: () {
                   Recipe recipe1 = new Recipe(716429);
@@ -261,12 +260,13 @@ class Calendar extends State<MyCalendar> {
                     });
                   });
                 },
-              ),
+              ),*/
               ListTile(
                 title: (addRecipe != null) ? Text(message): Text(""),
               ),
               FloatingActionButton(
                 child: Icon(Icons.add),
+
                 backgroundColor: Colors.redAccent,
                 onPressed: (){
                   Navigator.push(context,
