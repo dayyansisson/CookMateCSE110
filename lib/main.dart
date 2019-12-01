@@ -36,6 +36,7 @@ class HomePageState extends State<HomePage> {
     this.recipe1.imageURL = "https://spoonacular.com/recipeImages/221886-312x231.jpg";
     this.recipe2.title = "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
     this.recipe2.imageURL = "https://spoonacular.com/recipeImages/716429-312x231.jpg";
+
   }
 
   // Recipe recipe1 = new Recipe(
@@ -58,7 +59,8 @@ class HomePageState extends State<HomePage> {
                 title: Text("Calendar"),
                 onTap: (){
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyCalendar(recipe: recipe2,)));
+                      MaterialPageRoute(builder: (context) => MyCalendar()));
+
                 },
               ),
               ListTile(
@@ -84,17 +86,6 @@ class HomePageState extends State<HomePage> {
                   });
                 },
               ),
-
-              /*ListTile(
-                title: Text("Search"),
-                onTap: (){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()));
-                },
-              )*/
-
-
-
             ],
           )
       )

@@ -125,8 +125,15 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                 backgroundColor: Colors.redAccent,
                 label: 'Add to Calendar',
                 labelStyle: TextStyle(fontSize: 18.0),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) =>new MyCalendar(recipe: pageRecipe,) ))//print('SECOND CHILD'),
+                onTap: () {
+                  setState(() {
+                    this.rp = new Recipe(pageRecipe.apiID);
+                    this.rp.title = pageRecipe.title;
+                    this.rp.imageURL = pageRecipe.imageURL;
+                  });
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) =>MyCalendar(recipe: this.rp,) ));//print('SECOND CHILD'),
+                }
 
               ),
             ],
