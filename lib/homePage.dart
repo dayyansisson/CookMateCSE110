@@ -126,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
-                      'Popular Today !'.toUpperCase(),
+                      'Your Favorites!'.toUpperCase(),
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: ScreenUtil.instance.setWidth(22.0),
@@ -181,22 +181,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     colors: [Colors.black54, Colors.black54],
                   ),
                 ),
-              ),
-            ),
-            Positioned(
-              top: ScreenUtil.instance.setWidth(200.0),
-              left: ScreenUtil.instance.setWidth(125.0),
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.stars),
-                    color: Colors.white,
-                    iconSize: ScreenUtil.instance.setWidth(20.0),
-                    onPressed: () {
-                      print('Pressed');
-                    },
-                  ),
-                ],
               ),
             ),
             Positioned(

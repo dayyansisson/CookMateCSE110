@@ -1,3 +1,4 @@
+import 'package:cookmate/profile.dart';
 import 'package:cookmate/search.dart';
 import 'package:cookmate/shoppingListPage.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,9 @@ class TopNavBar extends StatelessWidget {
                 color: Colors.white,
                 iconSize: ScreenUtil.instance.setWidth(45.0),
                 onPressed: () {
-                  print('Pressed');
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => UserProfile()
+                  ));
                 },
               ),
             ],
