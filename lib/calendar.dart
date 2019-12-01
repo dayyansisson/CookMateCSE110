@@ -1,11 +1,10 @@
 import 'package:cookmate/cookbook.dart';
-import 'package:cookmate/recipe.dart';
 import 'package:cookmate/searchResultPage.dart';
-import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 
 // ignore: must_be_immutable
 class MyCalendar extends StatefulWidget {
@@ -84,7 +83,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: TopNavBar().build(context),
+        appBar: NavBar(title: "Calendar", titleSize: 20, isCalendar: true),
         body: SingleChildScrollView(
           child:
           Column(

@@ -1,8 +1,4 @@
-import 'package:cookmate/calendar.dart';
-import 'package:cookmate/search.dart';
-import 'package:cookmate/shoppingListPage.dart';
-import 'package:cookmate/topNavBar.dart';
-import 'package:cookmate/util/database_helpers.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,18 +9,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CookMate',
-      theme: ThemeData(),
+      theme: CookmateStyle.theme,
       home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   GlobalKey _tabBarKey = GlobalKey();
 
@@ -39,60 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
     )..init(context);
 
     return Scaffold(
-        appBar: TopNavBar().build(context),
+      appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
         body: Column(
           children: <Widget>[
-            // DefaultTabController(
-            //   length: 3,
-            //   child: Column(
-            //     children: <Widget>[
-            //       TabBar(
-            //         key: _tabBarKey,
-            //         tabs: <Widget>[
-            //           Tab(
-            //               child: Text("Today",
-            //                   style: TextStyle(color: _titleColor))),
-            //           Tab(
-            //               child: Text("Popular",
-            //                   style: TextStyle(color: _titleColor))),
-            //           Tab(
-            //               child: Text("Favorites",
-            //                   style: TextStyle(color: _titleColor))),
-            //         ],
-            //       ),
-            //       TabBarView(
-            //         children: <Widget>[
-            //           Container(
-            //             height: ScreenUtil.instance.setWidth(250.0),
-            //             child: ListView.builder(
-            //               padding: const EdgeInsets.only(left: 16.0),
-            //               scrollDirection: Axis.vertical,
-            //               itemBuilder: _buildItem,
-            //             ),
-            //           ),
-            //           Container(
-            //             height: ScreenUtil.instance.setWidth(250.0),
-            //             child: ListView.builder(
-            //               padding: const EdgeInsets.only(left: 16.0),
-            //               scrollDirection: Axis.vertical,
-            //               itemBuilder: (context, index) =>
-            //                   _buildItem(context, index),
-            //             ),
-            //           ),
-            //           Container(
-            //             height: ScreenUtil.instance.setWidth(250.0),
-            //             child: ListView.builder(
-            //               padding: const EdgeInsets.only(left: 16.0),
-            //               scrollDirection: Axis.vertical,
-            //               itemBuilder: (context, index) =>
-            //                   _buildItem(context, index),
-            //             ),
-            //           ),
-            //         ],
-            //       )
-            //     ],
-            //   ),
-            // ),
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildItem(BuildContext context, index) {
+    
     String mealName;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),

@@ -1,5 +1,5 @@
 import 'package:cookmate/cookbook.dart';
-import 'package:cookmate/topNavBar.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/util/user.dart';
@@ -134,10 +134,9 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
 
-        // GENERIC APPBAR
-        appBar: TopNavBar().build(context),
+    return new Scaffold(
+        appBar: NavBar(title: "Profile", titleSize: 25, isUserPrefs: true),
 
         // MAIN BODY
         body: ListView(
