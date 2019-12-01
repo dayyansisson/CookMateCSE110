@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:developer' as logger;
 import 'package:cookmate/scanner.dart';
+import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/util/localStorage.dart';
@@ -194,7 +195,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
     dummySearchList.addAll(duplicateItems);
@@ -242,11 +242,12 @@ class _SearchPageState extends State<SearchPage> {
       }).toList(),
     );
   }
-  _getBCList() async{
+
+  _getBCList() async {
     List<String> bcList = await scanButt.scanBarcodeNormal();
-    if(bcList != null){
-      if(ingredientQuery == null) ingredientQuery = new List<String>();
-      for(int i = 0; i < bcList.length; i++){
+    if (bcList != null) {
+      if (ingredientQuery == null) ingredientQuery = new List<String>();
+      for (int i = 0; i < bcList.length; i++) {
         ingredientQuery.add(bcList[i]);
         print(bcList[i]);
       }
@@ -257,9 +258,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: new AppBar(
-        title: new Text('Recipe Search'),
-      ),
+      appBar: TopNavBar().build(context),
       body: Container(
         child: Column(
           children: <Widget>[

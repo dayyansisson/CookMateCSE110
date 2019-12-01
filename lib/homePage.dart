@@ -1,5 +1,7 @@
+import 'package:cookmate/calendar.dart';
 import 'package:cookmate/search.dart';
 import 'package:cookmate/shoppingListPage.dart';
+import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,6 +25,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
+  GlobalKey _tabBarKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     double defaultScreenWidth = 400.0;
@@ -34,192 +39,118 @@ class _MyHomePageState extends State<MyHomePage> {
     )..init(context);
 
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.home),
-                color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(50.0),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => MyHomePage()
-                  ));
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.search),
-                color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(50.0),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SearchPage()));
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.shopping_cart),
-                color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(50.0),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => ShoppingListPage()
-                  ));
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.menu),
-                color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(50.0),
-                onPressed: () {
-                  print('Pressed');
-                },
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              FlatButton(
-                child: Text(
-                  'Today',
-                  style: TextStyle(
-                      shadows: <Shadow>[
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 15.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 5.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                      ],
-                      fontWeight: FontWeight.bold,
-                      fontSize: ScreenUtil.instance.setWidth(25.0),
-                      color: Colors.white),
-                ),
-                onPressed: () {},
-              ),
-              FlatButton(
-                child: Text(
-                  'Popular',
-                  style: TextStyle(
-                      shadows: <Shadow>[
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 15.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 5.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                      ],
-                      fontWeight: FontWeight.bold,
-                      fontSize: ScreenUtil.instance.setWidth(25.0),
-                      color: Colors.white),
-                ),
-                onPressed: () {},
-              ),
-              FlatButton(
-                child: Text(
-                  'Favorite',
-                  style: TextStyle(
-                      shadows: <Shadow>[
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 15.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                        Shadow(
-                          offset: Offset(5.0, 5.0),
-                          blurRadius: 5.0,
-                          color: Color.fromARGB(78, 79, 79, 79),
-                        ),
-                      ],
-                      fontWeight: FontWeight.bold,
-                      fontSize: ScreenUtil.instance.setWidth(25.0),
-                      color: Colors.white),
-                ),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.calendar_today),
-                color: Color(0xFFD50000),
-                iconSize: ScreenUtil.instance.setWidth(50.0),
-                onPressed: () {
-                  print('Pressed');
-                },
-              ),
-            ],
-          ),
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // SizedBox(
-                //   height: ScreenUtil.instance.setWidth(228.0),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    'Today Meals'.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil.instance.setWidth(22.0),
-                      fontWeight: FontWeight.bold,
+        appBar: TopNavBar().build(context),
+        body: Column(
+          children: <Widget>[
+            // DefaultTabController(
+            //   length: 3,
+            //   child: Column(
+            //     children: <Widget>[
+            //       TabBar(
+            //         key: _tabBarKey,
+            //         tabs: <Widget>[
+            //           Tab(
+            //               child: Text("Today",
+            //                   style: TextStyle(color: _titleColor))),
+            //           Tab(
+            //               child: Text("Popular",
+            //                   style: TextStyle(color: _titleColor))),
+            //           Tab(
+            //               child: Text("Favorites",
+            //                   style: TextStyle(color: _titleColor))),
+            //         ],
+            //       ),
+            //       TabBarView(
+            //         children: <Widget>[
+            //           Container(
+            //             height: ScreenUtil.instance.setWidth(250.0),
+            //             child: ListView.builder(
+            //               padding: const EdgeInsets.only(left: 16.0),
+            //               scrollDirection: Axis.vertical,
+            //               itemBuilder: _buildItem,
+            //             ),
+            //           ),
+            //           Container(
+            //             height: ScreenUtil.instance.setWidth(250.0),
+            //             child: ListView.builder(
+            //               padding: const EdgeInsets.only(left: 16.0),
+            //               scrollDirection: Axis.vertical,
+            //               itemBuilder: (context, index) =>
+            //                   _buildItem(context, index),
+            //             ),
+            //           ),
+            //           Container(
+            //             height: ScreenUtil.instance.setWidth(250.0),
+            //             child: ListView.builder(
+            //               padding: const EdgeInsets.only(left: 16.0),
+            //               scrollDirection: Axis.vertical,
+            //               itemBuilder: (context, index) =>
+            //                   _buildItem(context, index),
+            //             ),
+            //           ),
+            //         ],
+            //       )
+            //     ],
+            //   ),
+            // ),
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // SizedBox(
+                  //   height: ScreenUtil.instance.setWidth(228.0),
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      'Today Meals'.toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil.instance.setWidth(22.0),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
-                Container(
-                  height: ScreenUtil.instance.setWidth(250.0),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: _buildItem,
-                  ),
-                ),
-                SizedBox(
-                  height: ScreenUtil.instance.setWidth(7.0),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    'Popular Today !'.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil.instance.setWidth(22.0),
-                      fontWeight: FontWeight.bold,
+                  SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
+                  Container(
+                    height: ScreenUtil.instance.setWidth(250.0),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: _buildItem,
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: ScreenUtil.instance.setWidth(7.0),
-                ),
-                Container(
-                  height: ScreenUtil.instance.setWidth(250.0),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => _buildItem(context, index),
+                  SizedBox(
+                    height: ScreenUtil.instance.setWidth(7.0),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      'Popular Today !'.toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil.instance.setWidth(22.0),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: ScreenUtil.instance.setWidth(7.0),
+                  ),
+                  Container(
+                    height: ScreenUtil.instance.setWidth(250.0),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) =>
+                          _buildItem(context, index),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
   }
 
   Widget _buildItem(BuildContext context, index) {
