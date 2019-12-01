@@ -79,7 +79,7 @@ class Recipe {
           units = 'tsp';
         }
       }
-      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
     }
     //print(ingredients.toString());
