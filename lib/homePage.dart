@@ -5,6 +5,7 @@ import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cookmate/util/backendRequest.dart';
 
 void main() => runApp(MyApp());
 

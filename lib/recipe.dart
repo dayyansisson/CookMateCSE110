@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 //import 'package:cookmate/util/database_helpers.dart';
+import 'package:cookmate/util/localStorage.dart' as LS;
 
 class RecipeDisplay extends StatefulWidget {
   Future<Recipe> recipe;
@@ -22,15 +23,21 @@ class RecipeDisplay extends StatefulWidget {
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
   prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
-  BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  //BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  BackendRequest backend;
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
   Recipe pageRecipe;
 
   GlobalKey _tabBarKey = GlobalKey();
-
+  _getUserInfo() async {
+    int userID = await LS.LocalStorage.getUserID();
+    String token = await LS.LocalStorage.getAuthToken();
+    backend = BackendRequest(token, userID);
+  }
   _RecipeDisplayState(Future<Recipe> recipe) {
+    _getUserInfo();
     recipeFuture = recipe;
     recipeFuture.then((data) {
       pageRecipe = data;

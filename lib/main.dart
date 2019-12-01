@@ -1,3 +1,4 @@
+
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/homePage.dart';
 import 'package:cookmate/login.dart';
@@ -50,10 +51,10 @@ class MyApp extends StatelessWidget {
     db.insertShoppingListItem(sl);
 
     return MaterialApp(
-      theme: CookmateStyle.theme,
-      //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-      //home: ShoppingListPage(),
-      home: LoginPage()
+        theme: CookmateStyle.theme,
+        //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+        //home: ShoppingListPage(),
+        home: LoginPage()
     );
   }
 
