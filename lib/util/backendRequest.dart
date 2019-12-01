@@ -808,7 +808,7 @@ class BackendRequest {
    *    - success: ID of the calendar meal
    *    - failure: null
    */
-  Future<Meal> addMealToCalendar (Recipe recipe, Date date) async {
+  Future<bool> addMealToCalendar (Recipe recipe, Date date) async {
 
     print("Adding ${recipe.title} to ${date.getDate}");
 
@@ -828,13 +828,10 @@ class BackendRequest {
     if(statusCode != _SUCCESS)
     {
       print(_interpretStatus(statusCode, response.statusCode, response.body));
-      return null;
+      return false;
     }
 
-    var data = jsonDecode(response.body);
-    print("Added meal succesfully, meal has ID ${data['id']}");
-
-    return Meal.fromJSON(data);
+    return true;
   }
 
   /* Method: getMeals
@@ -890,7 +887,8 @@ class BackendRequest {
     var data = jsonDecode(response.body);
     String log = "\n\n MEALS \n------------";
     for(var meal in data) {
-      meals.add(Meal.fromJSON(meal));
+      Recipe recipe = await getRecipe(data['recipe']['api_id']);
+      meals.add(Meal.fromJSON(recipe, meal));
       log += "\n\t${meal['id']}, ${meal['date']}";
     }
 

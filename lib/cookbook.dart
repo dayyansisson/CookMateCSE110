@@ -245,16 +245,16 @@ class Date {
 class Meal {
 
   final int _id;
-  final String _recipeID;
+  final Recipe _recipe;
   final Date _date;
 
-  Meal.fromJSON(Map<String, dynamic> json) :
+  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
     _id = json['id'],
-    _recipeID = json['recipe']['api_id'],
+    _recipe = recipe,
     _date = Date.fromJSON(json['date']);
 
-  String get recipe => _recipeID;
+  Recipe get recipe => _recipe;
   int get id => _id;
   Date get date => _date;
-  @override String toString() => "Meal has ID $_recipeID on ${_date.getDate}";
+  @override String toString() => "Meal ID $_id is a ${_recipe.title} on ${_date.getDate}";
 }
