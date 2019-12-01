@@ -1,15 +1,12 @@
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/search.dart';
 import 'package:cookmate/searchResultPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-<<<<<<< HEAD
-import 'package:cookmate/search.dart';
-=======
 import 'package:cookmate/util/cookmateStyle.dart';
 
->>>>>>> 86398eedd50b4822e2c0f7ae8dea8a13eb80d6a5
 // ignore: must_be_immutable
 class MyCalendar extends StatefulWidget {
   Recipe recipe;
@@ -64,10 +61,10 @@ class Calendar extends State<MyCalendar> {
     this.dayML = [];
     this.ml = [];
     backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-      for (int i = 0; i < list.length; i++) {
-        Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
-        ml.add(m);
-      }
+      // for (int i = 0; i < list.length; i++) {
+      //   Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
+      //   ml.add(m);
+      // }
     });
     /*this.dayML.clear();
     selectedDayString =
@@ -143,9 +140,9 @@ class Calendar extends State<MyCalendar> {
                         setState(() {
                           ml.clear();
                           for (int i = 0; i < list.length; i++) {
-                            Meal m = new Meal(
-                                list[i].id, list[i].recipe, list[i].date);
-                            ml.add(m);
+                            // Meal m = new Meal(
+                            //     list[i].id, list[i].recipe, list[i].date);
+                            // ml.add(m);
                           }
                           /*print("-------------ML------------");
                               for (int i = 0; i < ml.length; i++) {
@@ -189,8 +186,8 @@ class Calendar extends State<MyCalendar> {
                         itemCount: dayML.length,
                         itemBuilder: (context, index) {
                           print("In List view");
-                          print(dayML[index].recipe.imageURL);
-                          print(dayML[index].recipe.title);
+                          // print(dayML[index].recipe.imageURL);
+                          // print(dayML[index].recipe.title);
                           return Container(
                               padding: EdgeInsets.all(4.00),
                               height: 180,
@@ -198,20 +195,20 @@ class Calendar extends State<MyCalendar> {
                               child: Wrap(
                                 children: <Widget>[
                                   //Image.network(dayML[index].recipe.imageURL),
-                                  FlatButton(
-                                    child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(15),
+                                  // FlatButton(
+                                  //   child: ClipRRect(
+                                  //       borderRadius: BorderRadius.circular(15),
 
-                                        child: Image.network(
-                                            dayML[index].recipe.imageURL,
-                                            width: 160
-                                        )
-                                    ),
-                                    onPressed: () {
-                                    },
-                                  ),
+                                  //       child: Image.network(
+                                  //           dayML[index].recipe.imageURL,
+                                  //           width: 160
+                                  //       )
+                                  //   ),
+                                  //   onPressed: () {
+                                  //   },
+                                  // ),
                                   //dayML[index].recipe.image,
-                                  Text(dayML[index].recipe.title),
+                                  //Text(dayML[index].recipe.title),
                                   FloatingActionButton(
                                     child: Icon(Icons.remove),
                                     backgroundColor: Colors.redAccent,
