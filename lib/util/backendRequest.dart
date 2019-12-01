@@ -592,7 +592,7 @@ class BackendRequest {
     print("Getting full list of diets...");
 
     // Make API call
-    final response = await http.get(
+    final response = await http.get( 
       "https://thecookmate.com/api/recipe/diets", 
       headers: { "Authorization":"Token $_authToken" }
     );

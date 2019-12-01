@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'Wave_clipper.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CookMate',
-      theme: ThemeData(),
-      home: MyHomePage(),
-    );
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   @override
