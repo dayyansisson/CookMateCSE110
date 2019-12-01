@@ -188,9 +188,9 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                   if(!isPressed){
                     _addToFavorites();
                   }
-                  else{
-                    _removeFromFavorites();
-                  }
+                  // else{
+                  //   _removeFromFavorites();
+                  // }
                 },
               )
             ],

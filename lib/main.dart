@@ -1,6 +1,7 @@
 
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/homePage.dart';
+import 'package:cookmate/login.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart';
@@ -49,18 +50,12 @@ class MyApp extends StatelessWidget {
 
 
     return MaterialApp(
-<<<<<<< HEAD
+
         theme: CookmateStyle.theme,
         //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
         //home: ShoppingListPage(),
         home: LoginPage()
-=======
-      theme: CookmateStyle.theme,
 
-      // home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-      //home: ShoppingListPage(),
-      home: MyHomePage()
->>>>>>> 86398eedd50b4822e2c0f7ae8dea8a13eb80d6a5
     );
   }
 
