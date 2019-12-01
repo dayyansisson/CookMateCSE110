@@ -834,7 +834,7 @@ class BackendRequest {
     var data = jsonDecode(response.body);
     print("Added meal succesfully, meal has ID ${data['id']}");
 
-    return Meal.fromJSON(recipe, data);
+    return Meal.fromJSON(data);
   }
 
   /* Method: getMeals
@@ -890,8 +890,7 @@ class BackendRequest {
     var data = jsonDecode(response.body);
     String log = "\n\n MEALS \n------------";
     for(var meal in data) {
-      Recipe recipe = Recipe.forCalendar(meal['recipe']);
-      meals.add(Meal.fromJSON(recipe, meal));
+      meals.add(Meal.fromJSON(meal));
       log += "\n\t${meal['id']}, ${meal['date']}";
     }
 
@@ -914,15 +913,15 @@ class BackendRequest {
   Future<bool> updateMealInCalendar (Meal meal, { Recipe newRecipe, Date newDate }) async {
 
     if(newRecipe != null) {
-      print("Changing meal ${meal.id} from ${meal.recipe.apiID} to ${newRecipe.apiID}");
+      print("Changing meal from ${meal.recipe} to ${newRecipe.apiID}");
     }
 
     if(newDate != null) {
-      print("Changing meal ${meal.id} from ${meal.date.getDate} to ${newDate.getDate}");
+      print("Changing meal from ${meal.date.getDate} to ${newDate.getDate}");
     }
 
     String dateToPass = meal.date.getDate;
-    String recipeToPass = meal.recipe.apiID.toString();
+    String recipeToPass = meal.recipe.toString();
 
     if(newRecipe != null) {
       recipeToPass = newRecipe.apiID.toString();
@@ -971,7 +970,7 @@ class BackendRequest {
 
     int id;
     if(meal != null) {
-      print("Deleting ${meal.recipe.title} from ${meal.date.getDate}");
+      print("Deleting ${meal.recipe} from ${meal.date.getDate}");
       id = meal.id;
     } else if (mealID != null) {
       print("Deleting $mealID from the calendar");
