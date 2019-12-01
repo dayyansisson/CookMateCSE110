@@ -48,11 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController editingController = TextEditingController();
   BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
   int _value = 2500;
-  String cuisine;
+   List cuisine;
   List<String> duplicateItems = hardcodedIngredientList();
   //List<String> duplicateItems = new List<String>();
   @override
   void initState() {
+    cuisine = [];
     //ingredientList();
     //items.addAll(duplicateItems);
     super.initState();
@@ -71,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var items = List<String>();
   List<String> wordsToSend = List<String>();
   List<String> cusineToSend = List<String>();
+  List<String> chosen = [];
 
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
@@ -143,16 +145,16 @@ class _MyHomePageState extends State<MyHomePage> {
             MultiSelect(
                 autovalidate: false,
                 titleText: 'Select Cuisine',
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select one or more option(s)';
-                  } else { return '';}
-                },
+//                validator: (value) {
+//                  if (value == null) {
+//                    return 'Please select one or more option(s)';
+//                  } else { return '';}
+//                },
                 errorText: 'Please select only one option:',
                 dataSource: [
                   {
                     "display": "Chinese",
-                    "value": 1,
+                    "value": "Chinese",
                   },
                   {
                     "display": "Indian",
@@ -171,11 +173,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 valueField: 'value',
                 filterable: true,
                 required: true,
-                value: '',
-                onSaved: (value) {
-                  cuisine = value;
-                  _onCuisineSelection(cuisine);
-                }
+                value: null,
+                onSaved: (values) {
+                  if (values == null) return;
+                  setState(() {
+                    cuisine = values;
+                    print(cuisine);
+                  });
+                print("Array: $cuisine");
+              },
+//                onSaved: (value) {
+//                  cuisine = value;
+//                  _onCuisineSelection(cuisine);
+//                }
             ),
             Expanded(
               child: ListView.builder(
@@ -239,6 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i =0; i < wordsToSend.length; i++) {
       print(wordsToSend[i]);
     }
+    print("CUISEINE+ $cuisine");
     print('FINAL LIST');
   }
 }
