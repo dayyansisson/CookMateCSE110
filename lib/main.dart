@@ -1,9 +1,6 @@
 
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/homePage.dart';
-import 'package:cookmate/login.dart';
-import 'package:cookmate/searchResultPage.dart';
-import 'package:cookmate/shoppingListPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart';
@@ -45,16 +42,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
-    DatabaseHelper db = DatabaseHelper.instance;
-    ShoppingList sl = ShoppingList(ingredient: 'Watermelon', quantity: 2, purchased: false, measurement: "slices");
-    db.insertShoppingListItem(sl);
+    // BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // ShoppingList sl = ShoppingList(ingredient: 'Watermelon', quantity: 2, purchased: false, measurement: "slices");
+    // db.insertShoppingListItem(sl);
+
 
     return MaterialApp(
+<<<<<<< HEAD
         theme: CookmateStyle.theme,
         //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
         //home: ShoppingListPage(),
         home: LoginPage()
+=======
+      theme: CookmateStyle.theme,
+
+      // home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+      //home: ShoppingListPage(),
+      home: MyHomePage()
+>>>>>>> 86398eedd50b4822e2c0f7ae8dea8a13eb80d6a5
     );
   }
 

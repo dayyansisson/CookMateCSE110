@@ -69,7 +69,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           bottom: TabBar(
             tabs: <Widget>[
               Tab(icon: Icon(Icons.restaurant_menu)),
-              Tab(icon: Icon(Icons.format_list_bulleted))
+              Tab(icon: Icon(Icons.menu))
             ],
           ),
         ),
@@ -86,7 +86,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     if(snapshot.data.length == 0) {
                       return noRecipesError();
                     }
-                    return ListView(children: _searchResults(snapshot.data));
+                    return _searchResults(snapshot.data);
                   default:
                     return Text("error");
                 }
@@ -99,11 +99,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  List<Widget> _searchResults(List<Recipe> data) {
+  Widget _searchResults(List<Recipe> data) {
 
-    List<Widget> results = List<Widget>();
     List<Widget> recipes = List<Widget>();
-
     _totalRecipesDisplayed = 0;
 
     for (Recipe recipe in data) {
@@ -115,29 +113,32 @@ class _SearchResultPageState extends State<SearchResultPage> {
     }
     recipes.add(Divider());
 
-    Widget topBar = 
-    Padding(
-      padding: EdgeInsets.all(16),
-      child: Row(
-        children: <Widget>[
-          Spacer(),
-          Text(
-            "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w300,
-              color: Color.fromRGBO(128, 128, 128, 1)
-            ),
+    return Column(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: <Widget>[
+              Spacer(),
+              Text(
+                "Found ${data.length} recipes, showing $_totalRecipesDisplayed",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w300,
+                  color: Color.fromRGBO(128, 128, 128, 1)
+                ),
+              ),
+              Spacer()
+            ],
+          )
+        ),
+        Flexible(
+          child: ListView(
+            children: recipes,
           ),
-          Spacer()
-        ],
-      )
+        )
+      ],
     );
-
-    results.add(topBar);
-    results.addAll(recipes);
-
-    return results;
   }
 
   void initializePreferences(List<Recipe> recipes) {
