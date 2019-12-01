@@ -3,6 +3,7 @@ import 'package:cookmate/shoppingListPage.dart';
 import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cookmate/util/backendRequest.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,9 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white,
                 iconSize: ScreenUtil.instance.setWidth(50.0),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => MyHomePage()
-                  ));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()));
                 },
               ),
               IconButton(
@@ -63,9 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.white,
                 iconSize: ScreenUtil.instance.setWidth(50.0),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => ShoppingListPage()
-                  ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ShoppingListPage()));
                 },
               ),
               IconButton(

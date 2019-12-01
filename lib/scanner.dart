@@ -22,13 +22,12 @@ class ScanButtonState extends State<ScanButton> {
   List<String> ingredientsForSearch;
   int userID;
   String token;
-
-  BackendRequest be = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  BackendRequest be;
 
   Future<List<String>> scanBarcodeNormal() async {
-//    userID = await LS.LocalStorage.getUserID();
-//    token = await LS.LocalStorage.getAuthToken();
-//    br = new BackendRequest(token, userID);
+    userID = await LS.LocalStorage.getUserID();
+    token = await LS.LocalStorage.getAuthToken();
+    be = new BackendRequest(token, userID);
 
     String barcodeScanRes;
     List<String> ingredients;
@@ -72,8 +71,12 @@ class ScanButtonState extends State<ScanButton> {
   }
 
   Future<List<String>> getIngredients(List<String> breadCrumbs) async {
+      int userID = await LS.LocalStorage.getUserID();
+      String token = await LS.LocalStorage.getAuthToken();
+      BackendRequest request = new BackendRequest(token, userID);
       //get the indredient list
-      List<Ingredient> ingredients = await be.getIngredientList();
+      //List<Ingredient> ingredients = await be.getIngredientList();
+      List<Ingredient> ingredients = await request.getIngredientList();
       List<String> matched = new List<String>();
       
       for(int i =0; i < breadCrumbs.length; i++){

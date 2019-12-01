@@ -75,11 +75,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    //token = await LocalStorage.getAuthToken();
-    //userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
+    print("Token: " + token.toString());
+    print("UserId: " +  userID.toString());
 
-    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    userID = 2;
+    //token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+    //userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
@@ -194,7 +196,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
     dummySearchList.addAll(duplicateItems);
@@ -242,11 +243,12 @@ class _SearchPageState extends State<SearchPage> {
       }).toList(),
     );
   }
-  _getBCList() async{
+
+  _getBCList() async {
     List<String> bcList = await scanButt.scanBarcodeNormal();
-    if(bcList != null){
-      if(ingredientQuery == null) ingredientQuery = new List<String>();
-      for(int i = 0; i < bcList.length; i++){
+    if (bcList != null) {
+      if (ingredientQuery == null) ingredientQuery = new List<String>();
+      for (int i = 0; i < bcList.length; i++) {
         ingredientQuery.add(bcList[i]);
         print(bcList[i]);
       }
