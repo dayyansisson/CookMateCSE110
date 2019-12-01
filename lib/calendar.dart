@@ -1,6 +1,7 @@
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/recipe.dart';
 import 'package:cookmate/searchResultPage.dart';
+import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -83,9 +84,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text("Calendar"),
-        ),
+        appBar: TopNavBar().build(context),
         body: SingleChildScrollView(
           child:
           Column(

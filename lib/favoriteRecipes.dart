@@ -1,25 +1,11 @@
 import 'package:flutter/material.dart';
 
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
+class FavoritesPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CookMate',
-      theme: ThemeData(),
-      home: MyHomePage(),
-    );
-  }
+  _FavoritesPageState createState() => _FavoritesPageState();
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
