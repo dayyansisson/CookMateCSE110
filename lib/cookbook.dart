@@ -9,19 +9,21 @@ class Recipe {
 
   bool _complete;
 
-  int id;
   int apiID;
   String title;
   String imageURL;
   int servings;
   int cookTime;
+  double price;
+  double calories; 
+  int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.id = id, _complete = false;
+  Recipe(int id) : this.apiID = id, _complete = false;
   Recipe.forCalendar(Map<String, dynamic> json) {
     
-    id = json['id'];
-    apiID = json['api_id'];
+    apiID = json['id'];
+    //apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
     _complete = false;
@@ -29,32 +31,59 @@ class Recipe {
 
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
-    id = json['id'];
-    //apiID = json['api_id'];
+    apiID = json['id'];
     title = json['title'];
-    imageURL = json['image'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
     _complete = true;
   }
 
+  Recipe.forPopularList(Map<String, dynamic> json) {
+
+    apiID = json['id'];
+    apiID = json['api_id'];
+    title = json['name'];
+    imageURL = json['url'];
+    popularity = json['popular_count'];
+    _complete = false;
+  }
+
   //Returns all the ingredients for a given recipe
-  List<String> getIngredients(){
-    List<String> ingredients = new List<String>();
+  List<Ingredient> getIngredients(){
+    List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
-    
-    
+
     for(int i =0; i < ingredientList.length; i++){
-      ingredients.add(ingredientList[i]["originalString"]);
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      ingredients.add(ing);
     }
-    print(ingredients.toString());
+    //print(ingredients.toString());
     return ingredients;
   }
 
   //Returns the instructions in a list
   List<String> getInstructions(){
     List<String> instructions = new List<String>();
+
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
 
     var instructionList = json["analyzedInstructions"][0][
       "steps"];
@@ -63,24 +92,47 @@ class Recipe {
       instructions.add(step["step"]);
     }
 
-    print(instructions.toString());
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
   Map<String, dynamic> get json => _json;
   bool get isComplete => _complete;
 
-  // TODO: Implement toString()
-
+  @override
+  String toString() => """\n
+      $title
+      ----------------------------
+      api:        $apiID
+      image:      $imageURL
+      servings:   $servings
+      cook time:  $cookTime
+      price:      $price 
+      calories:   $calories
+      popularity: $popularity
+      hasJson:    $_complete
+    """;
 }
 
 /* Class: Ingredient
  * Description: Ingredient object containing its name, and id.
  */
 class Ingredient {
+
+  int id;
+  String name;
+  double quantity;
+  String units;
+
+  Ingredient(int id, String name, double quantity, String units){
+    this.id = id;
+    this.name = name;
+    this.quantity = quantity;
+    this.units = units;
+  }
   
-  final int id;
-  final String name;
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -92,6 +144,7 @@ class Cuisine {
   
   final int id;
   final String name;
+
 
   Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -105,11 +158,19 @@ class Diet {
   String name;
   String summary;
 
+  Diet ({int id, String name, String summary}) : this.id = id, this.name = name, this.summary = summary;
+
   Diet.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     name = json['name'];
     summary = json['summary'];
+  }
+
+  Diet.forUP(Map<String, dynamic> json) {
+
+    id = json['id'];
+    name = json['name'];
   }
 }
 
@@ -119,20 +180,20 @@ class Diet {
 class UserProfile {
 
   int id;
-  Map<String, dynamic> diet;
+  Diet diet;
   List<Map<String, dynamic>> allergens;
   List<Map<String, dynamic>> favorites;
 
-  UserProfile(int id, Map<String, dynamic> diet, List<Map<String, dynamic>> allergens) : this.allergens = allergens, this.diet = diet, this.id = id;
+  UserProfile({ int id, Diet diet, List<Map<String, dynamic>> allergens, List<Map<String, dynamic>> favorites }) : this.allergens = allergens, this.diet = diet, this.id = id;
   UserProfile.fromJSON(Map<String, dynamic> json) {
     
     id = json['id'];
     var diet = json['diet'];
     if(diet != null)
     {
-      this.diet = diet;
+      this.diet = Diet.forUP(diet);
     } else {
-      this.diet = Map<String, dynamic>();
+      this.diet = null;
     }
     var allergens = json['allergens'];
     if(allergens != null)
@@ -148,6 +209,16 @@ class UserProfile {
     } else {
       this.favorites = List<Map<String, dynamic>>();
     }
+  }
+
+  String allergenList () {
+
+    String list = "";
+    for(Map<String, dynamic> allergen in allergens) {
+      list += "${allergen['name']}, ";
+    }
+
+    return list.substring(0, list.length - 2);
   }
 
   @override String toString() {
