@@ -4,7 +4,7 @@ import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
-import 'package:cookmate/util/database_helpers.dart' as prefix0;
+import 'package:cookmate/util/database_helpers.dart' as localDB;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -22,13 +22,14 @@ class RecipeDisplay extends StatefulWidget {
 }
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
-  prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
+  localDB.DatabaseHelper helper = localDB.DatabaseHelper.instance;
   //BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
   BackendRequest backend;
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
   Recipe pageRecipe;
+  Color starColor = Colors.white;
 
   GlobalKey _tabBarKey = GlobalKey();
   _getUserInfo() async {
@@ -148,6 +149,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   }
 
   Widget header(Image image) {
+    _isPressedFave();
     return Stack(
       children: <Widget>[
         image,
@@ -171,10 +173,10 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
               IconButton(
                 icon: Icon(Icons.star_border),
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
-                color: isPressedFave(),
+                color: starColor,
                 iconSize: 35.0,
                 onPressed: () {
-                  helper.clearRecipes();
+                  //helper.clearRecipes();
                   setState(() {
                     if (isPressed) {
                       isPressed = false;
@@ -403,7 +405,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   _addIngredients(List<Ingredient> ingredients) async {
     await helper.clearShoppingList();
     for (int i = 0; i < ingredients.length; i++) {
-      prefix0.ShoppingList sl = new prefix0.ShoppingList(
+      localDB.ShoppingList sl = new localDB.ShoppingList(
           ingredient: ingredients[i].name,
           quantity: ingredients[i].quantity.round(),
           purchased: false,
@@ -415,15 +417,15 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   }
 
   _addToFavorites() async {
-    prefix0.Recipe fave = new prefix0.Recipe(
+    localDB.Recipe fave = new localDB.Recipe(
       id: pageRecipe.apiID,
       name: pageRecipe.title,
       img: pageRecipe.imageURL
     );
 
     //print(pageRecipe.toString());
-    backend.removeFavorite(pageRecipe.apiID);
-
+    //backend.removeFavorite(pageRecipe.apiID);
+    print(pageRecipe);
     backend.addFavorite(pageRecipe);
 
     await helper.insertRecipe(fave);
@@ -432,6 +434,27 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   _removeFromFavorites() async {
     await helper.deleteRecipe(pageRecipe.apiID);
     backend.removeFavorite(pageRecipe.apiID);
+  }
+
+  _isPressedFave() async {
+    List<localDB.Recipe> recipes = await helper.recipes();
+
+    for(int i =0; i < recipes.length; i++){
+      if(pageRecipe.title == recipes[i].name){
+        isPressed = true;
+      }
+    }
+
+    if (this.isPressed) {
+      setState(() {
+        starColor = Colors.yellow;
+      });
+    }
+    else{
+      setState(() {
+        starColor = Colors.white;
+      });
+    }
   }
 
   // Widget unitsCheck(String units) {
@@ -451,14 +474,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   //     return Container();
   // }
 
-  Color isPressedFave() {
-
-
-    if (this.isPressed) {
-      return Colors.yellow;
-    }
-    return Colors.white;
-  }
+  
 
   String formatAmount(double amount) {
     if (amount == 0.25) {
