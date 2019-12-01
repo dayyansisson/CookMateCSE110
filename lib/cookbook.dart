@@ -70,6 +70,15 @@ class Recipe {
     List<dynamic> ingredientList = json["extendedIngredients"];
 
     for(int i =0; i < ingredientList.length; i++){
+      String units = ingredientList[i]['unit'];
+      if(units == 'tablespoon' || units == 'teaspoon'){
+        if(units == 'tablespoon'){
+          units = 'tbsp';
+        }
+        else{
+          units = 'tsp';
+        }
+      }
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
       ingredients.add(ing);
     }

@@ -3,6 +3,7 @@
  */
 import 'dart:convert';
 import 'dart:developer' as logger;
+import 'package:cookmate/dialog.dart';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
@@ -251,6 +252,17 @@ class _SearchPageState extends State<SearchPage> {
         ingredientQuery.add(bcList[i]);
         print(bcList[i]);
       }
+    }
+    else if(bcList == null){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+           title: "Uh Oh",
+           description:
+            "Barcode not found in our database, please try entering the item manually",
+           buttonText: "Okay",
+          ),
+        );
     }
   }
 

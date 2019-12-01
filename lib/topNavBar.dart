@@ -23,7 +23,7 @@ class TopNavBar extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.home),
                 color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(45.0),
+                iconSize: ScreenUtil.instance.setWidth(35.0),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => MyHomePage()));
@@ -32,7 +32,7 @@ class TopNavBar extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.search),
                 color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(45.0),
+                iconSize: ScreenUtil.instance.setWidth(35.0),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => SearchPage()));
@@ -41,7 +41,7 @@ class TopNavBar extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.shopping_cart),
                 color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(45.0),
+                iconSize: ScreenUtil.instance.setWidth(35.0),
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -52,7 +52,7 @@ class TopNavBar extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.calendar_today),
                 color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(45.0),
+                iconSize: ScreenUtil.instance.setWidth(35.0),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => MyCalendar()));
@@ -61,7 +61,7 @@ class TopNavBar extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.menu),
                 color: Colors.white,
-                iconSize: ScreenUtil.instance.setWidth(45.0),
+                iconSize: ScreenUtil.instance.setWidth(35.0),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) => UserProfile()
