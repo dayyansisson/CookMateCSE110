@@ -8,20 +8,19 @@ import 'package:flutter/material.dart';
 class Recipe {
 
   bool _complete;
-  int id;
 
+  int id;
   int apiID;
   String title;
   String imageURL;
   int servings;
   int cookTime;
   double price;
-  double calories; 
+  double calories;
   int popularity;
   Map<String, dynamic> _json;
 
   Recipe(int id) : this.apiID = id, _complete = false;
-
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -60,9 +59,7 @@ class Recipe {
     List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
-    
-    
-    
+
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
       if(units == 'tablespoon' || units == 'teaspoon'){
@@ -89,8 +86,8 @@ class Recipe {
     }
 
     var instructionList = json["analyzedInstructions"][0][
-      "steps"];
-    
+    "steps"];
+
     for(Map<String,dynamic> step in instructionList){
       instructions.add(step["step"]);
     }
@@ -136,7 +133,7 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-  
+
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -145,7 +142,7 @@ class Ingredient {
  * Description: Cuisine object containing its name, and id.
  */
 class Cuisine {
-  
+
   final int id;
   final String name;
 
@@ -190,7 +187,7 @@ class UserProfile {
 
   UserProfile({ int id, Diet diet, List<Map<String, dynamic>> allergens, List<Map<String, dynamic>> favorites }) : this.allergens = allergens, this.diet = diet, this.id = id;
   UserProfile.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     var diet = json['diet'];
     if(diet != null)
@@ -247,10 +244,10 @@ class Date {
 
   final int _year, _month, _day;
   Date(int year, int month, int day) : _year = year, _month = month, _day = day;
-  Date.fromJSON(String json) : 
-    _year = int.tryParse(json.substring(0, 4)),
-    _month = int.tryParse(json.substring(5, 7)),
-    _day = int.tryParse(json.substring(8, 10));
+  Date.fromJSON(String json) :
+        _year = int.tryParse(json.substring(0, 4)),
+        _month = int.tryParse(json.substring(5, 7)),
+        _day = int.tryParse(json.substring(8, 10));
 
   String get getDate => "$_year-$_month-$_day";
   @override String toString() => getDate;

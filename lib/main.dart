@@ -1,101 +1,62 @@
-
-
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/homePage.dart';
 import 'package:cookmate/login.dart';
-
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
-//import 'package:cookmate/search.dart';
+import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:cookmate/calendar.dart';
-import 'package:cookmate/homePage.dart';
-import 'package:cookmate/login.dart';
-import 'cookbook.dart';
 
-//import 'cookbook.dart' as cb;
-
-
-void main(){
-  runApp(MaterialApp(
-    title: 'Home',
-    theme: CookmateStyle.theme,
-    home: HomePage(),
-  ));
-}
-class HomePage extends StatefulWidget{
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return HomePageState();
-  }
-
+main() {
+  //DatabaseHelper helper = DatabaseHelper.instance;
+  //helper.clearRecipes();
+  runApp(MyApp());
 }
 
-class HomePageState extends State<HomePage> {
-  String _authToken = "e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
-  int id = 6;
-  BackendRequest br = new BackendRequest(
-      "e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
-  Recipe recipe1 = new Recipe(221886);
-  Recipe recipe2 = new Recipe(716429);
+class MyApp extends StatelessWidget {
 
-  HomePageState() {
-    this.recipe1.title = "Red pepper, ham & cheese tart";
-    this.recipe1.imageURL =
-    "https://spoonacular.com/recipeImages/221886-312x231.jpg";
-    this.recipe2.title =
-    "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
-    this.recipe2.imageURL =
-    "https://spoonacular.com/recipeImages/716429-312x231.jpg";
-  }
-
-
-  // Recipe recipe1 = new Recipe(
-  //     716429,
-  //     "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-  //     "https://spoonacular.com/recipeImages/716429-312x231.jpg");
+  final UserProfile profile = UserProfile(
+      id: -1,
+      diet: Diet(
+          id: 3,
+          name: "gluten free"
+      ),
+      allergens: [
+        // {
+        //   "id": 1,
+        //   "name": "Dairy"
+        // },
+        {
+          "id": 8,
+          "name": "Shellfish"
+        },
+      ],
+      favorites: [
+        {
+          "id": 1,
+          "api_id": 716429,
+          "name": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+          "url": "https://spoonacular.com/recipeImages/716429-312x231.jpg"
+        }
+      ]
+  );
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Home'),
-          backgroundColor: Colors.lightBlue,
-        ),
-        body: Container(
-            child: ListView(
-              children: <Widget>[
-                ListTile(
-                  title: Text("Calendar"),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => MyCalendar()));
-                  },
-                ),
-                ListTile(
-                  title: Text("Create User"),
-                  onTap: () {
-                    setState(() {
-                      /* br.createUser("Hatef.nabili@gmail.com", "hatef88" , "G0lPe3ar").then((id){
-                      this.id = id;
-                      print("id: " + this.id.toString());
-                    });*/
-                    });
-                  },
-                ),
-                ListTile(
-                  title: Text("Log in"),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) =>
-                        new LoginPage()));
-                  },
-                ),
-              ],
-            )
-        )
+
+    // BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // ShoppingList sl = ShoppingList(ingredient: 'Watermelon', quantity: 2, purchased: false, measurement: "slices");
+    // db.insertShoppingListItem(sl);
+
+
+    return MaterialApp(
+
+        theme: CookmateStyle.theme,
+        //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+        //home: ShoppingListPage(),
+        home: LoginPage()
+
     );
   }
+
 }

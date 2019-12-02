@@ -27,7 +27,7 @@ class Calendar extends State<MyCalendar> {
   List<Meal> ml;
   List<Meal> todayMeals;
   List<Meal> dayML;
-  bool isDateSet;
+  //bool isDateSet;
   Date st;
   Date en;
   Meal meal;
@@ -44,12 +44,18 @@ class Calendar extends State<MyCalendar> {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();
     backendRequest= BackendRequest(token, userID);
+    this.ml = await backendRequest.getMeals();
+  }
+  _getMealsFromCalendar() async {
+      this.ml = await backendRequest.getMeals();
+
   }
   Calendar(Recipe recipe) {
     if (recipe != null){
       this.addRecipe = recipe;
     }
     _getUserInfo();
+    //_getMealsFromCalendar();
     this.request =
     new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
     this.today = new DateTime.now();
@@ -64,9 +70,9 @@ class Calendar extends State<MyCalendar> {
   @override
   void initState() {
     super.initState();
-    request.getMeals(startDate: st, endDate: en).then((list) {
+    /*request.getMeals(startDate: st, endDate: en).then((list) {
       ml = list;
-    });
+    });*/
     _controller = CalendarController();
   }
 
@@ -75,9 +81,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text("Calendar"),
-        ),
+        appBar: NavBar(title: "Calendar", titleSize: 25, hasReturn: true, isSearch: true),
         body:
         SingleChildScrollView(
           child:
@@ -197,7 +201,7 @@ class Calendar extends State<MyCalendar> {
                                 Navigator.pop(context);
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => RecipeDisplay(backendRequest.getRecipe("${dayML[index].recipe.apiID}")))
+                                    MaterialPageRoute(builder: (context) => RecipeDisplay("${dayML[index].recipe.apiID}"))
                                 );
                               },
                             ),
