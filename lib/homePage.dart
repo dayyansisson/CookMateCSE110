@@ -23,7 +23,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
+
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   GlobalKey _tabBarKey = GlobalKey();
 
@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     )..init(context);
 
     return Scaffold(
-      appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
+        appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
         body: Column(
           children: <Widget>[
             SingleChildScrollView(
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildItem(BuildContext context, index) {
-    
+
     String mealName;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),

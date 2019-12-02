@@ -150,7 +150,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              new MyCalendar(recipe: pageRecipe)));
+                          new MyCalendar(recipe: pageRecipe)));
                 },
               ),
             ],
@@ -374,7 +374,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     String finalString = "";
     for (String word in formattedString) {
       finalString +=
-          "${word[0].toUpperCase()}${word.substring(1, word.length)} ";
+      "${word[0].toUpperCase()}${word.substring(1, word.length)} ";
     }
     return finalString;
   }

@@ -7,6 +7,7 @@ import 'dart:ffi';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/cookbook.dart' as CB;
@@ -271,7 +272,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: TopNavBar().build(context),
+      appBar: NavBar(title: "Search", titleSize: 25, hasReturn: true, isSearch: true),
       body: Container(
         child: Column(
           children: <Widget>[
