@@ -8,7 +8,8 @@ import 'package:cookmate/util/database_helpers.dart';
 import 'package:flutter/material.dart';
 
 main() {
-
+  //DatabaseHelper helper = DatabaseHelper.instance;
+  //helper.clearRecipes();
   runApp(MyApp());
 }
 

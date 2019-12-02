@@ -366,7 +366,7 @@ class BackendRequest {
    */
   Future<bool> removeFavorite(int recipeID) async {
 
-    print("Adding recipe $recipeID to favorites...");
+    print("Removing recipe $recipeID from favorites...");
 
     // Make API call
     final response = await http.post(
