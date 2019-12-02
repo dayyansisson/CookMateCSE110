@@ -1,6 +1,7 @@
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart' as DB;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ShoppingListPage extends StatefulWidget {
   @override
@@ -8,17 +9,15 @@ class ShoppingListPage extends StatefulWidget {
 }
 
 class _ShoppingListPageState extends State<ShoppingListPage> {
-
   Future<List<DB.ShoppingList>> _slFuture;
 
-  @override void initState() {
-
+  @override
+  void initState() {
     _initializeSL();
     super.initState();
   }
 
-  _initializeSL () {
-    
+  _initializeSL() {
     DB.DatabaseHelper db = DB.DatabaseHelper.instance;
     _slFuture = db.shoppingListItems();
   }
@@ -26,24 +25,11 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(
-          "Shopping List",
-          style: TextStyle(
-            fontWeight: FontWeight.w700
-          ),
-        ),
-      ),
+      appBar: NavBar(title: "Shopping List", titleSize: 20, isShoppingList: true),
       body: FutureBuilder(
         future: _slFuture,
         builder: (futureContext, snapshot) {
-          switch(snapshot.connectionState) {
+          switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return CookmateStyle.loadingIcon("Loading your shopping list...");
             case ConnectionState.done:
@@ -56,44 +42,42 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     );
   }
 
-  Widget shoppingListView (List<DB.ShoppingList> list) {
+  Widget shoppingListView(List<DB.ShoppingList> list) {
 
-    if(list.length == 0) {
+    if (list.length == 0) {
       return Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Looks like your shopping list is empty!",
-              style: TextStyle(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "Looks like your shopping list is empty!",
+            style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w300,
-                color: CookmateStyle.textGrey
-              ),
+                color: CookmateStyle.textGrey),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Icon(
+              Icons.shopping_cart,
+              color: CookmateStyle.iconGrey,
+              size: 40,
             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Icon(
-                Icons.shopping_cart,
-                color: CookmateStyle.iconGrey,
-                size: 40,
-              ),
-            )
-          ],
-        )
-      );
+          )
+        ],
+      ));
     }
 
     List<Widget> items = List<Widget>();
     String quantityDisplay;
     int purchasedItems = 0;
 
-    for(DB.ShoppingList item in list) {
+    for (DB.ShoppingList item in list) {
       quantityDisplay = item.quantity.toString();
-      if(item.measurement != null) {
+      if (item.measurement != null) {
         quantityDisplay += " ${item.measurement}";
       }
-      if(item.purchased) {
+      if (item.purchased) {
         purchasedItems++;
       }
       Widget shoppingItem = Row(
@@ -113,93 +97,113 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           Padding(padding: EdgeInsets.only(left: 10)),
           Container(
             width: 140,
-              child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  width: 20,
-                  child: IconButton(
-                    alignment: Alignment.centerRight,
-                    iconSize: 12,
-                    color: item.purchased == true ? Color.fromRGBO(230, 230, 230, 1) : CookmateStyle.iconGrey,
-                    disabledColor: Color.fromRGBO(230, 230, 230, 1),
-                    icon: Icon(Icons.arrow_back_ios),
-                    onPressed: item.quantity == 0 ? null : () {
-                      setState(() {
-                        item.quantity--;
-                        _updateShoppingItem(item);
-                      });
-                    },
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    width: 20,
+                    child: IconButton(
+                      alignment: Alignment.centerRight,
+                      iconSize: 12,
+                      color: item.purchased == true
+                          ? Color.fromRGBO(230, 230, 230, 1)
+                          : CookmateStyle.iconGrey,
+                      disabledColor: Color.fromRGBO(230, 230, 230, 1),
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: item.quantity == 0
+                          ? null
+                          : () {
+                              setState(() {
+                                item.quantity--;
+                                _updateShoppingItem(item);
+                              });
+                            },
+                    ),
                   ),
-                ),
-                Spacer(),
-                Text(
-                  quantityDisplay,
-                  style: item.purchased == true ? 
-                  TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w300,
-                    color: CookmateStyle.standardRed,
-                    decoration: TextDecoration.lineThrough
-                  ) :
-                  TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w300,
-                    color: CookmateStyle.textGrey,
+                  Spacer(),
+                  SizedBox(
+                    width: 80,
+                    height: 20,
+                    child: Center(
+                      child: Text(
+                        quantityDisplay,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: item.purchased == true
+                            ? TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w300,
+                                color: CookmateStyle.standardRed,
+                                decoration: TextDecoration.lineThrough)
+                            : TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w300,
+                                color: CookmateStyle.textGrey,
+                              ),
+                      ),
+                    ),
                   ),
-                ),
-                Spacer(),
-                SizedBox(
-                  width: 20,
-                  child: IconButton(
-                    alignment: Alignment.centerLeft,
-                    iconSize: 12,
-                    color: item.purchased == true ? Color.fromRGBO(230, 230, 230, 1) : CookmateStyle.iconGrey,
-                    disabledColor: Color.fromRGBO(230, 230, 230, 1),
-                    icon: Icon(Icons.arrow_forward_ios),
-                    onPressed: item.purchased == true ? null : () {
-                      setState(() {
-                        item.quantity++;
-                        _updateShoppingItem(item);
-                      });
-                    },
+                  Spacer(),
+                  SizedBox(
+                    width: 20,
+                    child: IconButton(
+                      alignment: Alignment.centerLeft,
+                      iconSize: 12,
+                      color: item.purchased == true
+                          ? Color.fromRGBO(230, 230, 230, 1)
+                          : CookmateStyle.iconGrey,
+                      disabledColor: Color.fromRGBO(230, 230, 230, 1),
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: item.purchased == true
+                          ? null
+                          : () {
+                              setState(() {
+                                item.quantity++;
+                                _updateShoppingItem(item);
+                              });
+                            },
+                    ),
                   ),
-                ),
-              ]
-            ),
+                ]),
           ),
           Spacer(),
-          Text(
-            item.ingredient,
-            style: item.purchased == true ? 
-            TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w400,
-              color: CookmateStyle.standardRed,
-              decoration: TextDecoration.lineThrough
-            ) :
-            TextStyle(
-              fontSize: 17,
-              color: CookmateStyle.textGrey,
+          SizedBox(
+            width: 120,
+            height: 40,
+            child: Center(
+              child: Text(
+                item.ingredient,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.fade,
+                style: item.purchased == true
+                    ? TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                        color: CookmateStyle.standardRed,
+                        decoration: TextDecoration.lineThrough)
+                    : TextStyle(
+                        fontSize: 17,
+                        color: CookmateStyle.textGrey,
+                      ),
+              ),
             ),
           ),
           Spacer(),
           SizedBox(
-            width: 10,
+            width: ScreenUtil.getInstance().setWidth(30),
             child: IconButton(
-              alignment: Alignment.centerLeft,
-              iconSize: 10,
-              icon: Icon(Icons.clear),
-              color: Color.fromRGBO(230, 100, 100, 1),
-              onPressed: () {
-                setState(() {
-                  _removeShoppingItem(item);
-                  _initializeSL();
-                });
-              },
+                iconSize: 10,
+                icon: Icon(Icons.clear),
+                color: Color.fromRGBO(230, 100, 100, 1),
+                onPressed: () {
+                  setState(() {
+                    _removeShoppingItem(item);
+                    _initializeSL();
+                  });
+                },
             ),
           ),
-          Padding(padding: EdgeInsets.only(right: 40)),
+          Spacer(flex: 4)
         ],
       );
       items.add(shoppingItem);
@@ -209,68 +213,59 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     return Column(
       children: <Widget>[
         Container(
-          height: 50,
-          color: Color.fromRGBO(240, 240, 240, 1),
-          child: Row(
-            children: <Widget>[
-              Padding(padding: EdgeInsets.only(left: 30)),
-              Text(
-                "$purchasedItems/${list.length}",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: CookmateStyle.iconGrey
-                ),
-              ),
-              // Padding(padding: EdgeInsets.only(left: 60)),
-              // Text(
-              //   "INGREDIENTS",
-              //   style: TextStyle(
-              //     fontSize: 15,
-              //     fontWeight: FontWeight.w800,
-              //     color: CookmateStyle.iconGrey
-              //   ),
-              // ),
-              Spacer(),
-              FlatButton(
-                child: Text(
-                  "CLEAR",
+          height: 30,
+          //color: Color.fromRGBO(240, 240, 240, 1),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: <Widget>[
+                Padding(padding: EdgeInsets.only(left: 30)),
+                Text(
+                  "$purchasedItems/${list.length}",
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: CookmateStyle.iconGrey
-                  ),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: CookmateStyle.iconGrey),
                 ),
-                onPressed: () {
-                  setState(() {
-                    _clearShoppingList();
-                    _initializeSL();
-                  });
-                },
-              ),
-              Padding(padding: EdgeInsets.only(right: 20)),
-            ],
+                Spacer(),
+                FlatButton(
+                  child: Text(
+                    "CLEAR",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: CookmateStyle.iconGrey),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _clearShoppingList();
+                      _initializeSL();
+                    });
+                  },
+                ),
+                Padding(padding: EdgeInsets.only(right: 20)),
+              ],
+            ),
           ),
         ),
+        Divider(),
         Flexible(child: ListView(children: items))
       ],
     );
   }
 
   _clearShoppingList() {
-
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     helper.clearShoppingList(); // removes all local shopping list items
   }
 
   _removeShoppingItem(DB.ShoppingList sl) {
-
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
-    helper.deleteShoppingListItem(sl.ingredient); // removes all local shopping list items
+    helper.deleteShoppingListItem(
+        sl.ingredient); // removes all local shopping list items
   }
 
   _updateShoppingItem(DB.ShoppingList sl) {
-
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     helper.updateShoppingListItem(sl);
   }

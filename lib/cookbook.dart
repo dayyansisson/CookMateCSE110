@@ -20,15 +20,7 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int apiId) : this.apiID = apiId, _complete = false;
-  Recipe.forCalendar(Map<String, dynamic> json) {
-    
-    //id = json['id'];
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    _complete = false;
-  }
+  Recipe(int id) : this.apiID = id, _complete = false;
 
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
@@ -56,7 +48,6 @@ class Recipe {
 
   Recipe.forPopularList(Map<String, dynamic> json) {
 
-    //id = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -256,16 +247,15 @@ class Date {
 }
 
 class Meal {
-
   final int _id;
   final Recipe _recipe;
   final Date _date;
-
-  Meal(int id, Recipe recipe, Date date) : _id = id, _recipe = recipe, _date = date;
-  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) : _recipe = recipe, _id = json['id'], _date = Date.fromJSON(json['date']);
-
-  int get id => _id;
+  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
+        _id = json['id'],
+        _recipe = recipe,
+        _date = Date.fromJSON(json['date']);
   Recipe get recipe => _recipe;
+  int get id => _id;
   Date get date => _date;
-  @override String toString() => "Meal $_id is a ${_recipe.title} on ${_date.getDate}";
+  @override String toString() => "Meal ID $_id is a ${_recipe.title} on ${_date.getDate}";
 }

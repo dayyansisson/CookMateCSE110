@@ -1,10 +1,11 @@
+
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 //import 'package:cookmate/search.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/homePage.dart';
-
+import 'package:cookmate/login.dart';
 import 'cookbook.dart';
 
 //import 'cookbook.dart' as cb;
@@ -48,48 +49,42 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-        backgroundColor: Colors.lightBlue,
-      ),
-      body: Container(
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                title: Text("Calendar"),
-                onTap: (){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyCalendar()));
-
-                },
-              ),
-              ListTile(
-                title: Text("Create User"),
-                onTap: (){
-                  setState(() {
-                   /* br.createUser("Hatef.nabili@gmail.com", "hatef88" , "G0lPe3ar").then((id){
+        appBar: AppBar(
+          title: Text('Home'),
+          backgroundColor: Colors.lightBlue,
+        ),
+        body: Container(
+            child: ListView(
+              children: <Widget>[
+                ListTile(
+                  title: Text("Calendar"),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => MyCalendar()));
+                  },
+                ),
+                ListTile(
+                  title: Text("Create User"),
+                  onTap: () {
+                    setState(() {
+                      /* br.createUser("Hatef.nabili@gmail.com", "hatef88" , "G0lPe3ar").then((id){
                       this.id = id;
                       print("id: " + this.id.toString());
                     });*/
-                  });
-                },
-              ),
-              ListTile(
-                title: Text("Log in"),
-                onTap: (){
-                  setState(() {
-                      BackendRequest.login("hatef88", "G0lPe3ar").then((_authToken){
-                      this._authToken = _authToken;
-                      this.br = new BackendRequest(this._authToken, id);
-                      print("Token: " + _authToken);
                     });
-                  });
-                },
-              ),
-            ],
-          )
-      )
-
+                  },
+                ),
+                ListTile(
+                  title: Text("Log in"),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) =>
+                        new LoginPage()));
+                  },
+                ),
+              ],
+            )
+        )
     );
   }
 }

@@ -4,8 +4,8 @@ import 'package:cookmate/search.dart';
 import 'package:cookmate/searchResultPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -22,6 +22,8 @@ class MyCalendar extends StatefulWidget {
 class Calendar extends State<MyCalendar> {
   CalendarController _controller;
   BackendRequest backendRequest;
+  int id;
+  String token;
   Future <List<Meal>> mealFuture;
   Future<Meal> mealListFuture;
   Future<bool> deleteFuture;
@@ -50,8 +52,8 @@ class Calendar extends State<MyCalendar> {
       this.addRecipe.title = recipe.title;
       this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";*/
     }
-    this.backendRequest =
-      new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+    /*this.backendRequest =
+    new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
     this.today = new DateTime.now();
     this.start = today.subtract(new Duration(days: 7));
     this.end = today.add(new Duration(days: 14));
@@ -60,16 +62,36 @@ class Calendar extends State<MyCalendar> {
     this.dayML = [];
     this.ml = [];
     backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-      for (int i = 0; i < list.length; i++) {
-        Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
-        ml.add(m);
-      }
-    });
+      ml = list;
+    });*/
 
   }
+  /*_getInitData() async {
+    userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    backendRequest = BackendRequest(token, userID);
+    _getMealsUser();
+  }*/
+
+  /*_getMealsUser() async {
+    backendRequest.getMeals(startDate: st, endDate: en).then((list) {
+      ml = list;
+    });
+  }*/
   @override
   void initState() {
     super.initState();
+    this.backendRequest =
+    new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+   // _getInitData();
+
+    this.today = new DateTime.now();
+    this.start = today.subtract(new Duration(days: 7));
+    this.end = today.add(new Duration(days: 14));
+    this.st = new Date(start.year, start.month, start.day);
+    this.en = new Date(end.year, end.month, end.day);
+    this.dayML = [];
+    this.ml = [];
     _controller = CalendarController();
   }
 
@@ -95,7 +117,7 @@ class Calendar extends State<MyCalendar> {
                 endDay: end,
                 calendarStyle: CalendarStyle(
                   //todayColor: Colors.green,
-                  selectedColor: Colors.redAccent
+                    selectedColor: Colors.redAccent
                 ),
                 daysOfWeekStyle: DaysOfWeekStyle(
 
@@ -106,40 +128,37 @@ class Calendar extends State<MyCalendar> {
                   formatButtonVisible: false,
                 ),
                 onDaySelected: (date, events) {
-                    if (addRecipe != null){
-                      backendRequest.addMealToCalendar(addRecipe, new Date(date.year, date.month, date.day)).then((meal){
-                         backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-                            setState(() {
-                              ml.clear();
-                              for (int i = 0; i < list.length; i++) {
-                                Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
-                                ml.add(m);
-                              }
-                              this.dayML.clear();
-                              selectedDayString =
-                              "${date.year}-${date.month}-${date.day}";
-                              for (Meal meal in ml) {
-                                if (meal.date.getDate.compareTo(selectedDayString) == 0) {
-                                  this.dayML.add(meal);
-                                }
-                              }
-                             addRecipe = null;
-                            });
-                          });
-                      });
-                    }
-                    else {
-                      setState(() {
-                        this.dayML.clear();
-                        selectedDayString =
-                        "${date.year}-${date.month}-${date.day}";
-                        for (Meal meal in ml) {
-                          if (meal.date.getDate.compareTo(selectedDayString) == 0) {
-                            this.dayML.add(meal);
+                  if (addRecipe != null){
+                    backendRequest.addMealToCalendar(addRecipe, new Date(date.year, date.month, date.day)).then((meal){
+                      backendRequest.getMeals(startDate: st, endDate: en).then((list) {
+                        setState(() {
+                          ml.clear();
+                          ml = list;
+                          this.dayML.clear();
+                          selectedDayString =
+                          "${date.year}-${date.month}-${date.day}";
+                          for (Meal meal in ml) {
+                            if (meal.date.getDate.compareTo(selectedDayString) == 0) {
+                              this.dayML.add(meal);
+                            }
                           }
-                        }
+                          addRecipe = null;
+                        });
                       });
-                    }
+                    });
+                  }
+                  else {
+                    setState(() {
+                      this.dayML.clear();
+                      selectedDayString =
+                      "${date.year}-${date.month}-${date.day}";
+                      for (Meal meal in ml) {
+                        if (meal.date.getDate.compareTo(selectedDayString) == 0) {
+                          this.dayML.add(meal);
+                        }
+                      }
+                    });
+                  }
                 },
               ),
 
@@ -177,39 +196,39 @@ class Calendar extends State<MyCalendar> {
                 color: Colors.white,
                 child: dayML.isNotEmpty
                     ? ListView.builder(
-                        itemCount: dayML.length,
-                        itemBuilder: (context, index) {
-                          print("In List view");
-                          print(dayML[0].date.getDate);
-                          print(dayML[index].recipe.imageURL);
-                          print(dayML[index].recipe.title);
-                          return Container(
-                              padding: EdgeInsets.all(2.00),
-                              height: 240,
-                              width: 182,
-                              child: Column(
-                                children: <Widget>[
-                                  //Image.network(dayML[index].recipe.imageURL),
-                                  FlatButton(
-                                    child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: dayML[index].recipe.image,
-                                        /*child: Image.network(
+                  itemCount: dayML.length,
+                  itemBuilder: (context, index) {
+                    print("In List view");
+                    print(dayML[0].date.getDate);
+                    print(dayML[index].recipe.imageURL);
+                    print(dayML[index].recipe.title);
+                    return Container(
+                        padding: EdgeInsets.all(2.00),
+                        height: 240,
+                        width: 182,
+                        child: Column(
+                          children: <Widget>[
+                            //Image.network(dayML[index].recipe.imageURL),
+                            FlatButton(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: dayML[index].recipe.image,
+                                /*child: Image.network(
                                             dayML[index].recipe.imageURL,
                                             width: 160
                                         )*/
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => RecipeDisplay(backendRequest.getRecipe("${dayML[index].recipe.apiID}")))
-                                      );
-                                    },
-                                  ),
-                                  //dayML[index].recipe.image,
-                                  Text(dayML[index].recipe.title),
-                                  /*ListTile(
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => RecipeDisplay(backendRequest.getRecipe("${dayML[index].recipe.apiID}")))
+                                );
+                              },
+                            ),
+                            //dayML[index].recipe.image,
+                            Text(dayML[index].recipe.title),
+                            /*ListTile(
                                     trailing: Icon(Icons.remove_circle),
                                     onTap: (){
                                       backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
@@ -221,34 +240,34 @@ class Calendar extends State<MyCalendar> {
                                       });
                                     },
                                   ),*/
-                                 FloatingActionButton(
-                                    child: Wrap(
-                                      children: <Widget>[
-                                        Container(
-                                          //margin: EdgeInsets.symmetric(vertical: 5.00, horizontal: 20.00),
-                                          padding: EdgeInsets.all(4.0),
-                                          child: Icon(Icons.remove),
-                                        )
-                                        //,
-                                      ],
-
-                                    ),
-                                    backgroundColor: Colors.redAccent,
-                                    onPressed: () {
-                                      backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
-                                        print("deleted");
-                                        setState(() {
-                                          ml.remove(dayML[index]);
-                                          dayML.removeAt(index);
-                                        });
-                                      });
-                                    },
-                                  ),
+                            FloatingActionButton(
+                              child: Wrap(
+                                children: <Widget>[
+                                  Container(
+                                    //margin: EdgeInsets.symmetric(vertical: 5.00, horizontal: 20.00),
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Icon(Icons.remove),
+                                  )
+                                  //,
                                 ],
-                              ));
-                        },
-                        scrollDirection: Axis.horizontal,
-                      )
+
+                              ),
+                              backgroundColor: Colors.redAccent,
+                              onPressed: () {
+                                backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
+                                  print("deleted");
+                                  setState(() {
+                                    ml.remove(dayML[index]);
+                                    dayML.removeAt(index);
+                                  });
+                                });
+                              },
+                            ),
+                          ],
+                        ));
+                  },
+                  scrollDirection: Axis.horizontal,
+                )
                     : Container(
                 ),
               ),
@@ -296,7 +315,7 @@ class Calendar extends State<MyCalendar> {
                   Navigator.pop(context);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) =>
-                          new SearchPage()));
+                      new SearchPage()));
                 },
               ),
               /*Container(
