@@ -39,25 +39,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // ShoppingList sl = ShoppingList(ingredient: 'Watermelon', quantity: 2, purchased: false, measurement: "slices");
-    // db.insertShoppingListItem(sl);
-
     return MaterialApp(
-<<<<<<< HEAD
       theme: CookmateStyle.theme,
-      // home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-      //home: ShoppingListPage(),
       home: HomePage()
-=======
-
-        theme: CookmateStyle.theme,
-        //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-        //home: ShoppingListPage(),
-        home: LoginPage()
-
->>>>>>> 9656f547c31b4f74fae103ac6b2102b00bb060f5
     );
   }
 

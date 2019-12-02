@@ -419,7 +419,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
             onPressed: () {
               Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (context) => RecipeDisplay("${recipe.apiID}"))
+                MaterialPageRoute(builder: (context) => RecipeDisplay(recipe.apiID.toString()))
               );
             },
           ),

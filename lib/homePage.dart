@@ -15,6 +15,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
+  Future<List<String>> _popularIDs;
+  List<Future<Recipe>> _popularRecipes;
+
+  @override
+  void initState() {
+
+    _popularRecipes = List<Future<Recipe>>();
+    _popularIDs = request.getPopularRecipes();
+    _popularIDs.then(
+      (popular) {
+        for(String recipeID in popular) {
+          _popularRecipes.add(request.getRecipe(recipeID));
+        }
+      }
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +63,16 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               FutureBuilder(
-                future: request.getPopularRecipes(),
+                future: _popularIDs,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return CookmateStyle.loadingIcon("Loading popular...");
+                      return Padding(
+                        padding: const EdgeInsets.all(100.0),
+                        child: CookmateStyle.loadingIcon("Loading popular..."),
+                      );
                     case ConnectionState.done:
-                      return _displayPopular(snapshot.data);
+                      return _displayPopular();
                     default:
                       return Text("error");
                   }
@@ -65,13 +85,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _displayPopular (List<String> popular) {
+  Widget _displayPopular () {
 
     List<Widget> recipeList = List<Widget>();
-    for(String recipeID in popular) {
-      recipeList.add(
-        _recipeCard(recipeID)
-      );
+    for(Future<Recipe> recipe in _popularRecipes) {
+      recipeList.add(_buildItem(recipe));
     }
 
     return Container(
@@ -89,16 +107,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _recipeCard (String recipeID) {
+  Widget _buildItem (Future<Recipe> recipe) {
 
     return FutureBuilder(
-      future: request.getRecipe(recipeID),
+      future: recipe,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return SizedBox(
-              width: 230,
-              height: 230,
+              width: 240,
+              height: 240,
               child: Center(
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
@@ -108,28 +126,33 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(0.0),
               child: Stack(
                 children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4.0, // has the effect of softening the shadow
-                          
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        height: 220,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(snapshot.data.imageURL)
-                          ) 
+                  FlatButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      print(snapshot.data.title);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4.0,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          height: 220,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(snapshot.data.imageURL)
+                            ) 
+                          ),
                         ),
                       ),
                     ),
@@ -173,125 +196,6 @@ class _HomePageState extends State<HomePage> {
             return Text("error");
         }
       },
-    );
-  }
-
-  //   return Scaffold(
-  //     appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
-  //       body: Column(
-  //         children: <Widget>[
-  //           SingleChildScrollView(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 Padding(
-  //                   padding: const EdgeInsets.only(left: 20.0),
-  //                   child: Text(
-  //                     'Today Meals'.toUpperCase(),
-  //                     style: TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: ScreenUtil.instance.setWidth(22.0),
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
-  //                 Container(
-  //                   height: ScreenUtil.instance.setWidth(250.0),
-  //                   child: ListView.builder(
-  //                     padding: const EdgeInsets.only(left: 16.0),
-  //                     scrollDirection: Axis.horizontal,
-  //                     itemBuilder: _buildItem,
-  //                   ),
-  //                 ),
-  //                 SizedBox(
-  //                   height: ScreenUtil.instance.setWidth(7.0),
-  //                 ),
-  //                 Padding(
-  //                   padding: const EdgeInsets.only(left: 20.0),
-  //                   child: Text(
-  //                     'Your Favorites!'.toUpperCase(),
-  //                     style: TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: ScreenUtil.instance.setWidth(22.0),
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 SizedBox(
-  //                   height: ScreenUtil.instance.setWidth(7.0),
-  //                 ),
-  //                 Container(
-  //                   height: ScreenUtil.instance.setWidth(250.0),
-  //                   child: ListView.builder(
-  //                     padding: const EdgeInsets.only(left: 16.0),
-  //                     scrollDirection: Axis.horizontal,
-  //                     itemBuilder: (context, index) =>
-  //                         _buildItem(context, index),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ],
-  //       ));
-  // }
-
-  Widget _buildItem(Recipe recipe) {
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(
-          Radius.circular(ScreenUtil.instance.setWidth(10.0)),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: ScreenUtil.instance.setWidth(210.0),
-              width: ScreenUtil.instance.setWidth(170.0),
-              child: recipe.image
-            ),
-            Positioned(
-              left: ScreenUtil.instance.setWidth(0.0),
-              bottom: ScreenUtil.instance.setWidth(0.0),
-              width: ScreenUtil.instance.setWidth(170.0),
-              height: ScreenUtil.instance.setWidth(50.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.black54, Colors.black54],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: ScreenUtil.instance.setWidth(40.0),
-              bottom: ScreenUtil.instance.setWidth(10.0),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    recipe.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setWidth(17.0),
-                    ),
-                  ),
-                  Text(
-                    'subtitle',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setWidth(15.0),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

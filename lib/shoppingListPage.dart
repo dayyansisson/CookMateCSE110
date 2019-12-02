@@ -9,6 +9,7 @@ class ShoppingListPage extends StatefulWidget {
 }
 
 class _ShoppingListPageState extends State<ShoppingListPage> {
+  
   Future<List<DB.ShoppingList>> _slFuture;
 
   @override
