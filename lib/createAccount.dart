@@ -5,8 +5,7 @@ import 'package:flutter/services.dart';
 import './util/backendRequest.dart';
 import 'homePage.dart';
 import 'package:flushbar/flushbar.dart';
-
-
+import 'login.dart';
 
 class CreateAccountPage extends StatefulWidget {
   @override
@@ -14,51 +13,62 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
-
   final _formKey = GlobalKey<FormState>();
   String _username, _email, _password, _confirmedPassword;
   bool signup = false;
 
-
-
   _submit() async {
     int _id;
-    if(_formKey.currentState.validate()) {
+    if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      if( _password == _confirmedPassword) {
-        Future<int> potentialID = BackendRequest.createUser(_email, _username, _password);
-          potentialID.then((id) {
-            _id = id;
-            if( _id != null) {
-              LocalStorage.storeUserID(_id);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
-            }
+      if (_password == _confirmedPassword) {
+        Future<int> potentialID =
+            BackendRequest.createUser(_email, _username, _password);
+        potentialID.then((id) {
+          _id = id;
+          if (_id != null) {
+            Future<String> potentialToken =
+            BackendRequest.login(_username, _password);
+            potentialToken.then((token) {
+              if(token != null) {
+                LocalStorage.storeAuthToken(token);
+                LocalStorage.storeUserID(_id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              }
+            });
 
-          });
+          }
+        });
       }
     }
+
     _formKey.currentState.reset();
     Flushbar(
       flushbarPosition: FlushbarPosition.TOP,
       flushbarStyle: FlushbarStyle.GROUNDED,
-      messageText: Text('Unable to Sign Up with provided credentials.',
-      textAlign: TextAlign.center, 
-      style: TextStyle(fontSize: 16, 
-      fontWeight: FontWeight.bold, color: Colors.white),) ,
-      backgroundColor: Colors.red[800],)..show(context);
+      messageText: Text(
+        'Unable to Sign Up with provided credentials.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      backgroundColor: Colors.red[800],
+    )..show(context);
   }
 
   Widget _buildUsernameTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 10.0,),
+        SizedBox(
+          height: 10.0,
+        ),
         Container(
           alignment: Alignment.centerLeft,
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.red[100],
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
@@ -78,19 +88,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               fontFamily: 'OpenSans',
             ),
             decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(15),
-                /*
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(15),
+              /*
                 prefixIcon: Icon(
                   Icons.supervised_user_circle,
                   color: Colors.white,
                 ),*/
-                hintText: 'Enter your Username',
-                hintStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              hintText: 'Enter your Username',
+              hintStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
-            validator: (input) => input.trim().isEmpty
-                ? 'Please enter a valid username'
-                : null,
+            validator: (input) =>
+                input.trim().isEmpty ? 'Please enter a valid username' : null,
             onSaved: (input) => _username = input,
           ),
         ),
@@ -102,10 +114,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 10.0,),
+        SizedBox(
+          height: 10.0,
+        ),
         Container(
           alignment: Alignment.centerLeft,
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.red[100],
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
@@ -126,13 +140,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               fontFamily: 'OpenSans',
             ),
             decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(15),
-                hintText: 'Enter your Email',
-                hintStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(15),
+              hintText: 'Enter your Email',
+              hintStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
             validator: (input) => !EmailValidator.Validate(input, true)
-                ? 'Please provide a valid email.' : null,
+                ? 'Please provide a valid email.'
+                : null,
             onSaved: (input) => _email = input,
           ),
         ),
@@ -144,10 +162,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 10.0,),
+        SizedBox(
+          height: 10.0,
+        ),
         Container(
           alignment: Alignment.centerLeft,
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.red[100],
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
@@ -164,7 +184,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
-              
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
             ),
@@ -172,13 +191,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(15),
                 hintText: 'Enter your Password',
-                hintStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
-            ),
-            validator: (input) => input.length < 6
-                ? 'Must be at least 6 characters'
-                : null,
+                hintStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
+            validator: (input) =>
+                input.length < 6 ? 'Must be at least 6 characters' : null,
             onSaved: (input) => _password = input,
-
           ),
         ),
       ],
@@ -189,10 +208,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 10.0,),
+        SizedBox(
+          height: 10.0,
+        ),
         Container(
           alignment: Alignment.centerLeft,
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.red[100],
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
@@ -215,15 +236,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(15),
-
                 hintText: 'Confirm your Password',
-                hintStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
-            ),
-            validator: (input) => input.length < 6
-                ? 'Must be at least 6 characters'
-                : null,
+                hintStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
+            validator: (input) =>
+                input.length < 6 ? 'Must be at least 6 characters' : null,
             onSaved: (input) => _confirmedPassword = input,
-
           ),
         ),
       ],
@@ -244,20 +264,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           borderRadius: BorderRadius.circular(30.0),
         ),
         color: Colors.red[800],
-        child: Text(
-            'SIGN UP',
+        child: Text('SIGN UP',
             style: TextStyle(
               color: Colors.white,
               letterSpacing: 1.5,
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
-            )
-        ),
+            )),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +283,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-
           child: Stack(
             children: <Widget>[
               Container(
@@ -293,32 +309,32 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     horizontal: 40.0,
                     vertical: 120.0,
                   ),
-                  child:
-                  Form(
+                  child: Form(
                     key: _formKey,
                     child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(height: 20.0,),
-                      _buildUsernameTF(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      _buildEmailTF(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      _buildPasswordTF(),
-                      _buildConfirmPasswordTF(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      _buildSignUpBtn(),
-
-                    ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _buildUsernameTF(),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _buildEmailTF(),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _buildPasswordTF(),
+                        _buildConfirmPasswordTF(),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _buildSignUpBtn(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               ),
             ],
           ),
@@ -327,5 +343,3 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 }
-
-

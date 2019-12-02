@@ -1,11 +1,14 @@
+
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/homePage.dart';
+import 'package:cookmate/login.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 
 main() {
-
+  //DatabaseHelper helper = DatabaseHelper.instance;
+  //helper.clearRecipes();
   runApp(MyApp());
 }
 
@@ -42,10 +45,19 @@ class MyApp extends StatelessWidget {
     // db.insertShoppingListItem(sl);
 
     return MaterialApp(
+<<<<<<< HEAD
       theme: CookmateStyle.theme,
       // home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
       //home: ShoppingListPage(),
       home: HomePage()
+=======
+
+        theme: CookmateStyle.theme,
+        //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
+        //home: ShoppingListPage(),
+        home: LoginPage()
+
+>>>>>>> 9656f547c31b4f74fae103ac6b2102b00bb060f5
     );
   }
 

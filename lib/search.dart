@@ -3,6 +3,7 @@
  */
 import 'dart:convert';
 import 'dart:developer' as logger;
+import 'dart:ffi';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
@@ -202,7 +203,7 @@ class _SearchPageState extends State<SearchPage> {
     if (query.isNotEmpty) {
       List<String> dummyListData = List<String>();
       dummySearchList.forEach((item) {
-        if (item.contains(query) && counter < 5) {
+        if (item.contains(query) && counter < 10) {
           dummyListData.add(item);
           counter++;
         }
@@ -217,6 +218,18 @@ class _SearchPageState extends State<SearchPage> {
         items.clear();
       });
     }
+  }
+
+  String displayIngredients(List<String> ingredient) {
+    String display = "";
+    for (int i = 0; i < ingredient.length; i++) {
+      String token = ingredient[i];
+      display += "$token";
+      if (i != ingredient.length - 1) {
+        display += ", ";
+      }
+    }
+    return display;
   }
 
   DropdownButton<String> cuisineButton(List<CB.Cuisine> data) {
@@ -258,7 +271,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: NavBar(title: "Search", titleSize: 25, hasReturn: true, isSearch: true),
+      appBar: NavBar(title: "Search", titleSize: 23, isSearch: true),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -317,15 +330,24 @@ class _SearchPageState extends State<SearchPage> {
                 itemBuilder: (context, index) {
                   return new Container(
                       child: new ListTile(
-                        title: new Text('${items[index]}'),
-                        trailing: Icon(Icons.add_circle),
+                        title: new Text(
+                          '${items[index]}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Icon(
+                          Icons.add_circle,
+                          color: Colors.redAccent,
+                        ),
+                        //enabled: true,
+                        //selected: true,
                         onTap: () {
                           _addIngredientQuery('${items[index]}');
+                          String display = displayIngredients(ingredientQuery);
                           showDialog(
                               context: context,
                               child: new AlertDialog(
-                                title: new Text("Ingredient Added:"),
-                                content: new Text("${items[index]}"),
+                                title: new Text("Selected Ingredients: "),
+                                content: new Text("$display"),
                               ));
                         },
                       ),
@@ -334,19 +356,84 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.navigate_next),
-                elevation: 0,
-                onPressed: () {
-                  editingController.clear();
-                  _routeRecipePage(context);
-                },
+            new Divider(
+              color: Colors.grey,
+            ),
+            new Container(
+              margin: new EdgeInsets.all(20.0),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  new RaisedButton(
+                    //backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.list),
+                    elevation: 0,
+                    onPressed: () {
+                      String display = displayIngredients(ingredientQuery);
+                      editingController.clear();
+                      showDialog(
+                          context: context,
+                          child: new AlertDialog(
+                            title: new Text("Your current list: "),
+                            content: new Text("$display"),
+                          ));
+                    },
+                  ),
+                  new Icon(
+                    Icons.fastfood,
+                    color: Colors.red,
+                    size: 35.0,
+                  ),
+                  new RaisedButton(
+                    //backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.search),
+                    elevation: 0,
+                    onPressed: () {
+                      editingController.clear();
+                      _routeRecipePage(context);
+                    },
+                  ),
+                ],
               ),
             ),
+//            Container(
+//              padding: const EdgeInsets.all(20),
+//              alignment: Alignment.bottomRight,
+//              child: FloatingActionButton(
+//                backgroundColor: Colors.redAccent,
+//                child: Icon(Icons.navigate_next),
+//                elevation: 0,
+//                onPressed: () {
+//                  String display = displayIngredients(ingredientQuery);
+//                  editingController.clear();
+//                  showDialog(
+//                      context: context,
+//                      child: new AlertDialog(
+//                        title: new Text("Selected Ingredients: "),
+//                        content: new Text("$display"),
+//                      ));
+//                },
+//              ),
+//            ),
+//            Container(
+//              padding: const EdgeInsets.all(20),
+//              alignment: Alignment.bottomLeft,
+//              child: FloatingActionButton(
+//                backgroundColor: Colors.redAccent,
+//                child: Icon(Icons.list),
+//                elevation: 0,
+//                onPressed: () {
+//                String display = displayIngredients(ingredientQuery);
+//                  editingController.clear();
+//                  showDialog(
+//                      context: context,
+//                      child: new AlertDialog(
+//                        title: new Text("Selected Ingredients: "),
+//                        content: new Text("$display"),
+//                      ));
+//                },
+//              ),
+//            ),
           ],
         ),
       ),

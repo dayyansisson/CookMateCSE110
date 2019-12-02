@@ -27,9 +27,11 @@ dependencies:
   flutter_screenutil: ^0.6.1
   flutter:
     sdk: flutter
-
   flushbar: ^1.9.1
 
+
+
+  # add flutter_ScreenUtil
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

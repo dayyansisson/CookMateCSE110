@@ -4,110 +4,127 @@ import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
-import 'package:cookmate/util/database_helpers.dart' as prefix0;
+import 'package:cookmate/util/database_helpers.dart' as localDB;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 //import 'package:cookmate/util/database_helpers.dart';
+import 'package:cookmate/util/localStorage.dart' as LS;
 
 class RecipeDisplay extends StatefulWidget {
-  Future<Recipe> recipe;
-  RecipeDisplay(Future<Recipe> recipe) {
-    this.recipe = recipe;
-  }
+  final String recipeID;
+  RecipeDisplay(this.recipeID);
 
   @override
-  _RecipeDisplayState createState() => _RecipeDisplayState(recipe);
+  _RecipeDisplayState createState() => _RecipeDisplayState();
 }
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
-  
-  prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
-  BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  localDB.DatabaseHelper helper = localDB.DatabaseHelper.instance;
+  //BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  BackendRequest backend;
   Future<Recipe> recipeFuture;
   List<String> instructions;
   List<Ingredient> ingredients;
   Recipe pageRecipe;
-
-  GlobalKey _tabBarKey = GlobalKey();
-
-  _RecipeDisplayState(Future<Recipe> recipe) {
-    recipeFuture = recipe;
-    recipeFuture.then((data) {
-      pageRecipe = data;
-      if (data.getInstructions() != null) {
-        instructions = data.getInstructions();
-      }
-      if (data.getIngredients() != null) {
-        ingredients = data.getIngredients();
-      }
-    });
-  }
-
+  Color starColor = Colors.white;
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   Color _iconColor = Color.fromRGBO(180, 180, 180, 1);
-  bool isPressed = false;
+  bool isFave = false;
+
+  GlobalKey _tabBarKey = GlobalKey();
+  _getUserInfo() async {
+    int userID = await LS.LocalStorage.getUserID();
+    String token = await LS.LocalStorage.getAuthToken();
+    backend = BackendRequest(token, userID);
+  }
+
+  @override
+  initState() {
+    helper.recipes().then((favorites) {
+      setState(() {
+        _getUserInfo().then((recipe) {
+          recipeFuture = backend.getRecipe(widget.recipeID);
+          recipeFuture.then((data) {
+            pageRecipe = data;
+            _isPressedFave(favorites);
+            if (data.getInstructions() != null) {
+              instructions = data.getInstructions();
+            }
+            if (data.getIngredients() != null) {
+              ingredients = data.getIngredients();
+            }
+          });
+        });
+      });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Recipe Page',
         home: Scaffold(
-          body: FutureBuilder(
-            future: recipeFuture,
-            builder: (futureContext, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState
-                    .waiting: // this handles waiting for the async call
-                  return CookmateStyle.loadingIcon("Loading recipe...");
-                case ConnectionState.done:
-                  return DefaultTabController(
-                      length: 2,
-                      child: CustomScrollView(slivers: <Widget>[
-                        SliverAppBar(
-                          backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-                          expandedHeight: 231.5,
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: header(snapshot.data.image),
-                          ),
-                        ),
-                        SliverFillRemaining(
-                          child: Column(
-                            children: <Widget>[
-                              infoBar(snapshot.data),
-                              Container(
-                                padding: EdgeInsets.all(7),
-                              ),
-                              TabBar(
-                                key: _tabBarKey,
-                                tabs: <Widget>[
-                                  Tab(
-                                      child: Text("Ingredients",
-                                          style:
-                                              TextStyle(color: _titleColor))),
-                                  Tab(
-                                      child: Text("Instructions",
-                                          style:
-                                              TextStyle(color: _titleColor))),
-                                ],
-                              ),
-                              Expanded(
-                                child: TabBarView(
-                                  children: <Widget>[
-                                    getIngredientWidgets(ingredients),
-                                    getInstructionWidgets(instructions),
-                                  ],
+          body: recipeFuture == null
+              ? CookmateStyle.loadingIcon("Loading favorites...")
+              : FutureBuilder(
+                  future: recipeFuture,
+                  builder: (futureContext, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState
+                          .waiting: // this handles waiting for the async call
+                        return CookmateStyle.loadingIcon("Loading recipe...");
+                      case ConnectionState.done:
+                        return DefaultTabController(
+                            length: 2,
+                            child: CustomScrollView(slivers: <Widget>[
+                              SliverAppBar(
+                                backgroundColor:
+                                    Color.fromRGBO(250, 250, 250, 1),
+                                expandedHeight: 231.5,
+                                flexibleSpace: FlexibleSpaceBar(
+                                  background: header(snapshot.data.image),
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                      ]));
-                default:
-                  return Text("error");
-              }
-            },
-          ),
+                              SliverFillRemaining(
+                                child: Column(
+                                  children: <Widget>[
+                                    infoBar(snapshot.data),
+                                    Container(
+                                      padding: EdgeInsets.all(7),
+                                    ),
+                                    TabBar(
+                                      key: _tabBarKey,
+                                      tabs: <Widget>[
+                                        Tab(
+                                            child: Text("Ingredients",
+                                                style: TextStyle(
+                                                    color: _titleColor))),
+                                        Tab(
+                                            child: Text("Instructions",
+                                                style: TextStyle(
+                                                    color: _titleColor))),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: TabBarView(
+                                        children: <Widget>[
+                                          getIngredientWidgets(ingredients),
+                                          getInstructionWidgets(instructions),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ]));
+                      default:
+                        return Text("error");
+                    }
+                  },
+                ),
           floatingActionButton: SpeedDial(
             animatedIcon: AnimatedIcons.menu_close,
             marginRight: 20,
@@ -157,38 +174,38 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
               ),
               onPressed: () => Navigator.pop(context),
             )),
-        Positioned(
-          top: 45,
-          right: 20,
-          child: Row(
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.star_border),
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                color: isPressedFave(),
-                iconSize: 35.0,
-                onPressed: () {
-                  helper.clearRecipes();
-                  setState(() {
-                    if (isPressed) {
-                      isPressed = false;
-                    } else {
-                      isPressed = true;
-                    }
-                  });
-
-                  if(!isPressed){
-                    _addToFavorites();
-                  }
-                  else{
-                    _removeFromFavorites();
-                  }
-                },
-              )
-            ],
-          ),
-        )
+        Positioned(top: 45, right: 20, child: isFave ? _fave() : _notFave()),
       ],
+    );
+  }
+
+  IconButton _notFave() {
+    return IconButton(
+      icon: Icon(Icons.star_border),
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      color: starColor,
+      iconSize: 35.0,
+      onPressed: () {
+        _addToFavorites();
+        setState(() {
+          isFave = true;
+        });
+      },
+    );
+  }
+
+  IconButton _fave() {
+    return IconButton(
+      icon: Icon(Icons.star),
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      color: Color.fromRGBO(238, 204, 95, 1),
+      iconSize: 35.0,
+      onPressed: () {
+        _removeFromFavorites();
+        setState(() {
+          isFave = false;
+        });
+      },
     );
   }
 
@@ -397,29 +414,22 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   _addIngredients(List<Ingredient> ingredients) async {
     await helper.clearShoppingList();
     for (int i = 0; i < ingredients.length; i++) {
-      prefix0.ShoppingList sl = new prefix0.ShoppingList(
+      localDB.ShoppingList sl = new localDB.ShoppingList(
           ingredient: ingredients[i].name,
           quantity: ingredients[i].quantity.round(),
           purchased: false,
           measurement: ingredients[i].units);
       await helper.insertShoppingListItem(sl);
-      
     }
     print(await helper.shoppingListItems());
   }
 
   _addToFavorites() async {
-    prefix0.Recipe fave = new prefix0.Recipe(
-      id: pageRecipe.apiID,
-      name: pageRecipe.title,
-      img: pageRecipe.imageURL
-    );
+    localDB.Recipe fave = new localDB.Recipe(
+        id: pageRecipe.apiID, name: pageRecipe.title, img: pageRecipe.imageURL);
 
-    //print(pageRecipe.toString());
-    backend.removeFavorite(pageRecipe.apiID);
-
+    print(pageRecipe);
     backend.addFavorite(pageRecipe);
-
     await helper.insertRecipe(fave);
   }
 
@@ -428,30 +438,12 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     backend.removeFavorite(pageRecipe.apiID);
   }
 
-  // Widget unitsCheck(String units) {
-  //   if (units != "") {
-  //     return Flexible(
-  //       child: Container(
-  //         padding: EdgeInsets.only(left: 7.0),
-  //         child: Text(
-  //           "${units}",
-  //           softWrap: true,
-  //           style: TextStyle(
-  //               fontSize: 20, fontWeight: FontWeight.w200, color: _titleColor),
-  //         ),
-  //       ),
-  //     );
-  //   } else
-  //     return Container();
-  // }
-
-  Color isPressedFave() {
-
-
-    if (this.isPressed) {
-      return Colors.yellow;
+  _isPressedFave(List<localDB.Recipe> favorites) {
+    for (int i = 0; i < favorites.length; i++) {
+      if (pageRecipe.title == favorites[i].name) {
+        isFave = true;
+      }
     }
-    return Colors.white;
   }
 
   String formatAmount(double amount) {

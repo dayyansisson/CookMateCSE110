@@ -9,6 +9,7 @@ class Recipe {
 
   bool _complete;
 
+  int id;
   int apiID;
   String title;
   String imageURL;
@@ -51,7 +52,16 @@ class Recipe {
     List<dynamic> ingredientList = json["extendedIngredients"];
 
     for(int i =0; i < ingredientList.length; i++){
-      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      String units = ingredientList[i]['unit'];
+      if(units == 'tablespoon' || units == 'teaspoon'){
+        if(units == 'tablespoon'){
+          units = 'tbsp';
+        }
+        else{
+          units = 'tsp';
+        }
+      }
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
     }
     //print(ingredients.toString());
@@ -86,6 +96,7 @@ class Recipe {
   String toString() => """\n
       $title
       ----------------------------
+      id:         $id
       api:        $apiID
       image:      $imageURL
       servings:   $servings

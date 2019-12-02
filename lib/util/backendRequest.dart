@@ -67,13 +67,13 @@ class BackendRequest {
   Future<int> getUser () async {
 
     print("Getting user info ($_authToken)...");
-
+    print("before call");
     // Make API call
     final response = await http.get(
-        "https://thecookmate.com/auth/users/me",
+        "https://thecookmate.com/auth/users/me/",
         headers: { "Authorization":"Token $_authToken" }
     );
-
+    print("after call");
     // Validate return
     int statusCode = response.statusCode ~/ 100;
     if(statusCode != _SUCCESS)
@@ -83,7 +83,8 @@ class BackendRequest {
     }
 
     var data = jsonDecode(response.body);
-    _userID = data;
+    _userID = data["id"].toString();
+    print("User id: " + data["id"].toString());
     print("User found, returning user ID ${data["id"]}");
     return data["id"];
   }
@@ -365,7 +366,7 @@ class BackendRequest {
    */
   Future<bool> removeFavorite(int recipeID) async {
 
-    print("Adding recipe $recipeID to favorites...");
+    print("Removing recipe $recipeID from favorites...");
 
     // Make API call
     final response = await http.post(
