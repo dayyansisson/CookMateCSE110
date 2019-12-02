@@ -3,11 +3,8 @@
  */
 import 'dart:convert';
 import 'dart:developer' as logger;
-<<<<<<< HEAD
 import 'package:cookmate/dialog.dart';
-=======
 import 'dart:ffi';
->>>>>>> 63e0ab47a33c356b77de13ba666d3d250003fe9d
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
