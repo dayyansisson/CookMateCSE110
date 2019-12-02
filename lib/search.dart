@@ -353,13 +353,13 @@ class _SearchPageState extends State<SearchPage> {
             new Divider(
               color: Colors.grey,
             ),
-            Container(
+            new Container(
               margin: new EdgeInsets.all(5.0),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  FloatingActionButton(
-                backgroundColor: Colors.redAccent,
+                  new RaisedButton(
+                //backgroundColor: Colors.redAccent,
                 child: Icon(Icons.list),
                 elevation: 0,
                 onPressed: () {
@@ -373,23 +373,20 @@ class _SearchPageState extends State<SearchPage> {
                       ));
                 },
               ),
-                  Icon(
+                  new Icon(
                     Icons.fastfood,
                     color: Colors.red,
                     size: 35.0,
                   ),
-
-              FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.navigate_next),
-                elevation: 0,
-                onPressed: () {
-                  editingController.clear();
-                  _routeRecipePage(context);
+              new RaisedButton(
+    //backgroundColor: Colors.redAccent,
+    child: Icon(Icons.navigate_next),
+    elevation: 0,
+    onPressed: () {
+    editingController.clear();
+    _routeRecipePage(context);
                 },
               ),
-
-
                 ],
               ),
             ),
