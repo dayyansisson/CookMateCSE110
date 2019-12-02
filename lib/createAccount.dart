@@ -1,3 +1,4 @@
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -82,7 +83,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           height: 60.0,
           child: TextFormField(
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
@@ -90,14 +91,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(15),
-              /*
-                prefixIcon: Icon(
-                  Icons.supervised_user_circle,
-                  color: Colors.white,
-                ),*/
+              prefixIcon: Icon(
+                Icons.supervised_user_circle,
+                color: Colors.red[100],
+              ),
               hintText: 'Enter your Username',
               hintStyle: TextStyle(
-                  color: Colors.white,
+                  color: Colors.red[300],
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
             ),
@@ -120,7 +120,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -134,17 +134,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
+              prefixIcon: Icon(
+                Icons.email,
+                color: Colors.red[100],
+              ),
               contentPadding: EdgeInsets.all(15),
               hintText: 'Enter your Email',
               hintStyle: TextStyle(
-                  color: Colors.white,
+                  color: Colors.red[300],
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
             ),
@@ -168,7 +172,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -182,17 +186,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           child: TextFormField(
             obscureText: true,
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
             ),
             decoration: InputDecoration(
                 border: InputBorder.none,
+                prefixIcon: Icon(
+                  Icons.lock_open,
+                  color: Colors.red[100],
+                ),
                 contentPadding: EdgeInsets.all(15),
                 hintText: 'Enter your Password',
                 hintStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.red[300],
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             validator: (input) =>
@@ -214,7 +222,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -228,7 +236,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           child: TextFormField(
             obscureText: true,
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
@@ -236,9 +244,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(15),
+                prefixIcon: Icon(
+                  Icons.lock,
+                  color: Colors.red[100],
+                ),
                 hintText: 'Confirm your Password',
                 hintStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.red[300],
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             validator: (input) =>
@@ -255,7 +267,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
-        elevation: 5.0,
+        elevation: 0,
         onPressed: () {
           _submit();
         },
@@ -263,14 +275,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),
-        color: Colors.red[800],
+        color: Colors.black26,
         child: Text('SIGN UP',
             style: TextStyle(
               color: Colors.white,
               letterSpacing: 1.5,
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
-              fontFamily: 'OpenSans',
             )),
       ),
     );
@@ -279,12 +290,33 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CookmateStyle.standardRed,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 150),
+                child: Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "Create Account",
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      shadows: [ 
+                        Shadow(
+                          color: Colors.black38,
+                          blurRadius: 4
+                        )
+                      ]
+                    ),
+                  ),
+                ),
+              ),
               Container(
                 height: double.infinity,
                 width: double.infinity,
@@ -307,7 +339,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    vertical: 120.0,
+                    vertical: 200.0,
                   ),
                   child: Form(
                     key: _formKey,
@@ -333,6 +365,20 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         _buildSignUpBtn(),
                       ],
                     ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 60,
+                left: 40,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: CookmateStyle.standardRed,
                   ),
                 ),
               ),

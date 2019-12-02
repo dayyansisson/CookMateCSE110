@@ -31,7 +31,7 @@ class CookmateStyle {
           child: Text(
             message,
             style: TextStyle(
-              fontWeight: FontWeight.w300
+              fontWeight: FontWeight.w200
             ),
           ),
           padding: EdgeInsets.all(30)

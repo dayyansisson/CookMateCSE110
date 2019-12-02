@@ -1,4 +1,5 @@
 import 'package:cookmate/homePage.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 
 import 'createAccount.dart';
 import 'package:flutter/material.dart';
@@ -65,13 +66,16 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Username',
-          style: TextStyle(color: Colors.red[800]),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15
+          ),
         ),
         SizedBox(height: 10.0),
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -84,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 60.0,
           child: TextFormField(
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
@@ -92,16 +96,16 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(15.0),
-                /*
                 prefixIcon: Icon(
                   Icons.supervised_user_circle,
-                  color: Colors.white,
-                ),*/
+                  color: Colors.red[100],
+                ),
                 hintText: 'Enter your Username',
                 hintStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+                  color: Colors.red[300],
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)
+                ),
             validator: (input) =>
             input.trim().isEmpty ? 'Please enter a valid username' : null,
             onSaved: (input) => _username = input,
@@ -117,7 +121,10 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Password',
-          style: TextStyle(color: Colors.red[800]),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15
+          ),
         ),
         SizedBox(
           height: 10.0,
@@ -125,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: Colors.red[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
@@ -139,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
           child: TextFormField(
             obscureText: true,
             style: TextStyle(
-              color: Colors.white,
+              color: CookmateStyle.standardRed,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: 'OpenSans',
@@ -147,16 +154,16 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(15),
-                /*
                 prefixIcon: Icon(
                   Icons.lock,
-                  color: Colors.white,
-                ),*/
+                  color: Colors.red[100],
+                ),
                 hintText: 'Enter your Password',
                 hintStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+                  color: Colors.red[300],
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)
+                ),
             validator: (input) =>
             input.length < 6 ? 'Must be at least 6 characters' : null,
             onSaved: (input) => _password = input,
@@ -171,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
-        elevation: 5.0,
+        elevation: 0.0,
         onPressed: () {
           _submit();
         },
@@ -179,14 +186,13 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        color: Colors.red[800],
+        color: Colors.black26,
         child: Text('LOGIN',
             style: TextStyle(
               color: Colors.white,
               letterSpacing: 1.5,
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
-              fontFamily: 'OpenSans',
             )),
       ),
     );
@@ -206,16 +212,16 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(
               text: 'Don\'t have an Account?',
               style: TextStyle(
-                color: Colors.red[800],
+                color: Colors.white70,
                 fontSize: 18.0,
                 fontWeight: FontWeight.w400,
               ),
             ),
             TextSpan(
-              text: ' Sign Up',
+              text: '  Sign Up',
               style: TextStyle(
-                color: Colors.red[800],
-                fontSize: 18.0,
+                color: Colors.white,
+                fontSize: 19.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -229,56 +235,92 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: CookmateStyle.standardRed,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xF8F8FF),
-                      Color(0xFFFFFF),
-                      Color(0xFFFAFA),
-                    ],
-                    stops: [0.1, 0.4, 0.7],
-                  ),
-                ),
-              ),
+              // Container(
+              //   height: double.infinity,
+              //   width: double.infinity,
+              //   decoration: BoxDecoration(
+              //     gradient: LinearGradient(
+              //       begin: Alignment.topCenter,
+              //       end: Alignment.bottomCenter,
+              //       colors: [
+              //         Color(0xF8F8FF),
+              //         Color(0xFFFFFF),
+              //         Color(0xFFFAFA),
+              //       ],
+              //       stops: [0.1, 0.4, 0.7],
+              //     ),
+              //   ),
+              // ),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    vertical: 120.0,
+                    //vertical: 260.0,
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 30.0,
+                  child: Column(
+                    children: <Widget> [
+                      SafeArea(child: Container()),
+                      Padding(
+                        padding: EdgeInsets.only(top: 30),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            width: 130,
+                            child: Image.network("https://files.slack.com/files-pri/TP18U4QGY-FR7861UEB/chef.png?pub_secret=1b10310be5")
+                          ),
+                        )
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            "Cookmate.",
+                            style: TextStyle(
+                              fontSize: 44,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              shadows: [ 
+                                Shadow(
+                                  color: Colors.black45,
+                                  blurRadius: 8
+                                )
+                              ]
+                            ),
+                          ),
                         ),
-                        _buildUsernameTF(),
-                        SizedBox(
-                          height: 30.0,
+                      ),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 30.0,
+                            ),
+                            _buildUsernameTF(),
+                            SizedBox(
+                              height: 30.0,
+                            ),
+                            _buildPasswordTF(),
+                            SizedBox(
+                              height: 30.0,
+                            ),
+                            _buildLoginBtn(),
+                            _buildSignUpBtn()
+                          ],
                         ),
-                        _buildPasswordTF(),
-                        SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildLoginBtn(),
-                        _buildSignUpBtn()
-                      ],
-                    ),
+                      ),
+                    ]
                   ),
                 ),
               ),

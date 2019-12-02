@@ -33,6 +33,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   bool isFave = false;
 
   GlobalKey _tabBarKey = GlobalKey();
+  
   _getUserInfo() async {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();

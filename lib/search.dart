@@ -233,27 +233,30 @@ class _SearchPageState extends State<SearchPage> {
     return display;
   }
 
-  DropdownButton<String> cuisineButton(List<CB.Cuisine> data) {
+  Widget cuisineButton(List<CB.Cuisine> data) {
     List<String> cuisines = new List<String>();
     for (int i = 0; i < data.length; i++) {
       cuisines.add(data[i].name);
     }
-    return DropdownButton<String>(
-      hint: Text("Cuisines"),
-      onChanged: (value) {
-        setState(() {
-          _setCuisine(value);
-        });
-      },
-      isExpanded: true,
-      iconSize: 35,
-      value: cuisineQuery,
-      items: cuisines.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: DropdownButton<String>(
+        hint: Text("Cuisines"),
+        onChanged: (value) {
+          setState(() {
+            _setCuisine(value);
+          });
+        },
+        isExpanded: true,
+        iconSize: 35,
+        value: cuisineQuery,
+        items: cuisines.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
     );
   }
 
