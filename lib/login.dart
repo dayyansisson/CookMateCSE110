@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Username',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.red[800]),
         ),
         SizedBox(height: 10.0),
         Container(
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Password',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.red[800]),
         ),
         SizedBox(
           height: 10.0,
