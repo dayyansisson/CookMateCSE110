@@ -10,7 +10,6 @@ import 'package:cookmate/util/localStorage.dart' as LS;
 
 import 'dialog.dart';
 
-
 class ScanButton extends StatefulWidget {
   @override
   ScanButtonState createState() => ScanButtonState();
@@ -46,48 +45,58 @@ class ScanButtonState extends State<ScanButton> {
     //if (!mounted) return null;
 
     //Call the backend with the barcode to return the Bread Crumb list
-    logger.log("here");
+    barcodeScanRes = barcodeScanRes.substring(1);
+
     List<String> breadCrumbs = await be.getBreadcrumbs(barcodeScanRes);
 
     // For testing uncoment this line of code below
-   // List<String> breadCrumbs = await be.getBreadcrumbs("089836187635");
+    //List<String> breadCrumbs = await be.getBreadcrumbs("024600010030");
     //If the backend does not return us anything this displays a popup
-    if(breadCrumbs == null){
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-           title: "Uh Oh",
-           description:
-            "Barcode not found in our database, please try entering the item manually",
-           buttonText: "Okay",
-          ),
-        );
-    }
-    else{
-     //Check the breadcrumbs for usable ingredients
-     ingredients = await getIngredients(breadCrumbs);
-     return ingredients;
-    }
+    // if(breadCrumbs == null){
+    //     showDialog(
+    //       context: context,
+    //       builder: (BuildContext context) => CustomDialog(
+    //        title: "Uh Oh",
+    //        description:
+    //         "Barcode not found in our database, please try entering the item manually",
+    //        buttonText: "Okay",
+    //       ),
+    //     );
+    // }
+    // else{
+    //Check the breadcrumbs for usable ingredients
+    ingredients = await getIngredients(breadCrumbs);
+    return ingredients;
   }
 
   Future<List<String>> getIngredients(List<String> breadCrumbs) async {
-      int userID = await LS.LocalStorage.getUserID();
-      String token = await LS.LocalStorage.getAuthToken();
-      BackendRequest request = new BackendRequest(token, userID);
-      //get the indredient list
-      //List<Ingredient> ingredients = await be.getIngredientList();
-      List<Ingredient> ingredients = await request.getIngredientList();
-      List<String> matched = new List<String>();
-      
-      for(int i =0; i < breadCrumbs.length; i++){
-        var curr = breadCrumbs[i];
-        for(int j = 0; j < ingredients.length; j++){
-          if(ingredients[j].name.contains(curr)){
+    if(breadCrumbs == null || breadCrumbs.length == 0){
+      return null;
+    }
+    int userID = await LS.LocalStorage.getUserID();
+    String token = await LS.LocalStorage.getAuthToken();
+    BackendRequest request = new BackendRequest(token, userID);
+    //get the indredient list
+    //List<Ingredient> ingredients = await be.getIngredientList();
+    List<Ingredient> ingredients = await request.getIngredientList();
+    List<String> matched = new List<String>();
+
+    for (int i = 0; i < breadCrumbs.length; i++) {
+      var curr = breadCrumbs[i];
+      for (int j = 0; j < ingredients.length; j++) {
+        if (ingredients[j].name == curr) {
+          matched.add(ingredients[j].name);
+        }
+      }
+      if (matched.length == 0) {
+        for (int j = 0; j < ingredients.length; j++) {
+          if (ingredients[j].name.contains(curr)) {
             matched.add(ingredients[j].name);
           }
         }
       }
-      return matched;
+    }
+    return matched;
   }
 
 //   @override
@@ -115,12 +124,12 @@ class ScanButtonState extends State<ScanButton> {
 //     );
 //   }
 
-  List<String> getList(){
+  List<String> getList() {
     return this.ingredientsForSearch;
   }
 
   @override
-  Widget build(BuildContext context)  {
+  Widget build(BuildContext context) {
     // return IconButton(
     //   icon: Icon(Icons.camera),
     //   onPressed: (){
