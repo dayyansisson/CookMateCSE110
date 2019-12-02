@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
 
       Future<String> potentialToken =
-          BackendRequest.login(_username, _password);
+      BackendRequest.login(_username, _password);
       potentialToken.then((token) {
         LocalStorage.storeAuthToken(token);
         _token = token;
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Username',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.red[800]),
         ),
         SizedBox(height: 10.0),
         Container(
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             validator: (input) =>
-                input.trim().isEmpty ? 'Please enter a valid username' : null,
+            input.trim().isEmpty ? 'Please enter a valid username' : null,
             onSaved: (input) => _username = input,
           ),
         ),
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
       children: <Widget>[
         Text(
           'Password',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.red[800]),
         ),
         SizedBox(
           height: 10.0,
@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             validator: (input) =>
-                input.length < 6 ? 'Must be at least 6 characters' : null,
+            input.length < 6 ? 'Must be at least 6 characters' : null,
             onSaved: (input) => _password = input,
           ),
         ),

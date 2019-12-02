@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:developer' as logger;
 import 'dart:ffi';
+import 'package:cookmate/dialog.dart';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
@@ -265,13 +266,24 @@ class _SearchPageState extends State<SearchPage> {
         print(bcList[i]);
       }
     }
+    else if (bcList == null || bcList.length == 0){ 
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+           title: "Uh Oh",
+           description:
+            "Barcode not found in our database, please try entering the item manually",
+           buttonText: "Okay",
+          ),
+        );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: NavBar(title: "Search", titleSize: 23, isSearch: true),
+      appBar: NavBar(title: "Search", titleSize: 25, hasReturn: true, isSearch: true),
       body: Container(
         child: Column(
           children: <Widget>[

@@ -2,7 +2,6 @@ import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:cookmate/util/backendRequest.dart';
 
 import 'cookbook.dart';
 
