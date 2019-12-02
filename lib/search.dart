@@ -3,6 +3,7 @@
  */
 import 'dart:convert';
 import 'dart:developer' as logger;
+import 'package:cookmate/dialog.dart';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
@@ -76,11 +77,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    //token = await LocalStorage.getAuthToken();
-    //userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
+    print("Token: " + token.toString());
+    print("UserId: " +  userID.toString());
 
-    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    userID = 2;
+    //token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+    //userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
@@ -251,6 +254,17 @@ class _SearchPageState extends State<SearchPage> {
         ingredientQuery.add(bcList[i]);
         print(bcList[i]);
       }
+    }
+    else if(bcList == null){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+           title: "Uh Oh",
+           description:
+            "Barcode not found in our database, please try entering the item manually",
+           buttonText: "Okay",
+          ),
+        );
     }
   }
   @override

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:developer' as logger;
 import 'package:cookmate/search.dart';
-
+import 'package:cookmate/util/localStorage.dart' as LS;
 
 import 'dialog.dart';
 
@@ -20,9 +20,15 @@ class ScanButtonState extends State<ScanButton> {
   String _scanBarcode = 'Unknown';
   String _itemName = 'Name';
   List<String> ingredientsForSearch;
-  BackendRequest be = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
+  int userID;
+  String token;
+  BackendRequest be;
 
   Future<List<String>> scanBarcodeNormal() async {
+    userID = await LS.LocalStorage.getUserID();
+    token = await LS.LocalStorage.getAuthToken();
+    be = new BackendRequest(token, userID);
+
     String barcodeScanRes;
     List<String> ingredients;
 
@@ -65,8 +71,12 @@ class ScanButtonState extends State<ScanButton> {
   }
 
   Future<List<String>> getIngredients(List<String> breadCrumbs) async {
+      int userID = await LS.LocalStorage.getUserID();
+      String token = await LS.LocalStorage.getAuthToken();
+      BackendRequest request = new BackendRequest(token, userID);
       //get the indredient list
-      List<Ingredient> ingredients = await be.getIngredientList();
+      //List<Ingredient> ingredients = await be.getIngredientList();
+      List<Ingredient> ingredients = await request.getIngredientList();
       List<String> matched = new List<String>();
       
       for(int i =0; i < breadCrumbs.length; i++){

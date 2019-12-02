@@ -1,4 +1,9 @@
 
+
+import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/homePage.dart';
+import 'package:cookmate/login.dart';
+
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 //import 'package:cookmate/search.dart';
@@ -26,19 +31,25 @@ class HomePage extends StatefulWidget{
   }
 
 }
+
 class HomePageState extends State<HomePage> {
-  String _authToken ="e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
+  String _authToken = "e27dc27ab455de7a3afa076e09e0eacff2b8eefb";
   int id = 6;
-  BackendRequest br = new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+  BackendRequest br = new BackendRequest(
+      "e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
   Recipe recipe1 = new Recipe(221886);
   Recipe recipe2 = new Recipe(716429);
-  HomePageState(){
-    this.recipe1.title = "Red pepper, ham & cheese tart";
-    this.recipe1.imageURL = "https://spoonacular.com/recipeImages/221886-312x231.jpg";
-    this.recipe2.title = "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
-    this.recipe2.imageURL = "https://spoonacular.com/recipeImages/716429-312x231.jpg";
 
+  HomePageState() {
+    this.recipe1.title = "Red pepper, ham & cheese tart";
+    this.recipe1.imageURL =
+    "https://spoonacular.com/recipeImages/221886-312x231.jpg";
+    this.recipe2.title =
+    "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
+    this.recipe2.imageURL =
+    "https://spoonacular.com/recipeImages/716429-312x231.jpg";
   }
+
 
   // Recipe recipe1 = new Recipe(
   //     716429,

@@ -3,7 +3,7 @@ import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'cookbook.dart';
-
+import 'package:cookmate/util/localStorage.dart' as LS;
 class SearchResultPage extends StatefulWidget {
 
   final Future<List<Recipe>> _searchResults;
@@ -28,10 +28,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   List<Recipe> recipeList;
 
-  final BackendRequest _request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
-
+  //final BackendRequest _request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
+  BackendRequest _request;
+  _initBackend() async {
+    int userID = await LS.LocalStorage.getUserID();
+    String token = await LS.LocalStorage.getAuthToken();
+    _request = BackendRequest(token, userID);
+  }
   @override
   void initState() {
+    _initBackend();
     widget._searchResults.then(
       (data) {
         setState(() {

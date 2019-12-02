@@ -1,13 +1,12 @@
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/recipe.dart';
 import 'package:cookmate/search.dart';
-import 'package:cookmate/searchResultPage.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
-import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:cookmate/util/localStorage.dart' as LS;
 
 // ignore: must_be_immutable
 class MyCalendar extends StatefulWidget {
@@ -18,12 +17,10 @@ class MyCalendar extends StatefulWidget {
     return Calendar(recipe);
   }
 }
-
 class Calendar extends State<MyCalendar> {
   CalendarController _controller;
   BackendRequest backendRequest;
-  int id;
-  String token;
+  BackendRequest request;
   Future <List<Meal>> mealFuture;
   Future<Meal> mealListFuture;
   Future<bool> deleteFuture;
@@ -43,16 +40,17 @@ class Calendar extends State<MyCalendar> {
   DateTime end;
   String message = "Select a day";
   Recipe addRecipe;
-
+  _getUserInfo() async {
+    int userID = await LS.LocalStorage.getUserID();
+    String token = await LS.LocalStorage.getAuthToken();
+    backendRequest= BackendRequest(token, userID);
+  }
   Calendar(Recipe recipe) {
     if (recipe != null){
       this.addRecipe = recipe;
-      //print(this.addRecipe.imageURL);
-      /*this.addRecipe = new Recipe(recipe.apiID);
-      this.addRecipe.title = recipe.title;
-      this.addRecipe.imageURL = "https://spoonacular.com/recipeImages/" + addRecipe.apiID.toString() + "-312x231.jpg";*/
     }
-    /*this.backendRequest =
+    _getUserInfo();
+    this.request =
     new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
     this.today = new DateTime.now();
     this.start = today.subtract(new Duration(days: 7));
@@ -61,37 +59,14 @@ class Calendar extends State<MyCalendar> {
     this.en = new Date(end.year, end.month, end.day);
     this.dayML = [];
     this.ml = [];
-    backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-      ml = list;
-    });*/
 
   }
-  /*_getInitData() async {
-    userID = await LocalStorage.getUserID();
-    token = await LocalStorage.getAuthToken();
-    backendRequest = BackendRequest(token, userID);
-    _getMealsUser();
-  }*/
-
-  /*_getMealsUser() async {
-    backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-      ml = list;
-    });
-  }*/
   @override
   void initState() {
     super.initState();
-    this.backendRequest =
-    new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
-   // _getInitData();
-
-    this.today = new DateTime.now();
-    this.start = today.subtract(new Duration(days: 7));
-    this.end = today.add(new Duration(days: 14));
-    this.st = new Date(start.year, start.month, start.day);
-    this.en = new Date(end.year, end.month, end.day);
-    this.dayML = [];
-    this.ml = [];
+    request.getMeals(startDate: st, endDate: en).then((list) {
+      ml = list;
+    });
     _controller = CalendarController();
   }
 
@@ -286,7 +261,6 @@ class Calendar extends State<MyCalendar> {
                   Date d1 = new Date(dt1.year, dt1.month, dt1.day);
                   Date d2 = new Date(dt2.year, dt2.month, dt2.day);
                   Date d3 = new Date(today.year, today.month, today.day);
-
                   backendRequest.addMealToCalendar(recipe1, d1).then((meal){
                     backendRequest.addMealToCalendar(recipe2, d2).then((meal){
                       backendRequest.addMealToCalendar(recipe2, d3).then((meal){
@@ -320,7 +294,6 @@ class Calendar extends State<MyCalendar> {
               ),
               /*Container(
                 child: (widget.recipe != null) ? widget.recipe.image : Text("No Image"),
-
               )*/
             ],
           ),
