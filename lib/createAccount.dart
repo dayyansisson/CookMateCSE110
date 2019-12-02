@@ -33,7 +33,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               LocalStorage.storeUserID(_id);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
+                MaterialPageRoute(builder: (context) => HomePage()),
               );
             }
 

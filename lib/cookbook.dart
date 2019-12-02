@@ -44,15 +44,6 @@ class Recipe {
     _complete = true;
   }
 
-  Recipe.forPopularList(Map<String, dynamic> json) {
-
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    popularity = json['popular_count'];
-    _complete = false;
-  }
-
   //Returns all the ingredients for a given recipe
   List<Ingredient> getIngredients(){
     List<Ingredient> ingredients = new List<Ingredient>();

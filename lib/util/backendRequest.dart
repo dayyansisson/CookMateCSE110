@@ -767,7 +767,7 @@ class BackendRequest {
    *    - success: List of recipes with data for popular recipes
    *    - failure: null
    */
-  Future<List<Recipe>> getPopularRecipes () async {
+  Future<List<String>> getPopularRecipes () async {
 
     print("Getting full list of popular recipes...");
 
@@ -787,13 +787,17 @@ class BackendRequest {
     }
 
     var data = jsonDecode(response.body);
-    List<Recipe> recipes = List<Recipe>();
-    for(Map<String, dynamic> recipe in data) {
-      recipes.add(Recipe.forPopularList(recipe));
+    List<String> recipes = List<String>();
+    int count = 0;
+    for(var recipe in data) {
+      if(count == 10) {
+        break;
+      }
+      recipes.add(recipe['api_id'].toString());
+      count++;
     }
 
-    print("Return ${recipes.length} recipes!");
-
+    print("Returning ${recipes.length} recipes!");
     return recipes;
   }
 
@@ -887,7 +891,7 @@ class BackendRequest {
     var data = jsonDecode(response.body);
     String log = "\n\n MEALS \n------------";
     for(var meal in data) {
-      Recipe recipe = await getRecipe(data['recipe']['api_id']);
+      Recipe recipe = await getRecipe(meal['recipe']['api_id'].toString());
       meals.add(Meal.fromJSON(recipe, meal));
       log += "\n\t${meal['id']}, ${meal['date']}";
     }

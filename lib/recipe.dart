@@ -21,6 +21,7 @@ class RecipeDisplay extends StatefulWidget {
 }
 
 class _RecipeDisplayState extends State<RecipeDisplay> {
+  
   prefix0.DatabaseHelper helper = prefix0.DatabaseHelper.instance;
   BackendRequest backend = new BackendRequest("42e96d88b6684215c9e260273b5e56b0522de18e", 4);
   Future<Recipe> recipeFuture;
