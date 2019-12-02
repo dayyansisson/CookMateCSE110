@@ -1,76 +1,83 @@
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
-import 'package:cookmate/util/user.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 
-class UserProfile extends StatefulWidget {
+class UserPreferences extends StatefulWidget {
   @override
-  _UserProfileState createState() => _UserProfileState();
+  _UserPreferencesState createState() => _UserPreferencesState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _UserPreferencesState extends State<UserPreferences> {
 
-  // TODO generate these maps with getDietList (), getCuisineList ()
-  Map<String, bool> allergens = {
-    'peanuts': true,
-    'gluten': false,
-  };
+  // User Data
+  String token;
+  int userID;
+  String currentUsername;
+  UserProfile user;
+  Map<String, bool> allergens = {};
+  Map<String, bool> diets = {};
+  
+  // Backend controller
+  BackendRequest request;
 
-  Map<String, bool> diets = {
-    'vegan': true,
-    'vegetarian': false,
-    'keto': false,
-    'idk': false,
-    'lowcarb': false,
-  };
+  @override
+  void initState() {
+    _initData();
+    super.initState();
+  }
 
-  Map<String, bool> cuisines = {
-    
-  };
+  _initData() async {
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
 
+    print("Token: " + token.toString());
+    print("UserId: " +  userID.toString());
+
+    request = BackendRequest(token, userID);
+    user = await request.getUserProfile();
+    //currentUsername = user.toString();
+  }
 
   Future<String> _asyncUsernameInput(BuildContext context) async {
     String newUserName = '';
     return showDialog<String>(
       context: context,
-      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      barrierDismissible:
+          false, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Username'),
           content: new Row(
             children: <Widget>[
               new Expanded(
-                child: new TextField(
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                    // TODO get (locally stored?) username of current user
-                    // labelText: 'user.username' + '(current)';
-                    hintText: 'New Username'
-                  ),
-                  onChanged: (value) {
-                    newUserName = value;
-                  },
-                )
-              )
+                  child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    hintText: 'New Username'),
+                onChanged: (value) {
+                  newUserName = value;
+                },
+              ))
             ],
           ),
           actions: <Widget>[
             FlatButton(
               child: Text('Update'),
               onPressed: () {
-                bool success = false;
                 // TODO backendrequest
-                /*
-                bool success = BackendRequest.updateUsername(currentUsername, newUserName);
-                if(!success){
+                Future<bool> success = request.updateUsername(currentUsername, newUserName);
+                success.then((result) {
+                  if(!result){
                   // 
-                }
-                else{
+                  }
+                  else{
                   // 
-                };
-                */
+                  };
+                });
                 Navigator.of(context).pop();
               },
             ),
@@ -85,36 +92,31 @@ class _UserProfileState extends State<UserProfile> {
     String newPassword = '';
     return showDialog<String>(
       context: context,
-      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      barrierDismissible:
+          false, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Password'),
           content: new Column(
             children: <Widget>[
               new Expanded(
-                child: new TextField(
-                  autofocus: true,
-                  obscureText: true,
-                  decoration: new InputDecoration(
-                    hintText: 'Current Password'
-                  ),
-                  onChanged: (value) {
-                    currentPassword = value;
-                  },
-                )
-              ),
+                  child: new TextField(
+                autofocus: true,
+                obscureText: true,
+                decoration: new InputDecoration(hintText: 'Current Password'),
+                onChanged: (value) {
+                  currentPassword = value;
+                },
+              )),
               new Expanded(
-                child: new TextField(
-                  autofocus: true,
-                  obscureText: true,
-                  decoration: new InputDecoration(
-                    hintText: 'New Password'
-                  ),
-                  onChanged: (value) {
-                    newPassword = value;
-                  },
-                )
-              )
+                  child: new TextField(
+                autofocus: true,
+                obscureText: true,
+                decoration: new InputDecoration(hintText: 'New Password'),
+                onChanged: (value) {
+                  newPassword = value;
+                },
+              ))
             ],
           ),
           actions: <Widget>[
@@ -122,17 +124,16 @@ class _UserProfileState extends State<UserProfile> {
               child: Text('Update'),
               onPressed: () {
                 // TODO backendrequest
-                bool success = false;
-                /*
-                bool success = myBackendRequest.updatePassword(currentPassword, newPassword);
-                if(!success){
+                Future<bool> success = request.updatePassword(currentPassword, newPassword);
+                success.then((result) {
+                  if(!result){
                   // 
-                }
-                else{
+                  }
+                  else{
                   // 
-                };
-                */
-                Navigator.of(context).pop(); 
+                  };
+                });
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -141,108 +142,78 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
-      
-      // GENERIC APPBAR 
-      appBar: AppBar(
-        title: Text("CookMate"),
-        leading: IconButton(
-          icon: Icon(Icons.home, semanticLabel: 'home',),
-          onPressed: () {
-            print('Home button');
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.search,
-              semanticLabel: "search",
-            ), 
-            onPressed: () {
-              print('Search button');
-            },
-          ),
-        ],
-      ),
+        appBar: NavBar(title: "Profile", titleSize: 25, isUserPrefs: true),
 
-      // MAIN BODY
-      body: ListView(
-        children: <Widget>[
-
-          OutlineButton(
-            padding: EdgeInsets.all(20.0),
-            onPressed: (){
-              print("change username");
-              _asyncUsernameInput(context);
-            },
-            child: Row(
+        // MAIN BODY
+        body: ListView(
+          children: <Widget>[
+            OutlineButton(
+              padding: EdgeInsets.all(20.0),
+              onPressed: () {
+                print("change username");
+                _asyncUsernameInput(context);
+              },
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.person_outline),
+                  SizedBox(width: 30.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("Change Username"),
+                      Text("user.username (current)"), // TODO
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            OutlineButton(
+              padding: EdgeInsets.all(20.0),
+              onPressed: () {
+                print("change Password");
+                _asyncPasswordInput(context);
+              },
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.lock),
+                  SizedBox(width: 30.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("Change Password"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Column(
               children: <Widget>[
-                Icon(Icons.person_outline),
-                SizedBox(width: 30.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text("Change Username"),
-                    Text("user.username (current)"), // TODO 
-                  ],
-                ),
+                Padding(child: Text("Select Diet:"), padding: null,),
               ],
             ),
-          ),
-
-          OutlineButton(
-            padding: EdgeInsets.all(20.0),
-            onPressed: (){
-              print("change Password");
-              _asyncPasswordInput(context);
-            },
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.lock),
-                SizedBox(width: 30.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text("Change Password"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Column(
-            children: <Widget>[
-              Text("Select Diet:"),
-            ],
-          ),
-          Card(
-            child:Container(
-              height: 175,
-              child: ListView(
-                children: 
-                  diets.keys.map((String key) {
-                  return new CheckboxListTile(
-                    dense: true,
-                    title: new Text(key),
-                    value: diets[key],
-                    onChanged: (bool value) {
-                      setState((){
-                        print("changing diet: " + key);
-                        diets[key]=value;
-                      });
-                    },
-                  );
-                }).toList(),
-              )
-            )
-          )
-        ],
-      )
-      
-    );
+            Card(
+                child: Container(
+                    height: 175,
+                    child: ListView(
+                      children: diets.keys.map((String key) {
+                        return new CheckboxListTile(
+                          dense: true,
+                          title: new Text(key),
+                          value: diets[key],
+                          onChanged: (bool value) {
+                            setState(() {
+                              print("changing diet: " + key);
+                              diets[key] = value;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    )))
+          ],
+        ));
   }
-
-      
 }

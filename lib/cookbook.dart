@@ -1,3 +1,4 @@
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
 
 /* Class: Recipe
@@ -19,31 +20,33 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.id = id, _complete = false;
-  Recipe.forCalendar(Map<String, dynamic> json) {
-    
-    id = json['id'];
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    _complete = false;
-  }
-
+  Recipe(int id) : this.apiID = id, _complete = false;
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
     title = json['title'];
-    imageURL = json['image'];
+    if(json['image'] != null) {
+      imageURL = json['image'];
+    } else {
+      imageURL = json['imageURL'];
+    }
     servings = json['servings'];
     cookTime = json['readyInMinutes'];
-    price = (servings * json['pricePerServings']).roundToDouble() / 100;
-    calories = json['calories'].toDouble();
+    if(json['pricePerServing'] != null) {
+      price = (servings * json['pricePerServing']).roundToDouble() / 100;
+    } else {
+      price = (servings * json['pricePerServings']).roundToDouble() / 100;
+    }
+    if(json['calories'] == null) {
+      calories = 0;
+    } else {
+      calories = json['calories'].toDouble();
+    }
     _complete = true;
   }
 
   Recipe.forPopularList(Map<String, dynamic> json) {
 
-    id = json['id'];
     apiID = json['api_id'];
     title = json['name'];
     imageURL = json['url'];
@@ -52,22 +55,35 @@ class Recipe {
   }
 
   //Returns all the ingredients for a given recipe
-  List<String> getIngredients(){
-    List<String> ingredients = new List<String>();
+  List<Ingredient> getIngredients(){
+    List<Ingredient> ingredients = new List<Ingredient>();
 
     List<dynamic> ingredientList = json["extendedIngredients"];
-    
-    
+
     for(int i =0; i < ingredientList.length; i++){
-      ingredients.add(ingredientList[i]["originalString"]);
+      String units = ingredientList[i]['unit'];
+      if(units == 'tablespoon' || units == 'teaspoon'){
+        if(units == 'tablespoon'){
+          units = 'tbsp';
+        }
+        else{
+          units = 'tsp';
+        }
+      }
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
+      ingredients.add(ing);
     }
-    print(ingredients.toString());
+    //print(ingredients.toString());
     return ingredients;
   }
 
   //Returns the instructions in a list
   List<String> getInstructions(){
     List<String> instructions = new List<String>();
+
+    if(json["instructions"] == null || json["instructions"] == ""){
+      return null;
+    }
 
     var instructionList = json["analyzedInstructions"][0][
       "steps"];
@@ -76,7 +92,9 @@ class Recipe {
       instructions.add(step["step"]);
     }
 
-    print(instructions.toString());
+    //print(instructions.toString());
+
+    return instructions;
   }
 
   Image get image => Image.network(imageURL);
@@ -103,9 +121,19 @@ class Recipe {
  * Description: Ingredient object containing its name, and id.
  */
 class Ingredient {
+
+  int id;
+  String name;
+  double quantity;
+  String units;
+
+  Ingredient(int id, String name, double quantity, String units){
+    this.id = id;
+    this.name = name;
+    this.quantity = quantity;
+    this.units = units;
+  }
   
-  final int id;
-  final String name;
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -117,6 +145,7 @@ class Cuisine {
   
   final int id;
   final String name;
+
 
   Cuisine.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -133,7 +162,7 @@ class Diet {
   Diet ({int id, String name, String summary}) : this.id = id, this.name = name, this.summary = summary;
 
   Diet.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     name = json['name'];
     summary = json['summary'];
@@ -227,14 +256,16 @@ class Date {
 class Meal {
 
   final int _id;
-  final Recipe _recipe;
+  final String _recipeID;
   final Date _date;
 
-  Meal(int id, Recipe recipe, Date date) : _id = id, _recipe = recipe, _date = date;
-  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) : _recipe = recipe, _id = json['id'], _date = Date.fromJSON(json['date']);
+  Meal.fromJSON(Map<String, dynamic> json) :
+    _id = json['id'],
+    _recipeID = json['recipe']['api_id'],
+    _date = Date.fromJSON(json['date']);
 
+  String get recipe => _recipeID;
   int get id => _id;
-  Recipe get recipe => _recipe;
   Date get date => _date;
-  @override String toString() => "Meal $_id is a ${_recipe.title} on ${_date.getDate}";
+  @override String toString() => "Meal has ID $_recipeID on ${_date.getDate}";
 }
