@@ -3,11 +3,10 @@
  */
 import 'dart:convert';
 import 'dart:developer' as logger;
-import 'package:cookmate/dialog.dart';
 import 'dart:ffi';
 import 'package:cookmate/scanner.dart';
+import 'package:cookmate/topNavBar.dart';
 import 'package:cookmate/util/backendRequest.dart';
-import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:cookmate/cookbook.dart' as CB;
@@ -78,13 +77,11 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    token = await LocalStorage.getAuthToken();
-    userID = await LocalStorage.getUserID();
-    print("Token: " + token.toString());
-    print("UserId: " +  userID.toString());
+    //token = await LocalStorage.getAuthToken();
+    //userID = await LocalStorage.getUserID();
 
-    //token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    //userID = 2;
+    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+    userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
@@ -268,24 +265,13 @@ class _SearchPageState extends State<SearchPage> {
         print(bcList[i]);
       }
     }
-    else if(bcList == null){
-      showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-           title: "Uh Oh",
-           description:
-            "Barcode not found in our database, please try entering the item manually",
-           buttonText: "Okay",
-          ),
-        );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: NavBar(title: "Search", titleSize: 25, hasReturn: true, isSearch: true),
+      appBar: TopNavBar().build(context),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -344,8 +330,14 @@ class _SearchPageState extends State<SearchPage> {
                 itemBuilder: (context, index) {
                   return new Container(
                       child: new ListTile(
-                        title: new Text('${items[index]}', style:  TextStyle(fontWeight: FontWeight.bold),),
-                        trailing: Icon(Icons.add_circle, color: Colors.redAccent,),
+                        title: new Text(
+                          '${items[index]}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Icon(
+                          Icons.add_circle,
+                          color: Colors.redAccent,
+                        ),
                         //enabled: true,
                         //selected: true,
                         onTap: () {
@@ -367,43 +359,40 @@ class _SearchPageState extends State<SearchPage> {
             new Divider(
               color: Colors.grey,
             ),
-            Container(
-              margin: new EdgeInsets.all(5.0),
+            new Container(
+              margin: new EdgeInsets.all(20.0),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.list),
-                elevation: 0,
-                onPressed: () {
-                  String display = displayIngredients(ingredientQuery);
-                  editingController.clear();
-                  showDialog(
-                      context: context,
-                      child: new AlertDialog(
-                        title: new Text("Your current list: "),
-                        content: new Text("$display"),
-                      ));
-                },
-              ),
-                  Icon(
+                  new RaisedButton(
+                    //backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.list),
+                    elevation: 0,
+                    onPressed: () {
+                      String display = displayIngredients(ingredientQuery);
+                      editingController.clear();
+                      showDialog(
+                          context: context,
+                          child: new AlertDialog(
+                            title: new Text("Your current list: "),
+                            content: new Text("$display"),
+                          ));
+                    },
+                  ),
+                  new Icon(
                     Icons.fastfood,
                     color: Colors.red,
                     size: 35.0,
                   ),
-
-              FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.navigate_next),
-                elevation: 0,
-                onPressed: () {
-                  editingController.clear();
-                  _routeRecipePage(context);
-                },
-              ),
-
-
+                  new RaisedButton(
+                    //backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.search),
+                    elevation: 0,
+                    onPressed: () {
+                      editingController.clear();
+                      _routeRecipePage(context);
+                    },
+                  ),
                 ],
               ),
             ),
