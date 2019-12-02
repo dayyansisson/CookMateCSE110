@@ -81,7 +81,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: NavBar(title: "Calendar", titleSize: 25, hasReturn: true, isSearch: true),
+        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isSearch: true),
         body:
         SingleChildScrollView(
           child:
@@ -182,7 +182,7 @@ class Calendar extends State<MyCalendar> {
                     print(dayML[index].recipe.imageURL);
                     print(dayML[index].recipe.title);
                     return Container(
-                        padding: EdgeInsets.all(2.00),
+                        padding: EdgeInsets.all(4.00),
                         height: 240,
                         width: 182,
                         child: Column(
