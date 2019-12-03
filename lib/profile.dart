@@ -13,7 +13,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-
   // Backend request object
   BackendRequest request;
 
@@ -29,8 +28,8 @@ class _UserProfileState extends State<UserProfile> {
   // Page data
   List<String> diets = new List<String>();
   String userInfo = "";
-  List<DropdownMenuItem<int>> dietsDropDownList = new List<DropdownMenuItem<int>>();
-
+  List<DropdownMenuItem<int>> dietsDropDownList =
+      new List<DropdownMenuItem<int>>();
 
   _initData() async {
     userID = await LS.LocalStorage.getUserID();
@@ -40,15 +39,19 @@ class _UserProfileState extends State<UserProfile> {
     _getUserProfile();
     _getDiets();
   }
+
   _getDiets() async {
     _dietList = request.getDietList();
-    _dietList.then((currList){
+    _dietList.then((currList) {
       setState(() {
-        for(int i = 0; i < currList.length; i++){
-          print("Diet: " + currList[i].name + " id: " + currList[i].id.toString());
+        for (int i = 0; i < currList.length; i++) {
+          print("Diet: " +
+              currList[i].name +
+              " id: " +
+              currList[i].id.toString());
           //diets[currList[i].id] = currList[i].name;
           diets.add(currList[i].name);
-       }
+        }
       });
     });
   }
@@ -70,23 +73,24 @@ class _UserProfileState extends State<UserProfile> {
       });
     }
   }
+
   _updateUserDiet(int newDiet) async {
-      bool success = await request.setDiet(newDiet);
-      if(success){
-        setState(() {
-          LS.LocalStorage.storeDiet(newDiet);
-          userDiet = newDiet;
-        });
-      }
+    bool success = await request.setDiet(newDiet);
+    if (success) {
+      setState(() {
+        LS.LocalStorage.storeDiet(newDiet);
+        userDiet = newDiet;
+      });
+    }
   }
 
   Future<bool> _updatePassword(String currPassword, String newPassword) async {
     print("Current Password: " + currPassword);
-    print("New Password: " +  newPassword);
+    print("New Password: " + newPassword);
     bool success = await request.updatePassword(currPassword, newPassword);
-    if(success){
+    if (success) {
       print("New Password was set");
-    }else{
+    } else {
       print("Faile to set new Password");
     }
     return success;
@@ -170,7 +174,7 @@ class _UserProfileState extends State<UserProfile> {
               child: Text('Update'),
               onPressed: () {
                 _updatePassword(currentPassword, newPassword).then((value) {
-                  if(value){
+                  if (value) {
                     print("succes changing password");
                   }
                 });
@@ -199,28 +203,27 @@ class _UserProfileState extends State<UserProfile> {
       ],
     );
   }
-  Widget _displayUSerDiet(){
+
+  Widget _displayUSerDiet() {
     String currDiet;
-    if(userDiet == -1){
+    if (userDiet == -1) {
       currDiet = "No diet set";
-    }else{
-      currDiet = diets[userDiet-1];
+    } else {
+      currDiet = diets[userDiet - 1];
     }
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: Text(
-        "Current Diet: " + currDiet
-      ),
+      child: Text("Current Diet: " + currDiet),
     );
-
   }
-  Widget _displayDietList(){
+
+  Widget _displayDietList() {
     int dietKey = 0;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: DropdownButton(
         hint: Text("Choose a Diet"),
-        onChanged: (value){
+        onChanged: (value) {
           setState(() {
             userDiet = value;
             _updateUserDiet(userDiet);
@@ -228,7 +231,7 @@ class _UserProfileState extends State<UserProfile> {
         },
         isExpanded: true,
         iconSize: 35,
-        items: diets.map<DropdownMenuItem<int>>((String value){
+        items: diets.map<DropdownMenuItem<int>>((String value) {
           return DropdownMenuItem<int>(
             value: ++dietKey,
             child: Text(value),
@@ -284,31 +287,29 @@ class _UserProfileState extends State<UserProfile> {
               ),
             ),
             FutureBuilder(
-              future: _dietList,
-              builder: (context, snapshot){
-                switch(snapshot.connectionState){
-                  case ConnectionState.waiting:
-                    return Text("Loading Diet List");
-                  case ConnectionState.done:
-                    return _displayUSerDiet();
-                  default:
-                    return Text("Error: Diet list not available");
-                }
-              }
-            ),
+                future: _dietList,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Text("Loading Diet List");
+                    case ConnectionState.done:
+                      return _displayUSerDiet();
+                    default:
+                      return Text("Error: Diet list not available");
+                  }
+                }),
             FutureBuilder(
-              future: _dietList,
-              builder: (context, snapshot){
-                switch(snapshot.connectionState){
-                  case ConnectionState.waiting:
-                    return Text("Loading Diet List");
-                  case ConnectionState.done:
-                    return _displayDietList();
-                  default:
-                    return Text("Error: Diet List not available");
-                }
-              }
-            ),
+                future: _dietList,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Text("Loading Diet List");
+                    case ConnectionState.done:
+                      return _displayDietList();
+                    default:
+                      return Text("Error: Diet List not available");
+                  }
+                }),
           ],
         ));
   }
