@@ -16,6 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int userID;
@@ -29,30 +30,36 @@ class _LoginPageState extends State<LoginPage> {
     DB.DatabaseHelper database = DB.DatabaseHelper.instance;
 
     // Load diet fresh
-    LocalStorage.deleteDiet();
-    LocalStorage.storeDiet(profile.diet.id);
+    if(profile.diet != null) {
+      LocalStorage.deleteDiet();
+      LocalStorage.storeDiet(profile.diet.id);
+    }
 
     print("Loaded diet ${profile.diet.id}");
 
     // Load allergens fresh
-    database.clearAllergens();
-    for(Map<String, dynamic> allergen in profile.allergens) {
-      database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
-      print("Loaded allergen ${allergen['id']}");
+    if(profile.allergens != null) {
+      database.clearAllergens();
+      for(Map<String, dynamic> allergen in profile.allergens) {
+        database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
+        print("Loaded allergen ${allergen['id']}");
+      }
     }
 
     // Load favorites fresh
-    database.clearRecipes();
-    for(Map<String, dynamic> recipe in profile.favorites) {
-      database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
-      print("Loaded favorite recipe ${recipe['api_id']}");
-
+    if(profile.favorites != null) {
+      database.clearRecipes();
+      for(Map<String, dynamic> recipe in profile.favorites) {
+        database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
+        print("Loaded favorite recipe ${recipe['api_id']}");
+      }
     }
 
     return true;
   }
 
   _submit() async {
+    
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
