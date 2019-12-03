@@ -24,7 +24,7 @@ class Recipe {
 // Store shopping list items locally
 class ShoppingList {
   String ingredient;
-  int quantity;
+  double quantity;
   bool purchased = false;
   String measurement;
 
@@ -129,7 +129,7 @@ class DatabaseHelper {
     await db.execute('''
       create table shopping_list (
         ingredient text primary key not null UNIQUE,
-        quantity integer not null,
+        quantity real not null,
         purchased integer default 0,
         measurement text
       )''');
