@@ -364,6 +364,7 @@ class _SearchPageState extends State<SearchPage> {
                                 title: new Text("Selected Ingredients: "),
                                 content: new Text("$display"),
                               ));
+                          editingController.clear();
                         },
                       ),
                       decoration: new BoxDecoration(
