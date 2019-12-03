@@ -40,7 +40,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 );
               }
             });
-
           }
         });
       }
@@ -49,7 +48,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _formKey.currentState.reset();
     Flushbar(
       flushbarPosition: FlushbarPosition.TOP,
-      flushbarStyle: FlushbarStyle.GROUNDED,
+      overlayBlur: 5.0,
       messageText: Text(
         'Unable to Sign Up with provided credentials.',
         textAlign: TextAlign.center,
@@ -57,6 +56,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
       ),
       backgroundColor: Colors.red[800],
+      duration: Duration(seconds: 3),
     )..show(context);
   }
 
@@ -82,6 +82,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             style: TextStyle(
               color: CookmateStyle.standardRed,
               fontSize: 18,
@@ -132,6 +133,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: CookmateStyle.standardRed,
@@ -184,6 +186,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             obscureText: true,
             style: TextStyle(
               color: CookmateStyle.standardRed,
@@ -234,6 +237,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             obscureText: true,
             style: TextStyle(
               color: CookmateStyle.standardRed,
@@ -369,7 +373,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
               ),
               Positioned(
-                top: 60,
+                top: 80,
                 left: 40,
                 child: FloatingActionButton(
                   backgroundColor: Colors.white,

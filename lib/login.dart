@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           _formKey.currentState.reset();
           Flushbar(
             flushbarPosition: FlushbarPosition.TOP,
-            flushbarStyle: FlushbarStyle.GROUNDED,
+            flushbarStyle: FlushbarStyle.FLOATING,
             borderWidth: 40,
             messageText: Text(
               'Unable to log in with provided credentials.',
@@ -124,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             style: TextStyle(
               color: CookmateStyle.standardRed,
               fontSize: 18,
@@ -181,6 +182,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             obscureText: true,
             style: TextStyle(
               color: CookmateStyle.standardRed,
