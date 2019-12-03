@@ -81,7 +81,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isSearch: true),
+        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isCalendar: true),
         body:
         SingleChildScrollView(
           child:

@@ -55,6 +55,7 @@ class _HomePageState extends State<HomePage> {
         _favoriteRecipes = List<Future<Recipe>>();
         setState(() {
           for(db.Recipe recipe in list) {
+            print("This recipe is a favorite: ${recipe.id}");
             _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
           }
         });

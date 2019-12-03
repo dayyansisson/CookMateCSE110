@@ -33,7 +33,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   bool isFave = false;
 
   GlobalKey _tabBarKey = GlobalKey();
-  
+
   _getUserInfo() async {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();
@@ -441,7 +441,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
 
   _isPressedFave(List<localDB.Recipe> favorites) {
     for (int i = 0; i < favorites.length; i++) {
-      if (pageRecipe.title == favorites[i].name) {
+      if (pageRecipe.apiID == favorites[i].id) {
         isFave = true;
       }
     }

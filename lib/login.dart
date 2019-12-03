@@ -1,6 +1,8 @@
 import 'package:cookmate/homePage.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/database_helpers.dart' as DB;
 
+import 'cookbook.dart';
 import 'createAccount.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,12 +21,42 @@ class _LoginPageState extends State<LoginPage> {
   int userID;
   String _username, _password, _token;
 
+  Future<bool> _pullUserDataFromServer(BackendRequest backend) async {
+
+    print("Pulling user data from server");
+
+    UserProfile profile = await backend.getUserProfile();
+    DB.DatabaseHelper database = DB.DatabaseHelper.instance;
+
+    // Load diet fresh
+    LocalStorage.deleteDiet();
+    LocalStorage.storeDiet(profile.diet.id);
+
+    print("Loaded diet ${profile.diet.id}");
+
+    // Load allergens fresh
+    database.clearAllergens();
+    for(Map<String, dynamic> allergen in profile.allergens) {
+      database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
+      print("Loaded allergen ${allergen['id']}");
+    }
+
+    // Load favorites fresh
+    database.clearRecipes();
+    for(Map<String, dynamic> recipe in profile.favorites) {
+      database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
+      print("Loaded favorite recipe ${recipe['api_id']}");
+
+    }
+
+    return true;
+  }
+
   _submit() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      Future<String> potentialToken =
-      BackendRequest.login(_username, _password);
+      Future<String> potentialToken = BackendRequest.login(_username, _password);
       potentialToken.then((token) {
         LocalStorage.storeAuthToken(token);
         _token = token;
@@ -34,9 +66,14 @@ class _LoginPageState extends State<LoginPage> {
           BackendRequest backend = new BackendRequest(_token, null);
           backend.getUser().then((userID){
             LocalStorage.storeUserID(userID);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+            _pullUserDataFromServer(backend).then(
+              (success) {
+                print("Logged in, going to home");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              }
             );
           });
         } else {

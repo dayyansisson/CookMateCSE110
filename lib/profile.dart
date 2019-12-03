@@ -21,7 +21,7 @@ class _UserProfileState extends State<UserProfile> {
   // User info
   int userID;
   String token;
-  String userDiet;
+  int userDiet;
   int userName;
 
   // Page data
@@ -33,6 +33,7 @@ class _UserProfileState extends State<UserProfile> {
     'peanuts': true,
     'gluten': false,
   };
+
 //  Map<String, bool> diets = {
 //    'vegan': true,
 //    'vegetarian': false,
@@ -60,6 +61,7 @@ class _UserProfileState extends State<UserProfile> {
   _getUserProfile() async {
     userInfo = await request.getUserName(userID);
   }
+
 
   Map<String, bool> cuisines = {};
 
