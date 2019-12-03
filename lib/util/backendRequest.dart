@@ -327,6 +327,42 @@ class BackendRequest {
     return profile;
   }
 
+  /* Method: getUserName
+   * Arg(s):
+   *    - userId: the id for current user
+   * Return:
+   *    - success: true
+   *    - failure: false
+   */
+  Future<String> getUserName(int userID) async {
+    print("Getting user info (User ID: $_userID, $_authToken)...");
+
+    // Make API call
+    final response = await http.get(
+        "https://thecookmate.com/auth/users/me/",
+        headers: { "Authorization":"Token $_authToken" }
+    );
+
+    // Validate return
+    int statusCode = response.statusCode ~/ 100;
+    if(statusCode != _SUCCESS)
+    {
+      print(_interpretStatus(statusCode, response.statusCode, response.body));
+      return null;
+    }
+
+    print("User profile found, returning profile for $_userID");
+    List<String> userInfo = new List<String>();
+    var json = jsonDecode(response.body) as Map<String, dynamic>;
+    String userName = json['username'];
+    print("UserName: " + userName);
+
+//    UserProfile profile = UserProfile.fromJSON(jsonDecode(response.body));
+//    print(profile.toString());
+
+    return userName;
+  }
+
   /* Method: addFavorite
    * Arg(s):
    *    - recipe: The recipe to add as favorite
