@@ -41,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
       print("Loaded allergen ${allergen['id']}");
     }
 
-
     // Load favorites fresh
     database.clearRecipes();
     for(Map<String, dynamic> recipe in profile.favorites) {
@@ -49,9 +48,6 @@ class _LoginPageState extends State<LoginPage> {
       print("Loaded favorite recipe ${recipe['api_id']}");
 
     }
-
-    // TODO: LOAD SHOPPING LIST
-    //database.clearShoppingList();
 
     return true;
   }
