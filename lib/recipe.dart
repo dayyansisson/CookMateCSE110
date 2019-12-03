@@ -413,7 +413,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
   }
 
   _addIngredients(List<Ingredient> ingredients) async {
-    await helper.clearShoppingList();
+    //await helper.clearShoppingList();
     for (int i = 0; i < ingredients.length; i++) {
       localDB.ShoppingList sl = new localDB.ShoppingList(
           ingredient: ingredients[i].name,
@@ -422,7 +422,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
           measurement: ingredients[i].units);
       await helper.insertShoppingListItem(sl);
     }
-    print(await helper.shoppingListItems());
+    //print(await helper.shoppingListItems());
   }
 
   _addToFavorites() async {
