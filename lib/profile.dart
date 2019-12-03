@@ -13,7 +13,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  // TODO generate these maps with getDietList (), getCuisineList ()
 
   // Backend request object
   BackendRequest request;
@@ -22,51 +21,79 @@ class _UserProfileState extends State<UserProfile> {
   int userID;
   String token;
   int userDiet;
-  int userName;
+
+  // Future data for rendering
+  Future<String> _userName;
+  Future<List<CB.Diet>> _dietList;
 
   // Page data
-  List<CB.Diet> dietsList = new List<CB.Diet>();
-  Map<String, bool> diets = new Map<String, bool>();
+  List<String> diets = new List<String>();
   String userInfo = "";
+  List<DropdownMenuItem<int>> dietsDropDownList = new List<DropdownMenuItem<int>>();
 
-  Map<String, bool> allergens = {
-    'peanuts': true,
-    'gluten': false,
-  };
 
-//  Map<String, bool> diets = {
-//    'vegan': true,
-//    'vegetarian': false,
-//    'keto': false,
-//    'idk': false,
-//    'lowcarb': false,
-//  };
   _initData() async {
     userID = await LS.LocalStorage.getUserID();
     token = await LS.LocalStorage.getAuthToken();
     userDiet = await LS.LocalStorage.getDiet();
-    userName = 2;
     request = new BackendRequest(token, userID);
-    _getDiets();
     _getUserProfile();
+    _getDiets();
   }
   _getDiets() async {
-    print(request);
-    dietsList = await request.getDietList();
-    for(int i = 0; i < dietsList.length; i++){
-      diets[dietsList[i].name] = false;
-    }
-    //diets.forEach((key, value) => print('$key'));
+    _dietList = request.getDietList();
+    _dietList.then((currList){
+      setState(() {
+        for(int i = 0; i < currList.length; i++){
+          print("Diet: " + currList[i].name + " id: " + currList[i].id.toString());
+          //diets[currList[i].id] = currList[i].name;
+          diets.add(currList[i].name);
+       }
+      });
+    });
   }
+
   _getUserProfile() async {
-    userInfo = await request.getUserName(userID);
+    _userName = request.getUserName(userID);
+    _userName.then((value) {
+      setState(() {
+        userInfo = value;
+      });
+    });
   }
 
+  _updateUserName(String newUserName) async {
+    bool succes = await request.updateUsername(userInfo, newUserName);
+    if (succes) {
+      setState(() {
+        userInfo = newUserName;
+      });
+    }
+  }
+  _updateUserDiet(int newDiet) async {
+      bool success = await request.setDiet(newDiet);
+      if(success){
+        setState(() {
+          LS.LocalStorage.storeDiet(newDiet);
+          userDiet = newDiet;
+        });
+      }
+  }
 
-  Map<String, bool> cuisines = {};
+  Future<bool> _updatePassword(String currPassword, String newPassword) async {
+    print("Current Password: " + currPassword);
+    print("New Password: " +  newPassword);
+    bool success = await request.updatePassword(currPassword, newPassword);
+    if(success){
+      print("New Password was set");
+    }else{
+      print("Faile to set new Password");
+    }
+    return success;
+  }
 
   @override
-  void initState(){
+  void initState() {
     _initData();
     super.initState();
   }
@@ -85,10 +112,7 @@ class _UserProfileState extends State<UserProfile> {
               new Expanded(
                   child: new TextField(
                 autofocus: true,
-                decoration: new InputDecoration(
-                    // TODO get (locally stored?) username of current user
-                    // labelText: 'user.username' + '(current)';
-                    hintText: 'New Username'),
+                decoration: new InputDecoration(hintText: 'New Username'),
                 onChanged: (value) {
                   newUserName = value;
                 },
@@ -99,17 +123,7 @@ class _UserProfileState extends State<UserProfile> {
             FlatButton(
               child: Text('Update'),
               onPressed: () {
-                bool success = false;
-                // TODO backendrequest
-                /*
-                bool success = BackendRequest.updateUsername(currentUsername, newUserName);
-                if(!success){
-                  // 
-                }
-                else{
-                  // 
-                };
-                */
+                _updateUserName(newUserName);
                 Navigator.of(context).pop();
               },
             ),
@@ -155,17 +169,12 @@ class _UserProfileState extends State<UserProfile> {
             FlatButton(
               child: Text('Update'),
               onPressed: () {
-                // TODO backendrequest
-                bool success = false;
-                /*
-                bool success = myBackendRequest.updatePassword(currentPassword, newPassword);
-                if(!success){
-                  // 
-                }
-                else{
-                  // 
-                };
-                */
+                _updatePassword(currentPassword, newPassword).then((value) {
+                  if(value){
+                    print("succes changing password");
+                  }
+                });
+
                 Navigator.of(context).pop();
               },
             ),
@@ -175,9 +184,62 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
+  Widget _displayUserName() {
+    return Row(
+      children: <Widget>[
+        Icon(Icons.person_outline),
+        SizedBox(width: 30.0),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("Change Username"),
+            Text("User Name: " + userInfo),
+          ],
+        )
+      ],
+    );
+  }
+  Widget _displayUSerDiet(){
+    String currDiet;
+    if(userDiet == -1){
+      currDiet = "No diet set";
+    }else{
+      currDiet = diets[userDiet-1];
+    }
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Text(
+        "Current Diet: " + currDiet
+      ),
+    );
+
+  }
+  Widget _displayDietList(){
+    int dietKey = 0;
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: DropdownButton(
+        hint: Text("Choose a Diet"),
+        onChanged: (value){
+          setState(() {
+            userDiet = value;
+            _updateUserDiet(userDiet);
+          });
+        },
+        isExpanded: true,
+        iconSize: 35,
+        items: diets.map<DropdownMenuItem<int>>((String value){
+          return DropdownMenuItem<int>(
+            value: ++dietKey,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
         appBar: NavBar(title: "Profile", titleSize: 25, isUserPrefs: true),
 
@@ -185,25 +247,23 @@ class _UserProfileState extends State<UserProfile> {
         body: ListView(
           children: <Widget>[
             OutlineButton(
-              padding: EdgeInsets.all(20.0),
-              onPressed: () {
-                print("change username");
-                _asyncUsernameInput(context);
-              },
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.person_outline),
-                  SizedBox(width: 30.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text("Change Username"),
-                      Text("user.username: "  + userInfo), // TODO
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                padding: EdgeInsets.all(20.0),
+                onPressed: () {
+                  print("change username");
+                  _asyncUsernameInput(context);
+                },
+                child: FutureBuilder(
+                    future: _userName,
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return Text("Loading User Info");
+                        case ConnectionState.done:
+                          return _displayUserName();
+                        default:
+                          return Text("Error: Not user info found");
+                      }
+                    })),
             OutlineButton(
               padding: EdgeInsets.all(20.0),
               onPressed: () {
@@ -223,29 +283,32 @@ class _UserProfileState extends State<UserProfile> {
                 ],
               ),
             ),
-            Column(
-              children: <Widget>[
-                Text("Select Diet:"),
-              ],
+            FutureBuilder(
+              future: _dietList,
+              builder: (context, snapshot){
+                switch(snapshot.connectionState){
+                  case ConnectionState.waiting:
+                    return Text("Loading Diet List");
+                  case ConnectionState.done:
+                    return _displayUSerDiet();
+                  default:
+                    return Text("Error: Diet list not available");
+                }
+              }
             ),
-            Card(
-                child: Container(
-                    height: 175,
-                    child: ListView(
-                      children: diets.keys.map((String key) {
-                        return new CheckboxListTile(
-                          dense: true,
-                          title: new Text(key),
-                          value: diets[key],
-                          onChanged: (bool value) {
-                            setState(() {
-                              print("changing diet: " + key);
-                              diets[key] = value;
-                            });
-                          },
-                        );
-                      }).toList(),
-                    )))
+            FutureBuilder(
+              future: _dietList,
+              builder: (context, snapshot){
+                switch(snapshot.connectionState){
+                  case ConnectionState.waiting:
+                    return Text("Loading Diet List");
+                  case ConnectionState.done:
+                    return _displayDietList();
+                  default:
+                    return Text("Error: Diet List not available");
+                }
+              }
+            ),
           ],
         ));
   }

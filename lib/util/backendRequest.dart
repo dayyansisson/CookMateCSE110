@@ -67,13 +67,11 @@ class BackendRequest {
   Future<int> getUser () async {
 
     print("Getting user info ($_authToken)...");
-    print("before call");
     // Make API call
     final response = await http.get(
         "https://thecookmate.com/auth/users/me/",
         headers: { "Authorization":"Token $_authToken" }
     );
-    print("after call");
     // Validate return
     int statusCode = response.statusCode ~/ 100;
     if(statusCode != _SUCCESS)
