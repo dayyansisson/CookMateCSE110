@@ -22,7 +22,6 @@ class _UserProfileState extends State<UserProfile> {
     'vegan': true,
     'vegetarian': false,
     'keto': false,
-    'idk': false,
     'lowcarb': false,
   };
 
