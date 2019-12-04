@@ -312,7 +312,12 @@ class _SearchPageState extends State<SearchPage> {
             FutureBuilder(
                 future: _loadCusines(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  if (!snapshot.hasData) {
+                    return Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    );
+                  }
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Text("Loading cuisines");
