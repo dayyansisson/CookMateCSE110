@@ -3,6 +3,17 @@ import 'package:cookmate/util/database_helpers.dart' as DB;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+/*
+  File: shoppingListPage.dart
+  Functionality: This file displays the shopping list page for the user. If a 
+  user adds a recipe to the shopping list from the recipe page the ingredients 
+  are added to our local database that is stored on the phone and this page
+  grabs those ingredients and displays them. It displays the ingredient's name,
+  quantity to purchase, and units. It allows the user to increment or decrement 
+  the amount to purchase, remove an ingredient from the list, mark as purchased,
+  and clear the entire shopping list.
+*/
+
 class ShoppingListPage extends StatefulWidget {
   @override
   _ShoppingListPageState createState() => _ShoppingListPageState();
@@ -74,7 +85,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     int purchasedItems = 0;
 
     for (DB.ShoppingList item in list) {
-      quantityDisplay = item.quantity.toString();
+      quantityDisplay = _formatAmount(item.quantity);
       if (item.measurement != null) {
         quantityDisplay += " ${item.measurement}";
       }
@@ -269,5 +280,20 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   _updateShoppingItem(DB.ShoppingList sl) {
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     helper.updateShoppingListItem(sl);
+  }
+
+  String _formatAmount(double amount) {
+    if (amount == 0.25) {
+      return "1/4";
+    } else if (amount == 0.5) {
+      return "1/2";
+    } else if (amount == 0.3333333333333333){
+      return "1/3";
+    } else if (amount == 0.125) {
+      return "1/8";
+    } else if (amount < 0.125) {
+      return "pinches";
+    } else
+      return amount.round().toString();
   }
 }

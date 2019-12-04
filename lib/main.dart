@@ -1,13 +1,13 @@
-import 'package:cookmate/cookbook.dart';
-import 'package:cookmate/homePage.dart';
 import 'package:cookmate/login.dart';
-import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 
+/*
+  File: main.dart
+  Functionality: This file runs the app. It launches the login page.
+*/
+
 main() {
-  //DatabaseHelper helper = DatabaseHelper.instance;
-  //helper.clearRecipes();
   runApp(MyApp());
 }
 

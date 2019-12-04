@@ -5,8 +5,15 @@ import 'package:cookmate/util/database_helpers.dart' as db;
 import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'cookbook.dart';
+
+/*
+  File: homePage.dart
+  Functionality: This page is the main page of the app. It is the page that 
+  is diplayed upon logging in. It displays the users favorite recipes and 
+  the current list of popular recipes within the app. The user can navigate 
+  to all the other pages using the upper navigation bar.
+*/
 
 class HomePage extends StatefulWidget {
 

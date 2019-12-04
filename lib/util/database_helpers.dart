@@ -3,6 +3,14 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
+/*
+  File: database_helpers.dart
+  Functionality: This file sets up our local database. It stores shopping list 
+  items, calendar items, favorites, user ID and auth token. It has methods that
+  allow the frontend to communicate and retreive/modidy/store data within the
+  database.
+*/
+
 // Store favorite recipe locally
 class Recipe {
   int id;
@@ -24,7 +32,7 @@ class Recipe {
 // Store shopping list items locally
 class ShoppingList {
   String ingredient;
-  int quantity;
+  double quantity;
   bool purchased = false;
   String measurement;
 
@@ -146,7 +154,7 @@ class DatabaseHelper {
     await db.execute('''
       create table shopping_list (
         ingredient text primary key not null UNIQUE,
-        quantity integer not null,
+        quantity real not null,
         purchased integer default 0,
         measurement text
       )''');

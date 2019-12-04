@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:developer' as logger;
-import 'package:cookmate/search.dart';
 import 'package:cookmate/util/localStorage.dart' as LS;
 
-import 'dialog.dart';
+/*
+  File: scanner.dart
+  Functionality: This file allows the user to open their camera and use it to
+  scan an items barcode and recieve recipes for it. It searches our database for
+  the UPC and if it is found it adds the ingredient to the ongoing search.
+*/
 
 class ScanButton extends StatefulWidget {
   @override
@@ -16,8 +19,6 @@ class ScanButton extends StatefulWidget {
 }
 
 class ScanButtonState extends State<ScanButton> {
-  String _scanBarcode = 'Unknown';
-  String _itemName = 'Name';
   List<String> ingredientsForSearch;
   int userID;
   String token;
@@ -49,21 +50,6 @@ class ScanButtonState extends State<ScanButton> {
 
     List<String> breadCrumbs = await be.getBreadcrumbs(barcodeScanRes);
 
-    // For testing uncoment this line of code below
-    //List<String> breadCrumbs = await be.getBreadcrumbs("024600010030");
-    //If the backend does not return us anything this displays a popup
-    // if(breadCrumbs == null){
-    //     showDialog(
-    //       context: context,
-    //       builder: (BuildContext context) => CustomDialog(
-    //        title: "Uh Oh",
-    //        description:
-    //         "Barcode not found in our database, please try entering the item manually",
-    //        buttonText: "Okay",
-    //       ),
-    //     );
-    // }
-    // else{
     //Check the breadcrumbs for usable ingredients
     ingredients = await getIngredients(breadCrumbs);
     return ingredients;
@@ -76,8 +62,8 @@ class ScanButtonState extends State<ScanButton> {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();
     BackendRequest request = new BackendRequest(token, userID);
+    
     //get the indredient list
-    //List<Ingredient> ingredients = await be.getIngredientList();
     List<Ingredient> ingredients = await request.getIngredientList();
     List<String> matched = new List<String>();
 
@@ -99,42 +85,12 @@ class ScanButtonState extends State<ScanButton> {
     return matched;
   }
 
-//   @override
-//   Widget build(BuildContext context)  {
-//    return Scaffold(
-//      appBar: AppBar(
-//         title: Text('Scanner'),
-//       ),
-//      body: Center(
-//        child: Column (children: <Widget>[
-//           FlatButton.icon(
-//             color: Colors.red,
-//             icon: Icon(Icons.add_a_photo),
-//             label: Text('Scanner'),
-//             onPressed: () {
-//               scanBarcodeNormal(context);
-//             },
-//           ),
-//
-//           Text('Scan result : $_scanBarcode\n', style: TextStyle(fontSize: 20)),
-//           Text('API result : $_itemName\n', style: TextStyle(fontSize: 20))
-//        ]
-//        ),
-//       )
-//     );
-//   }
-
   List<String> getList() {
     return this.ingredientsForSearch;
   }
 
   @override
   Widget build(BuildContext context) {
-    // return IconButton(
-    //   icon: Icon(Icons.camera),
-    //   onPressed: (){
-    //     scanBarcodeNormal();
-    //   }
-    // );
+  
   }
 }

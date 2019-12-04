@@ -1,6 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
+/*
+  File: localStorage.dart
+  Functionality: 
+*/
+
 class LocalStorage {
 
   /* Method: storeAuthToken
