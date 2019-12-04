@@ -1,7 +1,6 @@
 import 'package:cookmate/homePage.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart' as DB;
-
 import 'cookbook.dart';
 import 'createAccount.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,14 @@ import 'package:flutter/services.dart';
 import './util/backendRequest.dart';
 import './util/localStorage.dart';
 import 'package:flushbar/flushbar.dart';
+
+/*
+  File: login.dart
+  Functionality: This file displays the login page for the app. It it the first
+  page that the user will be presented with upon launching the app for the first 
+  time. It allows the user to login with an already created account or allows them
+  to sign up and navigates them to the create account page.
+*/
 
 class LoginPage extends StatefulWidget {
   @override

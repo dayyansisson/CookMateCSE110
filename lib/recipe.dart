@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cookmate/calendar.dart';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/backendRequest.dart';
@@ -10,6 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 //import 'package:cookmate/util/database_helpers.dart';
 import 'package:cookmate/util/localStorage.dart' as LS;
+
+/*
+  File: recipe.dart
+  Functionality: This page handles displaying the selected recipe. It displays
+  the recipes title, picture, servings, prep time, cost per serving, ingredients, 
+  and instructions. The user can also add the recipe to their favorites, shopping
+  lists, and calendar.
+*/
 
 class RecipeDisplay extends StatefulWidget {
   final String recipeID;
@@ -417,12 +423,13 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     for (int i = 0; i < ingredients.length; i++) {
       localDB.ShoppingList sl = new localDB.ShoppingList(
           ingredient: ingredients[i].name,
-          quantity: ingredients[i].quantity.round(),
+          quantity: ingredients[i].quantity,
           purchased: false,
           measurement: ingredients[i].units);
+          print(sl);
       await helper.insertShoppingListItem(sl);
     }
-    //print(await helper.shoppingListItems());
+    print(await helper.shoppingListItems());
   }
 
   _addToFavorites() async {
@@ -452,38 +459,13 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
       return "1/4";
     } else if (amount == 0.5) {
       return "1/2";
+    } else if (amount == 0.3333333333333333){
+      return "1/3";
     } else if (amount == 0.125) {
       return "1/8";
     } else if (amount < 0.125) {
       return "A pinch of";
     } else
       return amount.round().toString();
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate({
-    @required this.minHeight,
-    @required this.maxHeight,
-    @required this.child,
-  });
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-  @override
-  double get minExtent => minHeight;
-  @override
-  double get maxExtent => max(maxHeight, minHeight);
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new SizedBox.expand(child: child);
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
   }
 }

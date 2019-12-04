@@ -3,6 +3,11 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
+/*
+  File: database_helpers.dart
+  Functionality: 
+*/
+
 // Store favorite recipe locally
 class Recipe {
   int id;

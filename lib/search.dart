@@ -1,9 +1,6 @@
 /*
  * Coders: Rayhan, Luis
  */
-import 'dart:convert';
-import 'dart:developer' as logger;
-import 'dart:ffi';
 import 'package:cookmate/dialog.dart';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
@@ -14,6 +11,14 @@ import 'package:cookmate/cookbook.dart' as CB;
 import 'dart:async';
 import 'package:cookmate/util/database_helpers.dart' as DB;
 import 'package:cookmate/searchResultPage.dart';
+
+/*
+  File: search.dart
+  Functionality: This page handles the entire search functionality of the app.
+  It allows users to enter items manually and select from a list of autocompleted
+  ingredients within our database. It also implements the scanner class which allows
+  the user to add ingredients via a barcode scanner. 
+*/
 
 void main() => runApp(new MyApp());
 
@@ -40,7 +45,6 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   ScanButtonState scanButt = new ScanButtonState();
   TextEditingController editingController = TextEditingController();
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   // User Data
   String token;
@@ -57,9 +61,9 @@ class _SearchPageState extends State<SearchPage> {
   List<DropdownMenuItem<String>> dropDownCuisines = [];
 
   // Queries for recipe search
-  List<String> ingredientQuery = null;
-  int maxCalories = null;
-  String cuisineQuery = null;
+  List<String> ingredientQuery;
+  int maxCalories;
+  String cuisineQuery;
   String dietQuery;
 
   // Recipe List results
@@ -78,16 +82,16 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    //token = await LocalStorage.getAuthToken();
-    //userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
 
-    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    userID = 2;
+    //token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+    //userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
     _getDiets();
-    // _getCuisines();
+    _getCuisines();
     _getIngredients();
   }
 
@@ -102,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
     _recipeSearch();
     if (recipesResult != null) {
       print(recipesResult);
-      final result = await Navigator.push(
+      Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => SearchResultPage(recipesResult)));
@@ -140,7 +144,6 @@ class _SearchPageState extends State<SearchPage> {
 
   _getIngredients() async {
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
-    List<String> ingredients;
     helper.ingredients().then((list) {
       for (int i = 0; i < list.length; i++) {
         duplicateItems.add(list[i].name);

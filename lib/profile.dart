@@ -2,10 +2,16 @@ import 'package:cookmate/cookbook.dart' as CB;
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
-import 'package:cookmate/util/user.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
 import 'package:cookmate/util/localStorage.dart' as LS;
+
+/*
+  File: profile.dart
+  Functionality: This page handles the user preferences page. It allows the user
+  to change their username and password. It also allows the user to set their 
+  preferred diet. It also allows for the user to logout which clears all the data
+  that is stored locally.
+*/
 
 class UserProfile extends StatefulWidget {
   @override

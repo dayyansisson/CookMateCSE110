@@ -8,6 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cookmate/util/localStorage.dart' as LS;
 
+/*
+  File: calendar.dart
+  Functionality: This page displays the calendar for the user. It displays 
+  a week at a time and a user can select a day and the meals that they have 
+  added for that day will load. It allows for the user to remove and add 
+  recipes to the calendar.
+*/
+
 // ignore: must_be_immutable
 class MyCalendar extends StatefulWidget {
   Recipe recipe;

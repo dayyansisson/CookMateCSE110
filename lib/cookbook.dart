@@ -1,5 +1,10 @@
-import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
+
+/*
+  File: cookbook.dart
+  Functionality: This file defines several classes and functions that are 
+  used throughout the app.
+*/
 
 /* Class: Recipe
  * Description: Recipe object with basic data about a recipe, including its title, image, servings, etc...
