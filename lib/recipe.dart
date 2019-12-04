@@ -417,7 +417,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
     for (int i = 0; i < ingredients.length; i++) {
       localDB.ShoppingList sl = new localDB.ShoppingList(
           ingredient: ingredients[i].name,
-          quantity: ingredients[i].quantity.round(),
+          quantity: ingredients[i].quantity,
           purchased: false,
           measurement: ingredients[i].units);
       await helper.insertShoppingListItem(sl);

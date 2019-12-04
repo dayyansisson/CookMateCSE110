@@ -22,35 +22,36 @@ class _LoginPageState extends State<LoginPage> {
   String _username, _password, _token;
 
   Future<bool> _pullUserDataFromServer(BackendRequest backend) async {
-
     print("Pulling user data from server");
-
     UserProfile profile = await backend.getUserProfile();
     DB.DatabaseHelper database = DB.DatabaseHelper.instance;
-
     // Load diet fresh
-//    LocalStorage.deleteDiet();
-//    LocalStorage.storeDiet(profile.diet.id);
-
- //   print("Loaded diet ${profile.diet.id}");
-
+    if(profile.diet != null) {
+      LocalStorage.deleteDiet();
+      LocalStorage.storeDiet(profile.diet.id);
+      print("Loaded diet ${profile.diet.id}");
+    }
+    
     // Load allergens fresh
-//    database.clearAllergens();
-//    for(Map<String, dynamic> allergen in profile.allergens) {
-//      database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
-//      print("Loaded allergen ${allergen['id']}");
-//    }
-
-//    // Load favorites fresh
-//    database.clearRecipes();
-//    for(Map<String, dynamic> recipe in profile.favorites) {
-//      database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
-//      print("Loaded favorite recipe ${recipe['api_id']}");
-//
-//    }
+    if(profile.allergens != null) {
+      database.clearAllergens();
+      for(Map<String, dynamic> allergen in profile.allergens) {
+        database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
+        print("Loaded allergen ${allergen['id']}");
+      }
+    }
+    // Load favorites fresh
+    if(profile.favorites != null) {
+      database.clearRecipes();
+      for(Map<String, dynamic> recipe in profile.favorites) {
+        database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
+        print("Loaded favorite recipe ${recipe['api_id']}");
+      }
+    }
 
     return true;
-  }
+}
+  
 
   _submit() async {
     if (_formKey.currentState.validate()) {
@@ -80,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           _formKey.currentState.reset();
           Flushbar(
             flushbarPosition: FlushbarPosition.TOP,
-            flushbarStyle: FlushbarStyle.GROUNDED,
+            flushbarStyle: FlushbarStyle.FLOATING,
             borderWidth: 40,
             messageText: Text(
               'Unable to log in with provided credentials.',
@@ -124,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             style: TextStyle(
               color: CookmateStyle.standardRed,
               fontSize: 18,
@@ -181,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           height: 60.0,
           child: TextFormField(
+            autocorrect: false,
             obscureText: true,
             style: TextStyle(
               color: CookmateStyle.standardRed,

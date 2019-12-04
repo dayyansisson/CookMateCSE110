@@ -55,6 +55,7 @@ class _SearchPageState extends State<SearchPage> {
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
   List<DropdownMenuItem<String>> dropDownCuisines = [];
+  Future<List<CB.Cuisine>> cuisinesList;
 
   // Queries for recipe search
   List<String> ingredientQuery = null;
@@ -78,16 +79,15 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _initData() async {
-    //token = await LocalStorage.getAuthToken();
-    //userID = await LocalStorage.getUserID();
+    token = await LocalStorage.getAuthToken();
+    userID = await LocalStorage.getUserID();
 
-    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    userID = 2;
+//    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+//    userID = 2;
     request = BackendRequest(token, userID);
     ingredientQuery;
     _addAllIngredients();
-    _getDiets();
-    // _getCuisines();
+    _getCuisines();
     _getIngredients();
   }
 
@@ -119,15 +119,15 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _getCuisines() async {
-    request.getCuisineList().then((cuisineList) {
-      for (int i = 0; i < cuisineList.length; i++) {
-        cuisines.add(cuisineList[i].name);
-      }
+    cuisinesList = request.getCuisineList();
+    cuisinesList.then((currList){
+      setState(() {
+        for(int i  = 0; i < currList.length; i++){
+          cuisines.add(currList[i].name);
+        }
+      });
     });
-  }
 
-  Future<List<CB.Cuisine>> _loadCusines() async {
-    return request.getCuisineList();
   }
 
   _getDiets() async {
@@ -233,11 +233,8 @@ class _SearchPageState extends State<SearchPage> {
     return display;
   }
 
-  Widget cuisineButton(List<CB.Cuisine> data) {
-    List<String> cuisines = new List<String>();
-    for (int i = 0; i < data.length; i++) {
-      cuisines.add(data[i].name);
-    }
+  Widget cuisineButton() {
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: DropdownButton<String>(
@@ -326,16 +323,16 @@ class _SearchPageState extends State<SearchPage> {
               label: 'Max Calories: $_value',
             ),
             FutureBuilder(
-                future: _loadCusines(),
+                future: cuisinesList,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return CircularProgressIndicator();
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Text("Loading cuisines");
                     case ConnectionState.done:
-                      return cuisineButton(snapshot.data);
+                      return cuisineButton();
                     default:
-                      return Text("Error");
+                      return Text("Error: Loading cuisines");
                   }
                 }),
             Expanded(
@@ -364,6 +361,7 @@ class _SearchPageState extends State<SearchPage> {
                                 title: new Text("Selected Ingredients: "),
                                 content: new Text("$display"),
                               ));
+                          editingController.clear();
                         },
                       ),
                       decoration: new BoxDecoration(

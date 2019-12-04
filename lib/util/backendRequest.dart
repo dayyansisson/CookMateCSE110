@@ -1,3 +1,9 @@
+/*
+ * Author: Rayhan Kerawalla, Luis Jibaja
+ * Description: this file is intend to implement search functionality
+ *              for different types of ingredients and cuisines
+ * Return: List of type recipe which contain information of different recipes
+ */
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
 import 'package:http/http.dart' as http;
