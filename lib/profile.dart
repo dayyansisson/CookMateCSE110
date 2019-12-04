@@ -1,6 +1,8 @@
 import 'package:cookmate/cookbook.dart' as CB;
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/database_helpers.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cookmate/util/localStorage.dart' as LS;
@@ -50,6 +52,7 @@ class _UserProfileState extends State<UserProfile> {
     _dietList = request.getDietList();
     _dietList.then((currList) {
       setState(() {
+        diets.add("None");
         for (int i = 0; i < currList.length; i++) {
           print("Diet: " +
               currList[i].name +
@@ -72,8 +75,8 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   _updateUserName(String newUserName) async {
-    bool succes = await request.updateUsername(userInfo, newUserName);
-    if (succes) {
+    bool success = await request.updateUsername(userInfo, newUserName);
+    if (success) {
       setState(() {
         userInfo = newUserName;
       });
@@ -81,7 +84,12 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   _updateUserDiet(int newDiet) async {
-    bool success = await request.setDiet(newDiet);
+    bool success = false;
+    if(newDiet == 0) {
+      success = await request.clearDiet();
+    } else {
+      success = await request.setDiet(newDiet);
+    }
     if (success) {
       setState(() {
         LS.LocalStorage.storeDiet(newDiet);
@@ -91,6 +99,7 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Future<bool> _updatePassword(String currPassword, String newPassword) async {
+
     print("Current Password: " + currPassword);
     print("New Password: " + newPassword);
     bool success = await request.updatePassword(currPassword, newPassword);
@@ -113,10 +122,13 @@ class _UserProfileState extends State<UserProfile> {
     return showDialog<String>(
       context: context,
       barrierDismissible:
-          false, // dialog is dismissible with a tap on the barrier
+          true, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Username'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           content: new Row(
             children: <Widget>[
               new Expanded(
@@ -137,6 +149,17 @@ class _UserProfileState extends State<UserProfile> {
                 Navigator.of(context).pop();
               },
             ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         );
       },
@@ -149,31 +172,38 @@ class _UserProfileState extends State<UserProfile> {
     return showDialog<String>(
       context: context,
       barrierDismissible:
-          false, // dialog is dismissible with a tap on the barrier
+          true, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Password'),
-          content: new Column(
-            children: <Widget>[
-              new Expanded(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Container(
+            height: 125,
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                new Expanded(
                   child: new TextField(
-                autofocus: true,
-                obscureText: true,
-                decoration: new InputDecoration(hintText: 'Current Password'),
-                onChanged: (value) {
-                  currentPassword = value;
-                },
-              )),
-              new Expanded(
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'Current Password'),
+                  onChanged: (value) {
+                    currentPassword = value;
+                  },
+                )),
+                new Expanded(
                   child: new TextField(
-                autofocus: true,
-                obscureText: true,
-                decoration: new InputDecoration(hintText: 'New Password'),
-                onChanged: (value) {
-                  newPassword = value;
-                },
-              ))
-            ],
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'New Password'),
+                  onChanged: (value) {
+                    newPassword = value;
+                  },
+                ))
+              ],
+            ),
           ),
           actions: <Widget>[
             FlatButton(
@@ -181,10 +211,20 @@ class _UserProfileState extends State<UserProfile> {
               onPressed: () {
                 _updatePassword(currentPassword, newPassword).then((value) {
                   if (value) {
-                    print("succes changing password");
+                    print("Success changing password");
                   }
                 });
-
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
@@ -197,41 +237,121 @@ class _UserProfileState extends State<UserProfile> {
   Widget _displayUserName() {
     return Row(
       children: <Widget>[
-        Icon(Icons.person_outline),
-        SizedBox(width: 30.0),
+        Icon(
+          Icons.person_outline,
+          color: CookmateStyle.iconGrey,
+        ),
+        Padding(padding: EdgeInsets.only(left: 30)),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("Change Username"),
-            Text("User Name: " + userInfo),
+            Text(
+              "Username",
+              style: TextStyle(
+                fontSize: 15
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(bottom: 2)),
+            Text(
+              userInfo,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w300
+              ),
+            ),
           ],
-        )
+        ),
+        Spacer(),
+        Text(
+          "Tap to change",
+          style: TextStyle(
+            fontWeight: FontWeight.w200
+          ),
+        ),
+        Padding(padding: EdgeInsets.only(right: 50)),
       ],
     );
   }
 
-  Widget _displayUSerDiet() {
-    String currDiet;
-    if (userDiet == -1) {
-      currDiet = "No diet set";
-    } else {
-      currDiet = diets[userDiet - 1];
-    }
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Text("Current Diet: " + currDiet),
+  Widget _displayPassword() {
+
+    return Row(
+      children: <Widget>[
+        Icon(
+          Icons.lock,
+          color: CookmateStyle.iconGrey,
+        ),
+        Padding(padding: EdgeInsets.only(left: 30)),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "Password",
+              style: TextStyle(
+                fontSize: 15
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(bottom: 5)),
+            Text(
+              "******",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w300
+              ),
+            ),
+          ],
+        ),
+        Spacer(),
+        Text(
+          "Tap to change",
+          style: TextStyle(
+            fontWeight: FontWeight.w200
+          ),
+        ),
+        Padding(padding: EdgeInsets.only(right: 50)),
+      ],
     );
   }
 
+  // Widget _displayUserDiet() {
+
+  //   String currDiet;
+  //   if (userDiet == -1) {
+  //     currDiet = "No diet set";
+  //   } else {
+  //     currDiet = diets[userDiet - 1];
+  //   }
+
+  //   return Padding(
+  //     padding: const EdgeInsets.all(20.0),
+  //     child: Text("Current Diet: " + currDiet),
+  //   );
+  // }
+
   Widget _displayDietList() {
+
     int dietKey = 0;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: DropdownButton(
-        hint: Text("Choose a Diet"),
+        hint: Row(
+          children: <Widget> [
+            Text(
+              "Your Diet ",
+            ),
+            Padding(padding: EdgeInsets.only(left: 10)),
+            Text(
+              userDiet == -1 ? "None" : diets[userDiet],
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16
+              ),
+            ),
+          ]
+        ),
         onChanged: (value) {
           setState(() {
-            userDiet = value;
+            userDiet = value - 1;
             _updateUserDiet(userDiet);
           });
         },
@@ -247,21 +367,79 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
+  Widget _buildLogoutBtn() {
+    
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 25.0),
+      width: 120,
+      child: RaisedButton(
+        elevation: 2,
+        onPressed: () {
+          request.logout();
+          _clearLocal();
+          Navigator.popUntil(context, ModalRoute.withName('/'));
+        },
+        padding: EdgeInsets.all(15.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        color: CookmateStyle.standardRed,
+        child: Text('LOGOUT',
+          style: TextStyle(
+            color: Colors.white,
+            letterSpacing: 1.5,
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+          )
+        ),
+      ),
+    );
+  }
+
+  _clearLocal () {
+
+    LocalStorage.deleteAuthToken();
+    LocalStorage.deleteDiet();
+    LocalStorage.deleteUserID();
+    DatabaseHelper database = DatabaseHelper.instance;
+    database.clearShoppingList();
+    database.clearCalendars();
+    database.clearIngredients();
+    database.clearRecipes();
+    database.clearAllergens();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: NavBar(title: "Profile", titleSize: 25, isUserPrefs: true),
-
-        // MAIN BODY
-        body: ListView(
-          children: <Widget>[
-            OutlineButton(
-                padding: EdgeInsets.all(20.0),
-                onPressed: () {
-                  print("change username");
-                  _asyncUsernameInput(context);
-                },
-                child: FutureBuilder(
+      appBar: NavBar(title: "Settings", titleSize: 25, isUserPrefs: true),
+      // MAIN BODY
+      body: Column(
+        children: <Widget> [
+          Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 20),
+            child: Text(
+              "Profile",
+              style: TextStyle (
+                fontWeight: FontWeight.w800,
+                fontSize: 25,
+                color: CookmateStyle.textGrey
+              ),
+            ),
+          ),
+          Flexible(
+            child: ListView(
+              children: <Widget>[
+                OutlineButton(
+                  borderSide: BorderSide(
+                    width: 0.05
+                  ),
+                  padding: EdgeInsets.all(20.0),
+                  onPressed: () {
+                    print("change username");
+                    _asyncUsernameInput(context);
+                  },
+                  child: FutureBuilder(
                     future: _userName,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
@@ -270,53 +448,52 @@ class _UserProfileState extends State<UserProfile> {
                         case ConnectionState.done:
                           return _displayUserName();
                         default:
-                          return Text("Error: Not user info found");
+                          return Text("Finding user info...");
                       }
-                    })),
-            OutlineButton(
-              padding: EdgeInsets.all(20.0),
-              onPressed: () {
-                print("change Password");
-                _asyncPasswordInput(context);
-              },
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.lock),
-                  SizedBox(width: 30.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text("Change Password"),
-                    ],
+                    }
+                  )
+                ),
+                OutlineButton(
+                  borderSide: BorderSide(
+                    width: 0.05
                   ),
-                ],
-              ),
+                  padding: EdgeInsets.all(20.0),
+                  onPressed: () {
+                    print("change Password");
+                    _asyncPasswordInput(context);
+                  },
+                  child: _displayPassword()
+                ),
+                FutureBuilder(
+                  future: _dietList,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Center(child: Text("Loading Diet List")),
+                        );
+                      case ConnectionState.done:
+                        return _displayDietList();
+                      default:
+                        return Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Center(child: Text("Looking for Diet List")),
+                        );
+                    }
+                  }
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _buildLogoutBtn()
+                  ],
+                )
+              ],
             ),
-            FutureBuilder(
-                future: _dietList,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Text("Loading Diet List");
-                    case ConnectionState.done:
-                      return _displayUSerDiet();
-                    default:
-                      return Text("Error: Diet list not available");
-                  }
-                }),
-            FutureBuilder(
-                future: _dietList,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Text("Loading Diet List");
-                    case ConnectionState.done:
-                      return _displayDietList();
-                    default:
-                      return Text("Error: Diet List not available");
-                  }
-                }),
-          ],
-        ));
+          ),
+        ]
+      )
+    );
   }
 }

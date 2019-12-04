@@ -91,7 +91,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     case ConnectionState.waiting:
                       return CookmateStyle.loadingIcon("Loading recipes...");
                     case ConnectionState.done:
-                      if(snapshot.data.length == 0) {
+                      if(snapshot.data == null || snapshot.data.length == 0) {
                         return noRecipesError();
                       }
                       return _searchResults(snapshot.data);

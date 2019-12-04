@@ -23,10 +23,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int userID;
   String _username, _password, _token;
+  bool _loggingIn = false;
+
+  @override
+  initState() {
+
+    _loggingIn = false;
+    super.initState();
+  }
 
   Future<bool> _pullUserDataFromServer(BackendRequest backend) async {
     print("Pulling user data from server");
@@ -69,7 +78,9 @@ class _LoginPageState extends State<LoginPage> {
         _token = token;
         if (_token != null &&
             _token != "Unable to log in with provided credentials.") {
-
+          setState(() {
+            _loggingIn = true;
+          });
           BackendRequest backend = new BackendRequest(_token, null);
           backend.getUser().then((userID){
             LocalStorage.storeUserID(userID);
@@ -220,7 +231,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLoginBtn() {
-    return Container(
+
+    return !_loggingIn ? Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
@@ -241,6 +253,11 @@ class _LoginPageState extends State<LoginPage> {
               fontWeight: FontWeight.bold,
             )),
       ),
+    ) : Padding(
+      padding: EdgeInsets.all(30),
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+      )
     );
   }
 
@@ -288,29 +305,12 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              // Container(
-              //   height: double.infinity,
-              //   width: double.infinity,
-              //   decoration: BoxDecoration(
-              //     gradient: LinearGradient(
-              //       begin: Alignment.topCenter,
-              //       end: Alignment.bottomCenter,
-              //       colors: [
-              //         Color(0xF8F8FF),
-              //         Color(0xFFFFFF),
-              //         Color(0xFFFAFA),
-              //       ],
-              //       stops: [0.1, 0.4, 0.7],
-              //     ),
-              //   ),
-              // ),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    //vertical: 260.0,
                   ),
                   child: Column(
                     children: <Widget> [

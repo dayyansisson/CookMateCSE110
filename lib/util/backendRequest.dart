@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/database_helpers.dart' as DB;
+import 'package:cookmate/util/localStorage.dart';
 import 'package:http/http.dart' as http;
 
 /*
@@ -757,13 +759,28 @@ class BackendRequest {
 
       ingredientList = ingredientList.substring(0, ingredientList.length - 2);
     }
-    //"diet":_userProfile.diet.name,
-    //"intolerances":_userProfile.allergenList(),
+
+    int dietID = await LocalStorage.getDiet();
+    
+    String allergenList;
+    List<DB.Allergen> allergens = await DB.DatabaseHelper.instance.allergens();
+    if(allergens != null) {
+      allergenList = "";
+      for(DB.Allergen allergen in allergens) {
+        allergenList += "${allergen.name}, ";
+      }
+      allergenList = allergenList.substring(0, allergenList.length - 2);
+    }
+
+    String diet = (await getDietList())[dietID].name;
+
     final body = {
       "cuisine":cuisine,
       "maxCalories":maxCalories.toString(),
       "number":"10",
-      "includeIngredients":ingredientList
+      "includeIngredients":ingredientList,
+      "diet":diet,
+      "intolerances":allergenList
     };
 
     if(cuisine == null) {
@@ -776,6 +793,14 @@ class BackendRequest {
 
     if(ingredients == null) {
       body.remove("includeIngredients");
+    }
+
+    if(diet == "-1") {
+      body.remove("diet");
+    }
+
+    if(allergenList == null) {
+      body.remove("intolerances");
     }
 
     // Make API call
