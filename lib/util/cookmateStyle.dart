@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../calendar.dart';
 import '../homePage.dart';
 import '../profile.dart';
 import '../search.dart';
 import '../shoppingListPage.dart';
+
+/*
+  File: cookmateStyle.dart
+  Functionality: This file defines all the standard widgets and colors for the
+  UI design to maintain consistency. This included the top navigation bar, colors
+  used throughout the app, and the fonts used within the app.
+*/
 
 class CookmateStyle {
 
@@ -31,7 +36,7 @@ class CookmateStyle {
           child: Text(
             message,
             style: TextStyle(
-              fontWeight: FontWeight.w300
+              fontWeight: FontWeight.w200
             ),
           ),
           padding: EdgeInsets.all(30)
@@ -125,7 +130,7 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
                   onPressed: isHome ? null : () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     );
                   },
                 ),
@@ -204,6 +209,7 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _BottomWaveClipper extends CustomClipper<Path> {
+
   @override
   Path getClip(Size size) {
     var path = new Path();
@@ -214,8 +220,7 @@ class _BottomWaveClipper extends CustomClipper<Path> {
     path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
         firstEndPoint.dx, firstEndPoint.dy);
 
-    var secondControlPoint =
-        Offset(size.width - (size.width / 3.25), size.height - 40);
+    var secondControlPoint = Offset(size.width - (size.width / 3.25), size.height - 40);
     var secondEndPoint = Offset(size.width, size.height - 20);
     path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
         secondEndPoint.dx, secondEndPoint.dy);

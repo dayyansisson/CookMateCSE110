@@ -1,6 +1,23 @@
+/*
+ * Author: Rayhan Kerawalla, Luis Jibaja
+ * Description: this file is intend to implement search functionality
+ *              for different types of ingredients and cuisines
+ * Return: List of type recipe which contain information of different recipes
+ */
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/database_helpers.dart' as DB;
+import 'package:cookmate/util/localStorage.dart';
 import 'package:http/http.dart' as http;
+
+/*
+  File: backendRequest.dart
+  Functionality: This is the one of Model classes for our app it handles 
+  all the communication between the frontend and our backend server. In 
+  this class are getter, post, and delete functions that make calls to 
+  our backend. To make a call we require a user ID and their respective
+  authorization token which are both stored locally on the device.
+*/
 
 class BackendRequest {
 
@@ -59,7 +76,7 @@ class BackendRequest {
 
   /* Method: getUser
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: ID of the new user
    *    - failure: null
@@ -67,13 +84,11 @@ class BackendRequest {
   Future<int> getUser () async {
 
     print("Getting user info ($_authToken)...");
-    print("before call");
     // Make API call
     final response = await http.get(
         "https://thecookmate.com/auth/users/me/",
         headers: { "Authorization":"Token $_authToken" }
     );
-    print("after call");
     // Validate return
     int statusCode = response.statusCode ~/ 100;
     if(statusCode != _SUCCESS)
@@ -125,7 +140,7 @@ class BackendRequest {
    * Arg(s):
    *    - currentUsername: The user's current username
    *    - newUsername: The user's requested new username
-   * 
+   *
    * Return:
    *    - success: true, if update is successfuls
    *    - failure: false, if updates fails
@@ -138,9 +153,9 @@ class BackendRequest {
 
       // Make API call
       final response = await http.post(
-        "https://thecookmate.com/auth/users/set_username/", 
-        headers: { "Authorization":"Token $_authToken" },
-        body: {"new_username":newUsername, "current_username":currentUsername}
+          "https://thecookmate.com/auth/users/set_username/",
+          headers: { "Authorization":"Token $_authToken" },
+          body: {"new_username":newUsername, "current_username":currentUsername}
       );
 
       // Validate return
@@ -160,7 +175,7 @@ class BackendRequest {
    * Arg(s):
    *    - currentPassword: The user's current password
    *    - newPassword: The user's requested new password
-   * 
+   *
    * Return:
    *    - success: true, if update is successfuls
    *    - failure: false, if updates fails
@@ -173,9 +188,9 @@ class BackendRequest {
 
       // Make API call
       final response = await http.post(
-        "https://thecookmate.com/auth/users/set_password/", 
-        headers: { "Authorization":"Token $_authToken" },
-        body: { "new_password":newPassword, "current_password":currentPassword }
+          "https://thecookmate.com/auth/users/set_password/",
+          headers: { "Authorization":"Token $_authToken" },
+          body: { "new_password":newPassword, "current_password":currentPassword }
       );
 
       // Validate return
@@ -194,7 +209,7 @@ class BackendRequest {
   /* Method: updateEmail
    * Arg(s):
    *    - newEmail: The user's requested new email
-   * 
+   *
    * Return:
    *    - success: true, if update is successfuls
    *    - failure: false, if updates fails
@@ -207,9 +222,9 @@ class BackendRequest {
 
       // Make API call
       final response = await http.patch(
-        "https://thecookmate.com/auth/users/me/", 
-        headers: { "Authorization":"Token $_authToken" },
-        body: { "email":newEmail }
+          "https://thecookmate.com/auth/users/me/",
+          headers: { "Authorization":"Token $_authToken" },
+          body: { "email":newEmail }
       );
 
       // Validate return
@@ -267,7 +282,7 @@ class BackendRequest {
 
   /* Method: logout
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: true
    *    - failure: false
@@ -275,10 +290,10 @@ class BackendRequest {
   Future<bool> logout () async {
 
     print("Logging out ($_authToken)...");
-      
+
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/token/logout", 
+      "https://thecookmate.com/auth/token/logout",
       headers: { "Authorization":"Token $_authToken" },
     );
 
@@ -296,7 +311,7 @@ class BackendRequest {
 
   /* Method: getUserProfile
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: The UserProfile associated with the userID
    *    - failure: null
@@ -304,11 +319,11 @@ class BackendRequest {
   Future<UserProfile> getUserProfile () async {
 
     print("Getting user profile (User ID: $_userID, $_authToken)...");
-      
+
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/auth/user-profile/$_userID/", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/auth/user-profile/$_userID/",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -327,6 +342,42 @@ class BackendRequest {
     return profile;
   }
 
+  /* Method: getUserName
+   * Arg(s):
+   *    - userId: the id for current user
+   * Return:
+   *    - success: true
+   *    - failure: false
+   */
+  Future<String> getUserName(int userID) async {
+    print("Getting user info (User ID: $_userID, $_authToken)...");
+
+    // Make API call
+    final response = await http.get(
+        "https://thecookmate.com/auth/users/me/",
+        headers: { "Authorization":"Token $_authToken" }
+    );
+
+    // Validate return
+    int statusCode = response.statusCode ~/ 100;
+    if(statusCode != _SUCCESS)
+    {
+      print(_interpretStatus(statusCode, response.statusCode, response.body));
+      return null;
+    }
+
+    print("User profile found, returning profile for $_userID");
+    List<String> userInfo = new List<String>();
+    var json = jsonDecode(response.body) as Map<String, dynamic>;
+    String userName = json['username'];
+    print("UserName: " + userName);
+
+//    UserProfile profile = UserProfile.fromJSON(jsonDecode(response.body));
+//    print(profile.toString());
+
+    return userName;
+  }
+
   /* Method: addFavorite
    * Arg(s):
    *    - recipe: The recipe to add as favorite
@@ -340,9 +391,9 @@ class BackendRequest {
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/add-favorite/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID, "recipe":"${recipe.apiID}" }
+        "https://thecookmate.com/auth/user-profile/add-favorite/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID, "recipe":"${recipe.apiID}" }
     );
 
     // Validate return
@@ -366,13 +417,13 @@ class BackendRequest {
    */
   Future<bool> removeFavorite(int recipeID) async {
 
-    print("Adding recipe $recipeID to favorites...");
+    print("Removing recipe $recipeID from favorites...");
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/remove-favorite/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID, "recipe":"$recipeID" }
+        "https://thecookmate.com/auth/user-profile/remove-favorite/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID, "recipe":"$recipeID" }
     );
 
     // Validate return
@@ -400,9 +451,9 @@ class BackendRequest {
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/add-allergen/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID, "allergen":"$allergenID" }
+        "https://thecookmate.com/auth/user-profile/add-allergen/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID, "allergen":"$allergenID" }
     );
 
     // Validate return
@@ -430,9 +481,9 @@ class BackendRequest {
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/remove-allergen/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID, "allergen":"$allergenID" }
+        "https://thecookmate.com/auth/user-profile/remove-allergen/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID, "allergen":"$allergenID" }
     );
 
     // Validate return
@@ -460,9 +511,9 @@ class BackendRequest {
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/set-diet/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID, "diet":"$dietID" }
+        "https://thecookmate.com/auth/user-profile/set-diet/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID, "diet":"$dietID" }
     );
 
     // Validate return
@@ -489,9 +540,9 @@ class BackendRequest {
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/auth/user-profile/clear-diet/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: { "user":_userID }
+        "https://thecookmate.com/auth/user-profile/clear-diet/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: { "user":_userID }
     );
 
     // Validate return
@@ -508,7 +559,7 @@ class BackendRequest {
 
   /* Method: getIngredientList
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: The UserProfile associated with the userID
    *    - failure: null
@@ -519,8 +570,8 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/ingredient/", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/recipe/ingredient/",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -546,7 +597,7 @@ class BackendRequest {
 
   /* Method: getCuisineList
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: A list of cuisines
    *    - failure: null
@@ -557,8 +608,8 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/cuisine/", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/recipe/cuisine/",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -584,7 +635,7 @@ class BackendRequest {
 
   /* Method: getDietList
    * Arg(s):
-   * 
+   *
    * Return:
    *    - success: A list of diets
    *    - failure: null
@@ -595,8 +646,8 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/diet",
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/recipe/diet",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -625,7 +676,7 @@ class BackendRequest {
   /* Method: getBreadcrumbs
    * Arg(s):
    *    - barcode: The UPC of the item scanned
-   * 
+   *
    * Return:
    *    - success: A list of breadcrumbs
    *    - failure: null
@@ -664,7 +715,7 @@ class BackendRequest {
   /* Method: getRecipe
    * Arg(s):
    *    - apiID: The api ID of the recipe
-   * 
+   *
    * Return:
    *    - success: The complete recipe
    *    - failure: null
@@ -675,8 +726,8 @@ class BackendRequest {
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/recipeInfo?recipe_id=$apiID", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/recipe/recipeInfo?recipe_id=$apiID",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -696,7 +747,7 @@ class BackendRequest {
    *    - cuisine (optional): The cuisine to search for
    *    - maxCalories (optional): The max calorie limit for the recipes searched
    *    - ingredients (optional): The ingredients to include in search
-   * 
+   *
    * Return:
    *    - success: The list of recipes returned from the search. If there are no
    *               recipes returned, the list will be empty.
@@ -714,13 +765,27 @@ class BackendRequest {
 
       ingredientList = ingredientList.substring(0, ingredientList.length - 2);
     }
-    //"diet":_userProfile.diet.name,
-    //"intolerances":_userProfile.allergenList(),
+
+    int dietID = await LocalStorage.getDiet();
+    
+    String allergenList;
+    List<DB.Allergen> allergens = await DB.DatabaseHelper.instance.allergens();
+    if(allergens.length > 0) {
+      allergenList = "";
+      for(DB.Allergen allergen in allergens) {
+        allergenList += "${allergen.name}, ";
+      }
+      allergenList = allergenList.substring(0, allergenList.length - 2);
+    }
+    String diet = (await getDietList())[dietID].name;
+
     final body = {
       "cuisine":cuisine,
       "maxCalories":maxCalories.toString(),
       "number":"10",
-      "includeIngredients":ingredientList
+      "includeIngredients":ingredientList,
+      "diet":diet,
+      "intolerances":allergenList
     };
 
     if(cuisine == null) {
@@ -735,11 +800,19 @@ class BackendRequest {
       body.remove("includeIngredients");
     }
 
+    if(diet == "-1") {
+      body.remove("diet");
+    }
+
+    if(allergenList == null) {
+      body.remove("intolerances");
+    }
+
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/api/recipe/recipeSearch/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: body
+        "https://thecookmate.com/api/recipe/recipeSearch/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: body
     );
 
     // Validate return
@@ -763,19 +836,19 @@ class BackendRequest {
 
   /* Method: getPopularRecipes
    * Arg(s): n/a
-   * 
+   *
    * Return:
    *    - success: List of recipes with data for popular recipes
    *    - failure: null
    */
-  Future<List<Recipe>> getPopularRecipes () async {
+  Future<List<String>> getPopularRecipes () async {
 
     print("Getting full list of popular recipes...");
 
     // Make API call
     final response = await http.get(
-      "https://thecookmate.com/api/recipe/popular/", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/recipe/popular/",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return
@@ -788,13 +861,17 @@ class BackendRequest {
     }
 
     var data = jsonDecode(response.body);
-    List<Recipe> recipes = List<Recipe>();
-    for(Map<String, dynamic> recipe in data) {
-      recipes.add(Recipe.forPopularList(recipe));
+    List<String> recipes = List<String>();
+    int count = 0;
+    for(var recipe in data) {
+      if(count == 10) {
+        break;
+      }
+      recipes.add(recipe['api_id'].toString());
+      count++;
     }
 
-    print("Return ${recipes.length} recipes!");
-
+    print("Returning ${recipes.length} recipes!");
     return recipes;
   }
 
@@ -804,24 +881,24 @@ class BackendRequest {
    *    - day: The day to add to
    *    - month: The month to add to
    *    - year: The year to add to
-   * 
+   *
    * Return:
    *    - success: ID of the calendar meal
    *    - failure: null
    */
-  Future<Meal> addMealToCalendar (Recipe recipe, Date date) async {
+  Future<bool> addMealToCalendar (Recipe recipe, Date date) async {
 
     print("Adding ${recipe.title} to ${date.getDate}");
 
     // Make API call
     final response = await http.post(
-      "https://thecookmate.com/api/calendar/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: {
-        "user":"$_userID",
-        "recipe":recipe.apiID.toString(),
-        "date":"${date.getDate}"
-      }
+        "https://thecookmate.com/api/calendar/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: {
+          "user":"$_userID",
+          "recipe":recipe.apiID.toString(),
+          "date":"${date.getDate}"
+        }
     );
 
     // Validate return
@@ -829,20 +906,17 @@ class BackendRequest {
     if(statusCode != _SUCCESS)
     {
       print(_interpretStatus(statusCode, response.statusCode, response.body));
-      return null;
+      return false;
     }
 
-    var data = jsonDecode(response.body);
-    print("Added meal succesfully, meal has ID ${data['id']}");
-
-    return Meal.fromJSON(data);
+    return true;
   }
 
   /* Method: getMeals
    * Arg(s):
    *    - startDate: The beginning of the calendar range to get meals from
    *    - endDate: The end of the calendar range to get meals from
-   * 
+   *
    * Return:
    *    - success: ID of the calendar meal
    *    - failure: null
@@ -863,8 +937,8 @@ class BackendRequest {
       print("Getting all meals for user $_userID");
 
       response = await http.get(
-        "https://thecookmate.com/api/calendar/$_userID", 
-        headers: { "Authorization":"Token $_authToken" }
+          "https://thecookmate.com/api/calendar/$_userID",
+          headers: { "Authorization":"Token $_authToken" }
       );
     } else if(_paramCount < 2) { // Error in param. passing
       print("ERROR: Must specify full date range");
@@ -891,7 +965,8 @@ class BackendRequest {
     var data = jsonDecode(response.body);
     String log = "\n\n MEALS \n------------";
     for(var meal in data) {
-      meals.add(Meal.fromJSON(meal));
+      Recipe recipe = await getRecipe((meal['recipe']['api_id']).toString());
+      meals.add(Meal.fromJSON(recipe, meal));
       log += "\n\t${meal['id']}, ${meal['date']}";
     }
 
@@ -904,11 +979,11 @@ class BackendRequest {
    *    - meal: The meal to update
    *    - newRecipe (optional): The recipe to change the meal to
    *    - newDate (optional): The date to change the meal to
-   * 
+   *
    * Return:
    *    - success: true
    *    - failure: fail
-   * 
+   *
    * Note: Must pass in at least one of the optional arguments
    */
   Future<bool> updateMealInCalendar (Meal meal, { Recipe newRecipe, Date newDate }) async {
@@ -937,12 +1012,12 @@ class BackendRequest {
 
     // Make API call
     final response = await http.put(
-      "https://thecookmate.com/api/calendar/update/${meal.id}/", 
-      headers: { "Authorization":"Token $_authToken" },
-      body: {
-        "recipe":recipeToPass,
-        "date":dateToPass
-      }
+        "https://thecookmate.com/api/calendar/update/${meal.id}/",
+        headers: { "Authorization":"Token $_authToken" },
+        body: {
+          "recipe":recipeToPass,
+          "date":dateToPass
+        }
     );
     // Validate return
     int statusCode = response.statusCode ~/ 100;
@@ -958,12 +1033,12 @@ class BackendRequest {
    * Arg(s):
    *    - meal (optional): The meal to delete from the calendar
    *    - mealID (optional): The ID of the meal to delete from the calendar
-   * 
+   *
    * Return:
    *    - success: true
    *    - failure: false
    *    - error: null
-   * 
+   *
    * Note: Must pass either the meal or the mealID. If neither are passed in
    *       error. If meal is passed in, mealID will never be used.
    */
@@ -983,8 +1058,8 @@ class BackendRequest {
 
     // Make API call
     final response = await http.delete(
-      "https://thecookmate.com/api/calendar/delete/$id/", 
-      headers: { "Authorization":"Token $_authToken" }
+        "https://thecookmate.com/api/calendar/delete/$id/",
+        headers: { "Authorization":"Token $_authToken" }
     );
 
     // Validate return

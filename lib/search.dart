@@ -1,8 +1,6 @@
 /*
  * Coders: Rayhan, Luis
  */
-import 'dart:convert';
-import 'dart:developer' as logger;
 import 'package:cookmate/dialog.dart';
 import 'package:cookmate/scanner.dart';
 import 'package:cookmate/util/backendRequest.dart';
@@ -13,6 +11,14 @@ import 'package:cookmate/cookbook.dart' as CB;
 import 'dart:async';
 import 'package:cookmate/util/database_helpers.dart' as DB;
 import 'package:cookmate/searchResultPage.dart';
+
+/*
+  File: search.dart
+  Functionality: This page handles the entire search functionality of the app.
+  It allows users to enter items manually and select from a list of autocompleted
+  ingredients within our database. It also implements the scanner class which allows
+  the user to add ingredients via a barcode scanner. 
+*/
 
 void main() => runApp(new MyApp());
 
@@ -39,7 +45,6 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   ScanButtonState scanButt = new ScanButtonState();
   TextEditingController editingController = TextEditingController();
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   // User Data
   String token;
@@ -54,11 +59,12 @@ class _SearchPageState extends State<SearchPage> {
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
   List<DropdownMenuItem<String>> dropDownCuisines = [];
+  Future<List<CB.Cuisine>> cuisinesList;
 
   // Queries for recipe search
-  List<String> ingredientQuery = null;
-  int maxCalories = null;
-  String cuisineQuery = null;
+  List<String> ingredientQuery;
+  int maxCalories;
+  String cuisineQuery;
   String dietQuery;
 
   // Recipe List results
@@ -79,16 +85,11 @@ class _SearchPageState extends State<SearchPage> {
   _initData() async {
     token = await LocalStorage.getAuthToken();
     userID = await LocalStorage.getUserID();
-    print("Token: " + token.toString());
-    print("UserId: " +  userID.toString());
-
-    //token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
-    //userID = 2;
+//    token = "03740945581ed4d2c3b25a62e7b9064cd62971a4";
+//    userID = 2;
     request = BackendRequest(token, userID);
-    ingredientQuery;
     _addAllIngredients();
-    _getDiets();
-    // _getCuisines();
+    _getCuisines();
     _getIngredients();
   }
 
@@ -102,8 +103,7 @@ class _SearchPageState extends State<SearchPage> {
   _routeRecipePage(BuildContext context) async {
     _recipeSearch();
     if (recipesResult != null) {
-      print(recipesResult);
-      final result = await Navigator.push(
+      Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => SearchResultPage(recipesResult)));
@@ -120,15 +120,15 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _getCuisines() async {
-    request.getCuisineList().then((cuisineList) {
-      for (int i = 0; i < cuisineList.length; i++) {
-        cuisines.add(cuisineList[i].name);
-      }
+    cuisinesList = request.getCuisineList();
+    cuisinesList.then((currList){
+      setState(() {
+        for(int i  = 0; i < currList.length; i++){
+          cuisines.add(currList[i].name);
+        }
+      });
     });
-  }
 
-  Future<List<CB.Cuisine>> _loadCusines() async {
-    return request.getCuisineList();
   }
 
   _getDiets() async {
@@ -141,7 +141,6 @@ class _SearchPageState extends State<SearchPage> {
 
   _getIngredients() async {
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
-    List<String> ingredients;
     helper.ingredients().then((list) {
       for (int i = 0; i < list.length; i++) {
         duplicateItems.add(list[i].name);
@@ -172,11 +171,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   // Setters
-  _setMaxCalories(int maxCaloriesQuery) {
-    maxCalories = maxCaloriesQuery;
-    print("MaxCalories: " + maxCalories.toString());
-  }
-
   _setCuisine(String cuisine) {
     if (cuisine != null) cuisineQuery = cuisine;
     print(cuisine);
@@ -205,7 +199,7 @@ class _SearchPageState extends State<SearchPage> {
     if (query.isNotEmpty) {
       List<String> dummyListData = List<String>();
       dummySearchList.forEach((item) {
-        if (item.contains(query) && counter < 5) {
+        if (item.contains(query) && counter < 10) {
           dummyListData.add(item);
           counter++;
         }
@@ -222,27 +216,44 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  DropdownButton<String> cuisineButton(List<CB.Cuisine> data) {
-    List<String> cuisines = new List<String>();
-    for (int i = 0; i < data.length; i++) {
-      cuisines.add(data[i].name);
+  String displayIngredients(List<String> ingredient) {
+
+    if(ingredient == null) {
+      return "No ingredients added yet!";
     }
-    return DropdownButton<String>(
-      hint: Text("Cuisines"),
-      onChanged: (value) {
-        setState(() {
-          _setCuisine(value);
-        });
-      },
-      isExpanded: true,
-      iconSize: 35,
-      value: cuisineQuery,
-      items: cuisines.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+
+    String display = "";
+    for (int i = 0; i < ingredient.length; i++) {
+      String token = ingredient[i];
+      display += "$token";
+      if (i != ingredient.length - 1) {
+        display += ", ";
+      }
+    }
+    return display;
+  }
+
+  Widget cuisineButton() {
+
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: DropdownButton<String>(
+        hint: Text("Cuisines"),
+        onChanged: (value) {
+          setState(() {
+            _setCuisine(value);
+          });
+        },
+        isExpanded: true,
+        iconSize: 35,
+        value: cuisineQuery,
+        items: cuisines.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -255,7 +266,7 @@ class _SearchPageState extends State<SearchPage> {
         print(bcList[i]);
       }
     }
-    else if(bcList == null){
+    else if (bcList == null || bcList.length == 0){ 
       showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -296,32 +307,22 @@ class _SearchPageState extends State<SearchPage> {
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
               ),
             ),
-            Slider.adaptive(
-              value: _value.toDouble(),
-              min: 500,
-              max: 5000,
-              divisions: 10,
-              activeColor: Colors.red,
-              inactiveColor: Colors.black,
-              onChanged: (newValue) {
-                setState(() {
-                  _value = newValue.round();
-                  _setMaxCalories(newValue.round());
-                });
-              },
-              label: 'Max Calories: $_value',
-            ),
             FutureBuilder(
-                future: _loadCusines(),
+                future: cuisinesList,
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  if (!snapshot.hasData) {
+                    return Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    );
+                  }
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Text("Loading cuisines");
                     case ConnectionState.done:
-                      return cuisineButton(snapshot.data);
+                      return cuisineButton();
                     default:
-                      return Text("Error");
+                      return Center(child: Text("Error: Loading cuisines"));
                   }
                 }),
             Expanded(
@@ -331,34 +332,110 @@ class _SearchPageState extends State<SearchPage> {
                 itemBuilder: (context, index) {
                   return new Container(
                       child: new ListTile(
-                        title: new Text('${items[index]}'),
-                        trailing: Icon(Icons.add_circle),
+                        title: new Text(
+                          '${items[index]}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Icon(
+                          Icons.add_circle,
+                          color: Colors.redAccent,
+                        ),
                         onTap: () {
                           _addIngredientQuery('${items[index]}');
+                          String display = displayIngredients(ingredientQuery);
                           showDialog(
                               context: context,
-                              child: new AlertDialog(
-                                title: new Text("Ingredient Added:"),
-                                content: new Text("${items[index]}"),
+                              child: AlertDialog(
+                                title: Text("Selected Ingredients: "),
+                                content: Text("$display"),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                               ));
+                          editingController.clear();
                         },
                       ),
                       decoration: new BoxDecoration(
-                          border: new Border(bottom: new BorderSide())));
+                          border: new Border(bottom: new BorderSide(
+                            width: 0.1
+                          ))));
                 },
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.navigate_next),
-                elevation: 0,
-                onPressed: () {
-                  editingController.clear();
-                  _routeRecipePage(context);
-                },
+            new Divider(
+              color: Colors.grey,
+            ),
+            new Container(
+              margin: new EdgeInsets.all(20.0),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Column(
+                    children: <Widget> [
+                      Container(
+                        height: 45,
+                        width: 100,
+                        child: RaisedButton(
+                          color: CookmateStyle.standardRed,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          child: Icon(Icons.list, color: Colors.white, size: 30),
+                          elevation: 1,
+                          onPressed: () {
+                            String display = displayIngredients(ingredientQuery);
+                            editingController.clear();
+                            showDialog(
+                                context: context,
+                                child: AlertDialog(
+                                  title: Text("Ingredients"),
+                                  content: Text("$display"),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ));
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Ingredients",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: CookmateStyle.textGrey
+                          ),
+                        ),
+                      )
+                    ]
+                  ),
+                  Column (
+                    children: <Widget> [ 
+                      Container(
+                        height: 45,
+                        width: 100,
+                        child: RaisedButton(
+                          color: CookmateStyle.standardRed,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          child: Icon(Icons.search, color: Colors.white, size: 30),
+                          elevation: 1,
+                          onPressed: () {
+                            editingController.clear();
+                            _routeRecipePage(context);
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Search",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: CookmateStyle.textGrey
+                          ),
+                        ),
+                      )
+                    ]
+                  ),
+                ],
               ),
             ),
           ],

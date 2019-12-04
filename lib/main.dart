@@ -1,62 +1,67 @@
-
-import 'package:cookmate/cookbook.dart';
-import 'package:cookmate/homePage.dart';
 import 'package:cookmate/login.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
-import 'package:cookmate/util/database_helpers.dart';
+import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
 
-main() {
+import 'homePage.dart';
 
+/*
+  File: main.dart
+  Functionality: This file runs the app. It launches the login page.
+*/
+
+main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
 
-  final UserProfile profile = UserProfile(
-      id: -1,
-      diet: Diet(
-          id: 3,
-          name: "gluten free"
-      ),
-      allergens: [
-        // {
-        //   "id": 1,
-        //   "name": "Dairy"
-        // },
-        {
-          "id": 8,
-          "name": "Shellfish"
-        },
-      ],
-      favorites: [
-        {
-          "id": 1,
-          "api_id": 716429,
-          "name": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-          "url": "https://spoonacular.com/recipeImages/716429-312x231.jpg"
+  @override
+  Widget build(BuildContext context) {
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: CookmateStyle.theme,
+      home: StartPage()
+    );
+  }
+}
+
+class StartPage extends StatelessWidget {
+
+  Future<bool> _loginCheck(BuildContext context) async {
+
+    String _auth = await LocalStorage.getAuthToken();
+    if( _auth!= null) {
+      int _id = await LocalStorage.getUserID();
+      BackendRequest backend = BackendRequest(_auth, null);
+      int userID = await backend.getUser();
+        if (_id == userID) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+          return true;
         }
-      ]
-  );
+    }
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    // BackendRequest request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2, userProfile: profile);
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // ShoppingList sl = ShoppingList(ingredient: 'Watermelon', quantity: 2, purchased: false, measurement: "slices");
-    // db.insertShoppingListItem(sl);
+    _loginCheck(context);
 
-
-    return MaterialApp(
-
-        theme: CookmateStyle.theme,
-        //home: SearchResultPage(request.recipeSearch(ingredients: ["mozzarella"], maxCalories: 1000)),
-        //home: ShoppingListPage(),
-        home: LoginPage()
-
+    return Scaffold(
+      backgroundColor: CookmateStyle.standardRed,
+      body: Container(
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black38)
+          )
+        )
+      )
     );
   }
-
 }

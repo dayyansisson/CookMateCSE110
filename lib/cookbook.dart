@@ -1,5 +1,10 @@
-import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
+
+/*
+  File: cookbook.dart
+  Functionality: This file defines several classes and functions that are 
+  used throughout the app.
+*/
 
 /* Class: Recipe
  * Description: Recipe object with basic data about a recipe, including its title, image, servings, etc...
@@ -16,7 +21,7 @@ class Recipe {
   int servings;
   int cookTime;
   double price;
-  double calories; 
+  double calories;
   int popularity;
   Map<String, dynamic> _json;
 
@@ -45,15 +50,6 @@ class Recipe {
     _complete = true;
   }
 
-  Recipe.forPopularList(Map<String, dynamic> json) {
-
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    popularity = json['popular_count'];
-    _complete = false;
-  }
-
   //Returns all the ingredients for a given recipe
   List<Ingredient> getIngredients(){
     List<Ingredient> ingredients = new List<Ingredient>();
@@ -62,13 +58,14 @@ class Recipe {
 
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
-      if(units == 'tablespoon' || units == 'teaspoon'){
-        if(units == 'tablespoon'){
+      if(units == 'tablespoon' || units == 'teaspoon' || units == 'Tablespoon' || units == 'Teaspoon' || units == 'Tablespoons' || units == ' Teaspoons'){
+        if(units == 'tablespoon' || units == 'Tablespoon' || units == 'Tablespoons'){
           units = 'tbsp';
         }
         else{
           units = 'tsp';
         }
+        
       }
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
@@ -86,8 +83,8 @@ class Recipe {
     }
 
     var instructionList = json["analyzedInstructions"][0][
-      "steps"];
-    
+    "steps"];
+
     for(Map<String,dynamic> step in instructionList){
       instructions.add(step["step"]);
     }
@@ -133,7 +130,7 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-  
+
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -142,7 +139,7 @@ class Ingredient {
  * Description: Cuisine object containing its name, and id.
  */
 class Cuisine {
-  
+
   final int id;
   final String name;
 
@@ -187,7 +184,7 @@ class UserProfile {
 
   UserProfile({ int id, Diet diet, List<Map<String, dynamic>> allergens, List<Map<String, dynamic>> favorites }) : this.allergens = allergens, this.diet = diet, this.id = id;
   UserProfile.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     var diet = json['diet'];
     if(diet != null)
@@ -244,28 +241,25 @@ class Date {
 
   final int _year, _month, _day;
   Date(int year, int month, int day) : _year = year, _month = month, _day = day;
-  Date.fromJSON(String json) : 
-    _year = int.tryParse(json.substring(0, 4)),
-    _month = int.tryParse(json.substring(5, 7)),
-    _day = int.tryParse(json.substring(8, 10));
+  Date.fromJSON(String json) :
+        _year = int.tryParse(json.substring(0, 4)),
+        _month = int.tryParse(json.substring(5, 7)),
+        _day = int.tryParse(json.substring(8, 10));
 
   String get getDate => "$_year-$_month-$_day";
   @override String toString() => getDate;
 }
 
 class Meal {
-
   final int _id;
-  final String _recipeID;
+  final Recipe _recipe;
   final Date _date;
-
-  Meal.fromJSON(Map<String, dynamic> json) :
-    _id = json['id'],
-    _recipeID = json['recipe']['api_id'],
-    _date = Date.fromJSON(json['date']);
-
-  String get recipe => _recipeID;
+  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
+        _id = json['id'],
+        _recipe = recipe,
+        _date = Date.fromJSON(json['date']);
+  Recipe get recipe => _recipe;
   int get id => _id;
   Date get date => _date;
-  @override String toString() => "Meal has ID $_recipeID on ${_date.getDate}";
+  @override String toString() => "Meal ID $_id is a ${_recipe.title} on ${_date.getDate}";
 }

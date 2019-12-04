@@ -1,34 +1,80 @@
+import 'package:cookmate/recipe.dart';
+import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
+import 'package:cookmate/util/database_helpers.dart' as db;
+import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:cookmate/util/backendRequest.dart';
+import 'cookbook.dart';
 
-void main() => runApp(MyApp());
+/*
+  File: homePage.dart
+  Functionality: This page is the main page of the app. It is the page that 
+  is diplayed upon logging in. It displays the users favorite recipes and 
+  the current list of popular recipes within the app. The user can navigate 
+  to all the other pages using the upper navigation bar.
+*/
 
-class MyApp extends StatelessWidget {
+class HomePage extends StatefulWidget {
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CookMate',
-      theme: CookmateStyle.theme,
-      home: MyHomePage(),
-    );
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  BackendRequest backend;
+  Future<List<String>> _popularIDs;
+  List<Future<Recipe>> _popularRecipes;
+  Future<List<db.Recipe>> _favoriteRecipeList;
+  List<Future<Recipe>> _favoriteRecipes;
+  db.DatabaseHelper database = db.DatabaseHelper.instance;
+
+  Future<void> _getUserInfo() async {
+
+    int userID = await LocalStorage.getUserID();
+    String token = await LocalStorage.getAuthToken();
+    backend = BackendRequest(token, userID);
   }
-}
-
-class MyHomePage extends StatefulWidget {
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  void initState() {
 
-class _MyHomePageState extends State<MyHomePage> {
-  
-  Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
-  GlobalKey _tabBarKey = GlobalKey();
+    _getUserInfo().then(
+      (data) {
+        _popularRecipes = List<Future<Recipe>>();
+        _popularIDs = backend.getPopularRecipes();
+        _popularIDs.then(
+          (popular) {
+            setState(() {
+              for(String recipeID in popular) {
+                _popularRecipes.add(backend.getRecipe(recipeID));
+              }
+            });
+          }
+        );
+      }
+    );
+
+    _favoriteRecipeList = database.recipes();
+    _favoriteRecipeList.then(
+      (list) {
+        _favoriteRecipes = List<Future<Recipe>>();
+        setState(() {
+          for(db.Recipe recipe in list) {
+            print("This recipe is a favorite: ${recipe.id}");
+            _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
+          }
+        });
+      }
+    );
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+
     double defaultScreenWidth = 400.0;
     double defaultScreenHeight = 810.0;
     ScreenUtil.instance = ScreenUtil(
@@ -39,126 +85,211 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
-        body: Column(
+      body: SingleChildScrollView(
+        child: Column(
           children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // SizedBox(
-                  //   height: ScreenUtil.instance.setWidth(228.0),
-                  // ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      'Today Meals'.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ScreenUtil.instance.setWidth(22.0),
-                        fontWeight: FontWeight.bold,
-                      ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget> [
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
+                  child: Text(
+                    "Popular Today!",
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w800,
+                      color: CookmateStyle.textGrey
                     ),
-                  ),
-                  SizedBox(height: ScreenUtil.instance.setWidth(10.0)),
-                  Container(
-                    height: ScreenUtil.instance.setWidth(250.0),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: _buildItem,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.instance.setWidth(7.0),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      'Your Favorites!'.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: ScreenUtil.instance.setWidth(22.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil.instance.setWidth(7.0),
-                  ),
-                  Container(
-                    height: ScreenUtil.instance.setWidth(250.0),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) =>
-                          _buildItem(context, index),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ));
-  }
-
-  Widget _buildItem(BuildContext context, index) {
-    
-    String mealName;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(
-          Radius.circular(ScreenUtil.instance.setWidth(10.0)),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: ScreenUtil.instance.setWidth(210.0),
-              width: ScreenUtil.instance.setWidth(170.0),
-              child: Image.network(
-                  'https://previews.123rf.com/images/rawpixel/rawpixel1510/rawpixel151025608/47062607-food-table-celebration-delicious-party-meal-concept.jpg',
-                  fit: BoxFit.cover),
-            ),
-            Positioned(
-              left: ScreenUtil.instance.setWidth(0.0),
-              bottom: ScreenUtil.instance.setWidth(0.0),
-              width: ScreenUtil.instance.setWidth(170.0),
-              height: ScreenUtil.instance.setWidth(50.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.black54, Colors.black54],
                   ),
                 ),
-              ),
-            ),
-            Positioned(
-              left: ScreenUtil.instance.setWidth(40.0),
-              bottom: ScreenUtil.instance.setWidth(10.0),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    'MealName',
+                FutureBuilder(
+                  future: _popularIDs,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Padding(
+                          padding: const EdgeInsets.all(100.0),
+                          child: CookmateStyle.loadingIcon("Loading popular..."),
+                        );
+                      case ConnectionState.done:
+                        return _displayPopular();
+                      default:
+                        return Text("error");
+                    }
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
+                  child: Text(
+                    "Your Favorites",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setWidth(17.0),
+                      fontSize: 25,
+                      fontWeight: FontWeight.w800,
+                      color: CookmateStyle.textGrey
                     ),
                   ),
-                  Text(
-                    'subtitle',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setWidth(15.0),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
+                FutureBuilder(
+                  future: _favoriteRecipeList,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Padding(
+                          padding: const EdgeInsets.all(100.0),
+                          child: CookmateStyle.loadingIcon("Loading favorites..."),
+                        );
+                      case ConnectionState.done:
+                        return _displayFavorites();
+                      default:
+                        return Text("error");
+                    }
+                  },
+                ),
+              ]
+            )
           ],
         ),
       ),
+    );
+  }
+
+  Widget _displayPopular () {
+
+    List<Widget> recipeList = List<Widget>();
+    for(Future<Recipe> recipe in _popularRecipes) {
+      recipeList.add(_buildItem(recipe));
+    }
+
+    return Container(
+      height: 280,
+      child: Column(
+        children: <Widget> [
+          Flexible(
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: recipeList
+            )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _displayFavorites () {
+
+    List<Widget> recipeList = List<Widget>();
+    for(Future<Recipe> recipe in _favoriteRecipes) {
+      recipeList.add(_buildItem(recipe));
+    }
+
+    return Container(
+      height: 280,
+      child: Column(
+        children: <Widget> [
+          Flexible(
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: recipeList
+            )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItem (Future<Recipe> recipe) {
+
+    return FutureBuilder(
+      future: recipe,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return SizedBox(
+              width: 220,
+              height: 240,
+              child: Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            );
+          case ConnectionState.done:
+            return Padding(
+              padding: EdgeInsets.all(0.0),
+              child: Stack(
+                children: <Widget>[
+                  FlatButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      print("${snapshot.data.title} and ${snapshot.data.apiID}");
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => RecipeDisplay(snapshot.data.apiID.toString()))
+                      );
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4.0,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          height: 220,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(snapshot.data.imageURL)
+                            ) 
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 190,
+                    left: 10,
+                    child: Container(
+                      height: 80,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4.0,
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            snapshot.data.title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: CookmateStyle.textGrey,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          default:
+            return Text("error");
+        }
+      },
     );
   }
 }
