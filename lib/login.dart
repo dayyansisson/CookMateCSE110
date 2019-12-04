@@ -1,6 +1,7 @@
 import 'package:cookmate/homePage.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart' as DB;
+import 'package:cookmate/util/localStorage.dart' as prefix0;
 
 import 'cookbook.dart';
 import 'createAccount.dart';
@@ -213,6 +214,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLoginBtn() {
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
@@ -281,29 +283,12 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              // Container(
-              //   height: double.infinity,
-              //   width: double.infinity,
-              //   decoration: BoxDecoration(
-              //     gradient: LinearGradient(
-              //       begin: Alignment.topCenter,
-              //       end: Alignment.bottomCenter,
-              //       colors: [
-              //         Color(0xF8F8FF),
-              //         Color(0xFFFFFF),
-              //         Color(0xFFFAFA),
-              //       ],
-              //       stops: [0.1, 0.4, 0.7],
-              //     ),
-              //   ),
-              // ),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    //vertical: 260.0,
                   ),
                   child: Column(
                     children: <Widget> [
