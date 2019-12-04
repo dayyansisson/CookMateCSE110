@@ -1,4 +1,6 @@
 import 'package:cookmate/cookbook.dart' as CB;
+import 'package:cookmate/homePage.dart';
+import 'package:cookmate/login.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/database_helpers.dart';
@@ -370,6 +372,7 @@ class _UserProfileState extends State<UserProfile> {
           request.logout();
           _clearLocal();
           Navigator.popUntil(context, ModalRoute.withName('/'));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -424,7 +427,7 @@ class _UserProfileState extends State<UserProfile> {
               children: <Widget>[
                 OutlineButton(
                   borderSide: BorderSide(
-                    width: 0.05
+                    width: 0.05,
                   ),
                   padding: EdgeInsets.all(20.0),
                   onPressed: () {
@@ -470,7 +473,7 @@ class _UserProfileState extends State<UserProfile> {
                       default:
                         return Padding(
                           padding: EdgeInsets.only(top: 20),
-                          child: Center(child: Text("Looking for Diet List")),
+                          child: Center(child: Text("Looking for your diet")),
                         );
                     }
                   }
