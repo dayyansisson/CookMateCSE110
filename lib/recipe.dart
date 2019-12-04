@@ -429,7 +429,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
           print(sl);
       await helper.insertShoppingListItem(sl);
     }
-    print(await helper.shoppingListItems());
+    //print(await helper.shoppingListItems());
   }
 
   _addToFavorites() async {
