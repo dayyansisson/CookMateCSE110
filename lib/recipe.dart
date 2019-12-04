@@ -266,7 +266,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
       ));
     }
     return ListView(
-        children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
+        children: list, padding: EdgeInsets.only(top: 10, bottom: 20), shrinkWrap: true);
   }
 
   Widget infoBar(Recipe data) {
@@ -373,7 +373,7 @@ class _RecipeDisplayState extends State<RecipeDisplay> {
       ));
     }
     return ListView(
-        children: list, padding: EdgeInsets.only(top: 10), shrinkWrap: true);
+        children: list, padding: EdgeInsets.only(top: 10, bottom: 20), shrinkWrap: true);
   }
 
   String formatTitle(String input) {
