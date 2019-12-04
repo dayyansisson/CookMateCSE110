@@ -1,6 +1,7 @@
 import 'package:cookmate/cookbook.dart' as CB;
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
+import 'package:cookmate/util/database_helpers.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -66,8 +67,8 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   _updateUserName(String newUserName) async {
-    bool succes = await request.updateUsername(userInfo, newUserName);
-    if (succes) {
+    bool success = await request.updateUsername(userInfo, newUserName);
+    if (success) {
       setState(() {
         userInfo = newUserName;
       });
@@ -113,10 +114,13 @@ class _UserProfileState extends State<UserProfile> {
     return showDialog<String>(
       context: context,
       barrierDismissible:
-          false, // dialog is dismissible with a tap on the barrier
+          true, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Username'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           content: new Row(
             children: <Widget>[
               new Expanded(
@@ -137,6 +141,17 @@ class _UserProfileState extends State<UserProfile> {
                 Navigator.of(context).pop();
               },
             ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         );
       },
@@ -149,31 +164,38 @@ class _UserProfileState extends State<UserProfile> {
     return showDialog<String>(
       context: context,
       barrierDismissible:
-          false, // dialog is dismissible with a tap on the barrier
+          true, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Enter New Password'),
-          content: new Column(
-            children: <Widget>[
-              new Expanded(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Container(
+            height: 125,
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                new Expanded(
                   child: new TextField(
-                autofocus: true,
-                obscureText: true,
-                decoration: new InputDecoration(hintText: 'Current Password'),
-                onChanged: (value) {
-                  currentPassword = value;
-                },
-              )),
-              new Expanded(
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'Current Password'),
+                  onChanged: (value) {
+                    currentPassword = value;
+                  },
+                )),
+                new Expanded(
                   child: new TextField(
-                autofocus: true,
-                obscureText: true,
-                decoration: new InputDecoration(hintText: 'New Password'),
-                onChanged: (value) {
-                  newPassword = value;
-                },
-              ))
-            ],
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'New Password'),
+                  onChanged: (value) {
+                    newPassword = value;
+                  },
+                ))
+              ],
+            ),
           ),
           actions: <Widget>[
             FlatButton(
@@ -181,10 +203,20 @@ class _UserProfileState extends State<UserProfile> {
               onPressed: () {
                 _updatePassword(currentPassword, newPassword).then((value) {
                   if (value) {
-                    print("succes changing password");
+                    print("Success changing password");
                   }
                 });
-
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
@@ -273,19 +305,20 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget _displayUserDiet() {
+  // Widget _displayUserDiet() {
 
-    String currDiet;
-    if (userDiet == -1) {
-      currDiet = "No diet set";
-    } else {
-      currDiet = diets[userDiet - 1];
-    }
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Text("Current Diet: " + currDiet),
-    );
-  }
+  //   String currDiet;
+  //   if (userDiet == -1) {
+  //     currDiet = "No diet set";
+  //   } else {
+  //     currDiet = diets[userDiet - 1];
+  //   }
+
+  //   return Padding(
+  //     padding: const EdgeInsets.all(20.0),
+  //     child: Text("Current Diet: " + currDiet),
+  //   );
+  // }
 
   Widget _displayDietList() {
 
@@ -334,9 +367,8 @@ class _UserProfileState extends State<UserProfile> {
       child: RaisedButton(
         elevation: 2,
         onPressed: () {
-          print("Logging out");
           request.logout();
-          LocalStorage.deleteAuthToken();
+          _clearLocal();
           Navigator.popUntil(context, ModalRoute.withName('/'));
         },
         padding: EdgeInsets.all(15.0),
@@ -354,6 +386,19 @@ class _UserProfileState extends State<UserProfile> {
         ),
       ),
     );
+  }
+
+  _clearLocal () {
+
+    LocalStorage.deleteAuthToken();
+    LocalStorage.deleteDiet();
+    LocalStorage.deleteUserID();
+    DatabaseHelper database = DatabaseHelper.instance;
+    database.clearShoppingList();
+    database.clearCalendars();
+    database.clearIngredients();
+    database.clearRecipes();
+    database.clearAllergens();
   }
 
   @override
@@ -395,7 +440,7 @@ class _UserProfileState extends State<UserProfile> {
                         case ConnectionState.done:
                           return _displayUserName();
                         default:
-                          return Text("Error: Not user info found");
+                          return Text("Finding user info...");
                       }
                     }
                   )

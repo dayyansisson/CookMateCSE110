@@ -17,10 +17,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int userID;
   String _username, _password, _token;
+  bool _loggingIn = false;
+
+  @override
+  initState() {
+
+    _loggingIn = false;
+    super.initState();
+  }
 
   Future<bool> _pullUserDataFromServer(BackendRequest backend) async {
     print("Pulling user data from server");
@@ -63,7 +72,9 @@ class _LoginPageState extends State<LoginPage> {
         _token = token;
         if (_token != null &&
             _token != "Unable to log in with provided credentials.") {
-
+          setState(() {
+            _loggingIn = true;
+          });
           BackendRequest backend = new BackendRequest(_token, null);
           backend.getUser().then((userID){
             LocalStorage.storeUserID(userID);
@@ -215,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginBtn() {
 
-    return Container(
+    return !_loggingIn ? Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
@@ -236,6 +247,11 @@ class _LoginPageState extends State<LoginPage> {
               fontWeight: FontWeight.bold,
             )),
       ),
+    ) : Padding(
+      padding: EdgeInsets.all(30),
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+      )
     );
   }
 
