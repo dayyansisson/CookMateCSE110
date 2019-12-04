@@ -26,13 +26,15 @@ class _LoginPageState extends State<LoginPage> {
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  //user info
   int userID;
   String _username, _password, _token;
+  
   bool _loggingIn = false;
 
   @override
   initState() {
-
     _loggingIn = false;
     super.initState();
   }
@@ -65,9 +67,9 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
     return true;
-}
+  }
   
-
+  //Validating the credentials to login, if not display an error
   _submit() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
@@ -80,10 +82,11 @@ class _LoginPageState extends State<LoginPage> {
       potentialToken.then((token) {
         LocalStorage.storeAuthToken(token);
         _token = token;
+        //cheking the validation of auth token 
         if (_token != null &&
             _token != "Unable to log in with provided credentials.") {
-          
           BackendRequest backend = new BackendRequest(_token, null);
+          //geting the userId from backend and store it in the local storage
           backend.getUser().then((userID){
             LocalStorage.storeUserID(userID);
             _pullUserDataFromServer(backend).then(
@@ -100,7 +103,11 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             _loggingIn = false;
           });
+
+          //clear the username & password feilds
           _formKey.currentState.reset();
+
+          //displaying an error message for failing to login
           Flushbar(
             flushbarPosition: FlushbarPosition.TOP,
             flushbarStyle: FlushbarStyle.FLOATING,
@@ -235,6 +242,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  //building the login button
   Widget _buildLoginBtn() {
 
     return !_loggingIn ? Container(
@@ -267,6 +275,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  //building the sing up option
   Widget _buildSignUpBtn() {
     return GestureDetector(
       onTap: () {
