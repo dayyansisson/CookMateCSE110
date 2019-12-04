@@ -2,8 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 /*
-  File: 
-  Functionality:
+  File: localStorage.dart
+  Functionality: 
 */
 
 class LocalStorage {
