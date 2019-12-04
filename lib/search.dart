@@ -322,7 +322,7 @@ class _SearchPageState extends State<SearchPage> {
                     case ConnectionState.done:
                       return cuisineButton();
                     default:
-                      return Text("Error: Loading cuisines");
+                      return Center(child: Text("Error: Loading cuisines"));
                   }
                 }),
             Expanded(

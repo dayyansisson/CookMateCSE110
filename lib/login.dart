@@ -69,9 +69,12 @@ class _LoginPageState extends State<LoginPage> {
   
 
   _submit() async {
-    
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
+
+      setState(() {
+        _loggingIn = true;
+      });
 
       Future<String> potentialToken = BackendRequest.login(_username, _password);
       potentialToken.then((token) {
@@ -79,9 +82,7 @@ class _LoginPageState extends State<LoginPage> {
         _token = token;
         if (_token != null &&
             _token != "Unable to log in with provided credentials.") {
-          setState(() {
-            _loggingIn = true;
-          });
+          
           BackendRequest backend = new BackendRequest(_token, null);
           backend.getUser().then((userID){
             LocalStorage.storeUserID(userID);
@@ -96,6 +97,9 @@ class _LoginPageState extends State<LoginPage> {
             );
           });
         } else {
+          setState(() {
+            _loggingIn = false;
+          });
           _formKey.currentState.reset();
           Flushbar(
             flushbarPosition: FlushbarPosition.TOP,
@@ -258,6 +262,7 @@ class _LoginPageState extends State<LoginPage> {
       padding: EdgeInsets.all(30),
       child: CircularProgressIndicator(
         strokeWidth: 2,
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.black38)
       )
     );
   }
@@ -322,7 +327,7 @@ class _LoginPageState extends State<LoginPage> {
                           alignment: Alignment.topCenter,
                           child: Container(
                             width: 130,
-                            child: Image.network("https://files.slack.com/files-pri/TP18U4QGY-FR7861UEB/chef.png?pub_secret=1b10310be5")
+                            child: Image(image: AssetImage('assets/logo/chef.png'))
                           ),
                         )
                       ),
