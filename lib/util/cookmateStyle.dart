@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../calendar.dart';
 import '../homePage.dart';
 import '../profile.dart';
 import '../search.dart';
 import '../shoppingListPage.dart';
+
+/*
+  File: cookmateStyle.dart
+  Functionality: This file defines all the standard widgets and colors for the
+  UI design to maintain consistency. This included the top navigation bar, colors
+  used throughout the app, and the fonts used within the app.
+*/
 
 class CookmateStyle {
 

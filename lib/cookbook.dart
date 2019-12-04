@@ -1,5 +1,10 @@
-import 'package:cookmate/util/backendRequest.dart';
 import 'package:flutter/material.dart';
+
+/*
+  File: cookbook.dart
+  Functionality: This file defines several classes and functions that are 
+  used throughout the app.
+*/
 
 /* Class: Recipe
  * Description: Recipe object with basic data about a recipe, including its title, image, servings, etc...
@@ -53,13 +58,14 @@ class Recipe {
 
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
-      if(units == 'tablespoon' || units == 'teaspoon'){
-        if(units == 'tablespoon'){
+      if(units == 'tablespoon' || units == 'teaspoon' || units == 'Tablespoon' || units == 'Teaspoon' || units == 'Tablespoons' || units == ' Teaspoons'){
+        if(units == 'tablespoon' || units == 'Tablespoon' || units == 'Tablespoons'){
           units = 'tbsp';
         }
         else{
           units = 'tsp';
         }
+        
       }
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);

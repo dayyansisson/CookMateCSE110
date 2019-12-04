@@ -6,7 +6,14 @@ import 'package:flutter/services.dart';
 import './util/backendRequest.dart';
 import 'homePage.dart';
 import 'package:flushbar/flushbar.dart';
-import 'login.dart';
+
+/*
+  File: createAccount.dart
+  Functionality: This file handles creating a new account. It allows the user 
+  to enter a username, email, and password to create an account with us. It
+  adds the user to our backend and logs the user in upon a successful account
+  creation.
+*/
 
 class CreateAccountPage extends StatefulWidget {
   @override
