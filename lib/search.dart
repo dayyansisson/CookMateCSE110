@@ -55,6 +55,7 @@ class _SearchPageState extends State<SearchPage> {
 
   // Data containers
   var items = List<String>();
+  var selectedIngredients = List<String>();
   List<String> copyOfIngredients = new List<String>();
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
@@ -178,8 +179,14 @@ class _SearchPageState extends State<SearchPage> {
 
   _addIngredientQuery(String ingredient) {
     print(ingredient);
+    bool same = false;
     if (ingredientQuery == null) ingredientQuery = new List<String>();
-    if (ingredient != null) {
+    for(int i = 0; i < ingredientQuery.length; i ++) {
+      if (ingredientQuery[i] == ingredient) {
+        same = true;
+      }
+    }
+    if (ingredient != null && same == false) {
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
