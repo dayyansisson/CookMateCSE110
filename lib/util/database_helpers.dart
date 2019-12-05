@@ -54,11 +54,11 @@ class ShoppingList {
 }
 
 // Store users allergens locally
-class Allergen {
+class LocalAllergen {
   int id;
   String name;
 
-  Allergen({this.id, this.name});
+  LocalAllergen({this.id, this.name});
 
   Map<String, dynamic> toMap() {
     return {'id': id, 'name': name};
@@ -69,6 +69,7 @@ class Allergen {
     return 'Allergen{id: $id, name: $name}';
   }
 }
+
 
 // Store a list of all ingredients locally
 class Ingredient {
@@ -311,7 +312,7 @@ class DatabaseHelper {
   }
 
   // User's Allergens
-  Future<int> insertAllergen(Allergen allergen) async {
+  Future<int> insertAllergen(LocalAllergen allergen) async {
     Database db = await database;
     int id = await db.insert(
       'allergen',
@@ -336,13 +337,13 @@ class DatabaseHelper {
     await db.delete('allergen');
   }
 
-  Future<List<Allergen>> allergens() async {
+  Future<List<LocalAllergen>> allergens() async {
     final Database db = await database;
     // Query the table for all The Allergens.
     final List<Map<String, dynamic>> maps = await db.query('allergen');
     // Convert the List<Map<String, dynamic> into a List<Allergen>.
     return List.generate(maps.length, (i) {
-      return Allergen(
+      return LocalAllergen(
         id: maps[i]['id'],
         name: maps[i]['name'],
       );

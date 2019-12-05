@@ -26,6 +26,8 @@ class UserPreferences extends StatefulWidget {
 class _UserPreferences extends State<UserPreferences> {
   // Backend request object
   BackendRequest request;
+  // Local database object
+  DatabaseHelper database;
 
   // User info
   int userID;
@@ -35,9 +37,13 @@ class _UserPreferences extends State<UserPreferences> {
   // Future data for rendering
   Future<String> _userName;
   Future<List<CB.Diet>> _dietList;
+  Future<List<CB.Allergen>> _allergenList;
+  Future<List<LocalAllergen>> _localAllergens;
+
 
   // Page data
   List<String> diets = new List<String>();
+  List<String> allergens = new List<String>();
   String userInfo = "";
   List<DropdownMenuItem<int>> dietsDropDownList =
       new List<DropdownMenuItem<int>>();
@@ -47,8 +53,12 @@ class _UserPreferences extends State<UserPreferences> {
     token = await LS.LocalStorage.getAuthToken();
     userDiet = await LS.LocalStorage.getDiet();
     request = new BackendRequest(token, userID);
+    database = DatabaseHelper.instance;
+
+    // Fetch information from server
     _getUserProfile();
     _getDiets();
+    _getAllergens();
   }
 
   _getDiets() async {
@@ -63,6 +73,22 @@ class _UserPreferences extends State<UserPreferences> {
               currList[i].id.toString());
           //diets[currList[i].id] = currList[i].name;
           diets.add(currList[i].name);
+        }
+      });
+    });
+  }
+
+  _getAllergens() async {
+    _allergenList = request.getAllergenList(); 
+    _allergenList.then((currList) {
+      setState(() {
+        allergens.add("None");
+        for (int i = 0; i < currList.length; i++) {
+          print("Allergen: " +
+              currList[i].name +
+              " id: " +
+              currList[i].id.toString());
+          allergens.add(currList[i].name);
         }
       });
     });
@@ -405,7 +431,7 @@ class _UserPreferences extends State<UserPreferences> {
     LocalStorage.deleteAuthToken();
     LocalStorage.deleteDiet();
     LocalStorage.deleteUserID();
-    DatabaseHelper database = DatabaseHelper.instance;
+    
     database.clearShoppingList();
     database.clearCalendars();
     database.clearIngredients();

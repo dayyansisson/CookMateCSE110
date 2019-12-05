@@ -672,6 +672,45 @@ class BackendRequest {
     return diets;
   }
 
+  /* Method: getAllergenList
+   * Arg(s):
+   *
+   * Return:
+   *    - success: A list of allergens
+   *    - failure: null
+   */
+  Future<List<Allergen>> getAllergenList () async {
+
+    print("Getting full list of diets...");
+
+    // Make API call
+    final response = await http.get(
+        "https://thecookmate.com/api/recipe/allergen",
+        headers: { "Authorization":"Token $_authToken" }
+    );
+
+    // Validate return
+    int statusCode = response.statusCode ~/ 100;
+    if(statusCode != _SUCCESS)
+    {
+      print("Request for allergen list failed");
+      print(_interpretStatus(statusCode, response.statusCode, response.body));
+      return null;
+    }
+
+    // Parse JSON & build ingredient list
+    List<dynamic> data = jsonDecode(response.body);
+    List<Allergen> allergens = new List<Allergen>();
+    Allergen allergen;
+    for(int i = 0; i < data.length; i++)
+    {
+      allergen = Allergen.fromJSON(data[i]);
+      allergens.add(allergen);
+    }
+
+    return allergens;
+  }
+
 
   /* Method: getBreadcrumbs
    * Arg(s):
@@ -769,10 +808,10 @@ class BackendRequest {
     int dietID = await LocalStorage.getDiet();
     
     String allergenList;
-    List<DB.Allergen> allergens = await DB.DatabaseHelper.instance.allergens();
+    List<DB.LocalAllergen> allergens = await DB.DatabaseHelper.instance.allergens();
     if(allergens.length > 0) {
       allergenList = "";
-      for(DB.Allergen allergen in allergens) {
+      for(DB.LocalAllergen allergen in allergens) {
         allergenList += "${allergen.name}, ";
       }
       allergenList = allergenList.substring(0, allergenList.length - 2);
