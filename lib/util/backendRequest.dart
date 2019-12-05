@@ -899,7 +899,9 @@ class BackendRequest {
         body: {
           "user":"$_userID",
           "recipe":recipe.apiID.toString(),
-          "date":"${date.getDate}"
+          "date":"${date.getDate}",
+          'name':recipe.title,
+          'url':recipe.imageURL 
         }
     );
 
