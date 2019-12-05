@@ -21,37 +21,15 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
+
   final _formKey = GlobalKey<FormState>();
+
+  //user info
   String _username, _email, _password, _confirmedPassword;
-  bool signup = false;
 
-  _submit() async {
-    int _id;
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      if (_password == _confirmedPassword) {
-        Future<int> potentialID =
-            BackendRequest.createUser(_email, _username, _password);
-        potentialID.then((id) {
-          _id = id;
-          if (_id != null) {
-            Future<String> potentialToken =
-            BackendRequest.login(_username, _password);
-            potentialToken.then((token) {
-              if(token != null) {
-                LocalStorage.storeAuthToken(token);
-                LocalStorage.storeUserID(_id);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-              }
-            });
-          }
-        });
-      }
-    }
 
+  //reset the input fields and display the error for non-valid credentials
+  error() {
     _formKey.currentState.reset();
     Flushbar(
       flushbarPosition: FlushbarPosition.TOP,
@@ -67,6 +45,32 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     )..show(context);
   }
 
+  //Check if the given credentials are valid then navigate to homepage, esle display error
+  _submit() async {  
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      if (_password == _confirmedPassword) {
+        int _id = await BackendRequest.createUser(_email, _username, _password);
+        if (_id != null) {
+            //login the user with created username & pass
+            String token = await BackendRequest.login(_username, _password);
+            if(token != null) {
+                //store the auth token and it to the local storage
+                LocalStorage.storeAuthToken(token);
+                LocalStorage.storeUserID(_id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+            } else {error();}
+        } else {error();}
+      } else {error();}
+    } else{error();}
+  }
+  
+ 
+  
+  //building the username field
   Widget _buildUsernameTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,6 +122,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the email field and validating the email input
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,6 +176,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the password field and validating the password input
   Widget _buildPasswordTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,6 +228,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the password field and validating the confirmed password input
   Widget _buildConfirmPasswordTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,6 +280,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the sign up button
   Widget _buildSignUpBtn() {
     return Container(
       padding: EdgeInsets.only(top: 25.0, bottom: 10),
@@ -297,6 +305,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
