@@ -393,7 +393,7 @@ class BackendRequest {
     final response = await http.post(
         "https://thecookmate.com/auth/user-profile/add-favorite/",
         headers: { "Authorization":"Token $_authToken" },
-        body: { "user":_userID, "recipe":"${recipe.apiID}" }
+        body: { "user":"$_userID", "recipe":"${recipe.apiID}", "name":"${recipe.title}", "url":"${recipe.image}" }
     );
 
     // Validate return
@@ -777,7 +777,8 @@ class BackendRequest {
       }
       allergenList = allergenList.substring(0, allergenList.length - 2);
     }
-    String diet = (await getDietList())[dietID].name;
+    
+    String diet = (dietID < 0) ? 'None' : (await getDietList())[dietID].name;
 
     final body = {
       "cuisine":cuisine,
