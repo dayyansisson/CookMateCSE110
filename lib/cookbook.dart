@@ -24,8 +24,13 @@ class Recipe {
   double calories;
   int popularity;
   Map<String, dynamic> _json;
-
-  Recipe(int id) : this.apiID = id, _complete = false;
+  
+  Recipe.simple(this.apiID, this.title, this.imageURL);
+  Recipe.simpleJSON(Map<String, dynamic> json) {
+    apiID = json['api_id'];
+    title = json['name'];
+    imageURL = json['url'];
+  }
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -115,42 +120,6 @@ class Recipe {
     """;
 }
 
-/* Class: SimpleRecipe
- * Description: Popular/Favorite recipe object that are stored in server containing its name, image, and id.
- */
-class SimpleRecipe {
-
-  int apiID;
-  String title;
-  String imageURL;
-
-  SimpleRecipe(this.apiID, this.title, this.imageURL);
-
-  SimpleRecipe.fromJSON(Map<String, dynamic> json) {
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-  }
-  
-  Image get image => Image.network(this.imageURL);
-  int getID() {
-    return this.apiID;
-  }
-
-  String getTitle() {
-    return this.title;
-  }
-  
-
-  @override
-  String toString() => """\n
-      $title
-      ----------------------------
-      api:        $apiID
-      image:      $imageURL
-    """;
-}
-
 /* Class: Ingredient
  * Description: Ingredient object containing its name, and id.
  */
@@ -167,7 +136,6 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }

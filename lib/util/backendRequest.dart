@@ -842,7 +842,7 @@ class BackendRequest {
    *    - success: List of recipes with data for popular recipes
    *    - failure: null
    */
-  Future<List<SimpleRecipe>> getPopularRecipes () async {
+  Future<List<Recipe>> getPopularRecipes () async {
 
     print("Getting full list of popular recipes...");
 
@@ -863,13 +863,13 @@ class BackendRequest {
 
     // Parse JSON & build simple recipe list
     List<dynamic> data = jsonDecode(response.body);
-    List<SimpleRecipe> popRecipes = List<SimpleRecipe>();
-    SimpleRecipe popRecipe;
+    List<Recipe> popRecipes = List<Recipe>();
+    Recipe popRecipe;
     int count = 0;
     for(int i = 0; i < data.length; i++)
     {
       if(count == 10) break;
-      popRecipe = SimpleRecipe.fromJSON(data[i]);
+      popRecipe = Recipe.simpleJSON(data[i]);
       popRecipes.add(popRecipe);
       count++;
     }
