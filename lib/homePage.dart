@@ -4,7 +4,6 @@ import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/database_helpers.dart' as db;
 import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'cookbook.dart';
 
 /*
@@ -21,11 +20,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   BackendRequest backend;
   Future<List<Recipe>> _futurePopular;
   List<Recipe> _popularRecipes;
   Future<List<db.Recipe>> _favoriteRecipeList;
-  List<Future<Recipe>> _favoriteRecipes;
+  List<db.Recipe> _favoriteRecipes;
   db.DatabaseHelper database = db.DatabaseHelper.instance;
 
   Future<void> _getUserInfo() async {
@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+
     _getUserInfo().then((data) {
       _futurePopular = backend.getPopularRecipes();
       _futurePopular.then((popular) {
@@ -45,29 +46,13 @@ class _HomePageState extends State<HomePage> {
       });
     });
 
-    _favoriteRecipeList = database.recipes();
-    _favoriteRecipeList.then((list) {
-      _favoriteRecipes = List<Future<Recipe>>();
-      setState(() {
-        for (db.Recipe recipe in list) {
-          print("This recipe is a favorite: ${recipe.id}");
-          _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
-        }
-      });
-    });
+    _updateFavorites();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double defaultScreenWidth = 400.0;
-    double defaultScreenHeight = 810.0;
-    ScreenUtil.instance = ScreenUtil(
-      width: defaultScreenWidth,
-      height: defaultScreenHeight,
-      allowFontScaling: true,
-    )..init(context);
 
     return Scaffold(
       appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
@@ -157,8 +142,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _displayFavorites() {
     List<Widget> recipeList = List<Widget>();
-    for (Future<Recipe> recipe in _favoriteRecipes) {
-      recipeList.add(_buildItemFuture(recipe));
+    for (db.Recipe recipe in _favoriteRecipes) {
+      recipeList.add(_buildItemDB(recipe));
     }
 
     return Container(
@@ -166,106 +151,10 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: <Widget>[
           Flexible(
-              child: ListView(
-                  scrollDirection: Axis.horizontal, children: recipeList)),
+            child: ListView(
+              scrollDirection: Axis.horizontal, children: recipeList)),
         ],
       ),
-    );
-  }
-
-  Widget _buildItemFuture(Future<Recipe> recipe) {
-    return FutureBuilder(
-      future: recipe,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return SizedBox(
-                width: 220,
-                height: 240,
-                child: Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ));
-          case ConnectionState.done:
-            return Padding(
-              padding: EdgeInsets.all(0.0),
-              child: Stack(
-                children: <Widget>[
-                  FlatButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      print(
-                          "${snapshot.data.title} and ${snapshot.data.apiID}");
-                      Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RecipeDisplay(
-                                      snapshot.data.apiID.toString())))
-                          .then((value) {
-                        _updateFavorites();
-                      });
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4.0,
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Container(
-                          height: 220,
-                          width: 200,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(snapshot.data.imageURL))),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 190,
-                    left: 10,
-                    child: Container(
-                      height: 80,
-                      width: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4.0,
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            snapshot.data.title,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: CookmateStyle.textGrey,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            );
-          default:
-            return Text("error");
-        }
-      },
     );
   }
 
@@ -349,18 +238,90 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildItemDB(db.Recipe recipe) {
+
+    return Padding(
+      padding: EdgeInsets.all(0.0),
+      child: Stack(
+        children: <Widget>[
+          FlatButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecipeDisplay(
+                              recipe.id.toString())))
+                  .then((value) {
+                _updateFavorites();
+              });
+            },
+            child: Container(
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4.0,
+                  )
+                ],
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  height: 220,
+                  width: 200,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(recipe.img))),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 190,
+            left: 10,
+            child: Container(
+              height: 80,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4.0,
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    recipe.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: CookmateStyle.textGrey,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   _updateFavorites() {
     _favoriteRecipeList = database.recipes();
-    setState(() {
-      _favoriteRecipeList.then((list) {
-        _favoriteRecipes = List<Future<Recipe>>();
-        setState(() {
-          for (db.Recipe recipe in list) {
-            print("This recipe is a favorite: ${recipe.id}");
-            _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
-          }
-        });
-      });
-    });
+    _favoriteRecipeList.then(
+      (list) {
+        _favoriteRecipes = list;
+      }
+    );
   }
 }
