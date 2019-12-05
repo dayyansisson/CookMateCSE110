@@ -1,6 +1,23 @@
+/*
+ * Author: Rayhan Kerawalla, Luis Jibaja
+ * Description: this file is intend to implement search functionality
+ *              for different types of ingredients and cuisines
+ * Return: List of type recipe which contain information of different recipes
+ */
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
+import 'package:cookmate/util/database_helpers.dart' as DB;
+import 'package:cookmate/util/localStorage.dart';
 import 'package:http/http.dart' as http;
+
+/*
+  File: backendRequest.dart
+  Functionality: This is the one of Model classes for our app it handles 
+  all the communication between the frontend and our backend server. In 
+  this class are getter, post, and delete functions that make calls to 
+  our backend. To make a call we require a user ID and their respective
+  authorization token which are both stored locally on the device.
+*/
 
 class BackendRequest {
 
@@ -67,13 +84,11 @@ class BackendRequest {
   Future<int> getUser () async {
 
     print("Getting user info ($_authToken)...");
-    print("before call");
     // Make API call
     final response = await http.get(
         "https://thecookmate.com/auth/users/me/",
         headers: { "Authorization":"Token $_authToken" }
     );
-    print("after call");
     // Validate return
     int statusCode = response.statusCode ~/ 100;
     if(statusCode != _SUCCESS)
@@ -325,6 +340,42 @@ class BackendRequest {
 
     _userProfile = profile;
     return profile;
+  }
+
+  /* Method: getUserName
+   * Arg(s):
+   *    - userId: the id for current user
+   * Return:
+   *    - success: true
+   *    - failure: false
+   */
+  Future<String> getUserName(int userID) async {
+    print("Getting user info (User ID: $_userID, $_authToken)...");
+
+    // Make API call
+    final response = await http.get(
+        "https://thecookmate.com/auth/users/me/",
+        headers: { "Authorization":"Token $_authToken" }
+    );
+
+    // Validate return
+    int statusCode = response.statusCode ~/ 100;
+    if(statusCode != _SUCCESS)
+    {
+      print(_interpretStatus(statusCode, response.statusCode, response.body));
+      return null;
+    }
+
+    print("User profile found, returning profile for $_userID");
+    List<String> userInfo = new List<String>();
+    var json = jsonDecode(response.body) as Map<String, dynamic>;
+    String userName = json['username'];
+    print("UserName: " + userName);
+
+//    UserProfile profile = UserProfile.fromJSON(jsonDecode(response.body));
+//    print(profile.toString());
+
+    return userName;
   }
 
   /* Method: addFavorite
@@ -714,13 +765,27 @@ class BackendRequest {
 
       ingredientList = ingredientList.substring(0, ingredientList.length - 2);
     }
-    //"diet":_userProfile.diet.name,
-    //"intolerances":_userProfile.allergenList(),
+
+    int dietID = await LocalStorage.getDiet();
+    
+    String allergenList;
+    List<DB.Allergen> allergens = await DB.DatabaseHelper.instance.allergens();
+    if(allergens.length > 0) {
+      allergenList = "";
+      for(DB.Allergen allergen in allergens) {
+        allergenList += "${allergen.name}, ";
+      }
+      allergenList = allergenList.substring(0, allergenList.length - 2);
+    }
+    String diet = (await getDietList())[dietID].name;
+
     final body = {
       "cuisine":cuisine,
       "maxCalories":maxCalories.toString(),
       "number":"10",
-      "includeIngredients":ingredientList
+      "includeIngredients":ingredientList,
+      "diet":diet,
+      "intolerances":allergenList
     };
 
     if(cuisine == null) {
@@ -733,6 +798,14 @@ class BackendRequest {
 
     if(ingredients == null) {
       body.remove("includeIngredients");
+    }
+
+    if(diet == "-1") {
+      body.remove("diet");
+    }
+
+    if(allergenList == null) {
+      body.remove("intolerances");
     }
 
     // Make API call

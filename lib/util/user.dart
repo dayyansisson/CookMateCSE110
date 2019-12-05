@@ -1,3 +1,8 @@
+/*
+  File: 
+  Functionality:
+*/
+
 class UserProfile {
 
   String authToken;

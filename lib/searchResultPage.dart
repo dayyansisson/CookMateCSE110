@@ -4,6 +4,15 @@ import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 import 'cookbook.dart';
 import 'package:cookmate/util/localStorage.dart' as LS;
+
+/*
+  File: searchReultsPage.dart
+  Functionality: This page handles displaying the recipes from a search result.
+  It loads the recipes from the search page and displays them in a list with 
+  their title, image, prep time, servings, calories, and cost. It also allows
+  the user to filter the search results via calories, cost, and prep time.
+*/
+
 class SearchResultPage extends StatefulWidget {
 
   final Future<List<Recipe>> _searchResults;
@@ -28,7 +37,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Color _titleColor = Color.fromRGBO(70, 70, 70, 1);
   List<Recipe> recipeList;
 
-  //final BackendRequest _request = BackendRequest("03740945581ed4d2c3b25a62e7b9064cd62971a4", 2);
   BackendRequest _request;
   _initBackend() async {
     int userID = await LS.LocalStorage.getUserID();
@@ -83,7 +91,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     case ConnectionState.waiting:
                       return CookmateStyle.loadingIcon("Loading recipes...");
                     case ConnectionState.done:
-                      if(snapshot.data.length == 0) {
+                      if(snapshot.data == null || snapshot.data.length == 0) {
                         return noRecipesError();
                       }
                       return _searchResults(snapshot.data);

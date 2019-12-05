@@ -6,7 +6,14 @@ import 'package:flutter/services.dart';
 import './util/backendRequest.dart';
 import 'homePage.dart';
 import 'package:flushbar/flushbar.dart';
-import 'login.dart';
+
+/*
+  File: createAccount.dart
+  Functionality: This file handles creating a new account. It allows the user 
+  to enter a username, email, and password to create an account with us. It
+  adds the user to our backend and logs the user in upon a successful account
+  creation.
+*/
 
 class CreateAccountPage extends StatefulWidget {
   @override
@@ -14,37 +21,15 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
+
   final _formKey = GlobalKey<FormState>();
+
+  //user info
   String _username, _email, _password, _confirmedPassword;
-  bool signup = false;
 
-  _submit() async {
-    int _id;
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      if (_password == _confirmedPassword) {
-        Future<int> potentialID =
-            BackendRequest.createUser(_email, _username, _password);
-        potentialID.then((id) {
-          _id = id;
-          if (_id != null) {
-            Future<String> potentialToken =
-            BackendRequest.login(_username, _password);
-            potentialToken.then((token) {
-              if(token != null) {
-                LocalStorage.storeAuthToken(token);
-                LocalStorage.storeUserID(_id);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-              }
-            });
-          }
-        });
-      }
-    }
 
+  //reset the input fields and display the error for non-valid credentials
+  error() {
     _formKey.currentState.reset();
     Flushbar(
       flushbarPosition: FlushbarPosition.TOP,
@@ -60,6 +45,32 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     )..show(context);
   }
 
+  //Check if the given credentials are valid then navigate to homepage, esle display error
+  _submit() async {  
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      if (_password == _confirmedPassword) {
+        int _id = await BackendRequest.createUser(_email, _username, _password);
+        if (_id != null) {
+            //login the user with created username & pass
+            String token = await BackendRequest.login(_username, _password);
+            if(token != null) {
+                //store the auth token and it to the local storage
+                LocalStorage.storeAuthToken(token);
+                LocalStorage.storeUserID(_id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+            } else {error();}
+        } else {error();}
+      } else {error();}
+    } else{error();}
+  }
+  
+ 
+  
+  //building the username field
   Widget _buildUsernameTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,6 +122,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the email field and validating the email input
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,6 +176,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the password field and validating the password input
   Widget _buildPasswordTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,6 +228,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the password field and validating the confirmed password input
   Widget _buildConfirmPasswordTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,9 +280,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+  //building the sign up button
   Widget _buildSignUpBtn() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
+      padding: EdgeInsets.only(top: 25.0, bottom: 10),
       width: double.infinity,
       child: RaisedButton(
         elevation: 0,
@@ -291,6 +306,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -301,88 +317,74 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 150),
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  child: Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      shadows: [ 
-                        Shadow(
-                          color: Colors.black38,
-                          blurRadius: 4
-                        )
-                      ]
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xF8F8FF),
-                      Color(0xFFFFFF),
-                      Color(0xFFFAFA),
-                    ],
-                    stops: [0.1, 0.4, 0.7],
-                  ),
-                ),
-              ),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    vertical: 200.0,
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20.0,
+                  child: Column(
+                    children: <Widget> [ 
+                      Padding(
+                        padding: EdgeInsets.only(top: 75, bottom: 25),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            "Create Account",
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              shadows: [ 
+                                Shadow(
+                                  color: Colors.black38,
+                                  blurRadius: 4
+                                )
+                              ]
+                            ),
+                          ),
                         ),
-                        _buildUsernameTF(),
-                        SizedBox(
-                          height: 20.0,
+                      ),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildUsernameTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildEmailTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildPasswordTF(),
+                            _buildConfirmPasswordTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildSignUpBtn(),
+                          ],
                         ),
-                        _buildEmailTF(),
-                        SizedBox(
-                          height: 20.0,
+                      ),
+                      FlatButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Back to Login",
+                          style: TextStyle(
+                            color: Colors.black38,
+                            fontSize: 18
+                          ),
                         ),
-                        _buildPasswordTF(),
-                        _buildConfirmPasswordTF(),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        _buildSignUpBtn(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 80,
-                left: 40,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.white,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    color: CookmateStyle.standardRed,
+                      )
+                    ]
                   ),
                 ),
               ),

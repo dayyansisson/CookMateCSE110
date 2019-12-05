@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'login.dart';
 import 'createAccount.dart';
 
-
-
+/*
+  File: 
+  Functionality:
+*/
 
 class SplashPage extends StatefulWidget {
 
