@@ -275,7 +275,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildSignUpBtn() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
+      padding: EdgeInsets.only(top: 25.0, bottom: 10),
       width: double.infinity,
       child: RaisedButton(
         elevation: 0,
@@ -308,88 +308,74 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 150),
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  child: Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      shadows: [ 
-                        Shadow(
-                          color: Colors.black38,
-                          blurRadius: 4
-                        )
-                      ]
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xF8F8FF),
-                      Color(0xFFFFFF),
-                      Color(0xFFFAFA),
-                    ],
-                    stops: [0.1, 0.4, 0.7],
-                  ),
-                ),
-              ),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    vertical: 200.0,
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20.0,
+                  child: Column(
+                    children: <Widget> [ 
+                      Padding(
+                        padding: EdgeInsets.only(top: 75, bottom: 25),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            "Create Account",
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              shadows: [ 
+                                Shadow(
+                                  color: Colors.black38,
+                                  blurRadius: 4
+                                )
+                              ]
+                            ),
+                          ),
                         ),
-                        _buildUsernameTF(),
-                        SizedBox(
-                          height: 20.0,
+                      ),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildUsernameTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildEmailTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildPasswordTF(),
+                            _buildConfirmPasswordTF(),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            _buildSignUpBtn(),
+                          ],
                         ),
-                        _buildEmailTF(),
-                        SizedBox(
-                          height: 20.0,
+                      ),
+                      FlatButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Back to Login",
+                          style: TextStyle(
+                            color: Colors.black38,
+                            fontSize: 18
+                          ),
                         ),
-                        _buildPasswordTF(),
-                        _buildConfirmPasswordTF(),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        _buildSignUpBtn(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 80,
-                left: 40,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.white,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    color: CookmateStyle.standardRed,
+                      )
+                    ]
                   ),
                 ),
               ),

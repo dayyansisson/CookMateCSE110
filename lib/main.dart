@@ -3,6 +3,7 @@ import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/localStorage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'homePage.dart';
 
@@ -12,7 +13,12 @@ import 'homePage.dart';
 */
 
 main() {
-  runApp(MyApp());
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
+    (_) {
+      runApp(new MyApp());
+    }
+  );
 }
 
 class MyApp extends StatelessWidget {
