@@ -9,26 +9,18 @@ class Recipe {
 
   bool _complete;
 
+  int id;
   int apiID;
   String title;
   String imageURL;
   int servings;
   int cookTime;
   double price;
-  double calories; 
+  double calories;
   int popularity;
   Map<String, dynamic> _json;
 
   Recipe(int id) : this.apiID = id, _complete = false;
-  Recipe.forCalendar(Map<String, dynamic> json) {
-    
-    apiID = json['id'];
-    //apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    _complete = false;
-  }
-
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -53,16 +45,6 @@ class Recipe {
     _complete = true;
   }
 
-  Recipe.forPopularList(Map<String, dynamic> json) {
-
-    apiID = json['id'];
-    apiID = json['api_id'];
-    title = json['name'];
-    imageURL = json['url'];
-    popularity = json['popular_count'];
-    _complete = false;
-  }
-
   //Returns all the ingredients for a given recipe
   List<Ingredient> getIngredients(){
     List<Ingredient> ingredients = new List<Ingredient>();
@@ -70,7 +52,16 @@ class Recipe {
     List<dynamic> ingredientList = json["extendedIngredients"];
 
     for(int i =0; i < ingredientList.length; i++){
-      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], ingredientList[i]['unit']);
+      String units = ingredientList[i]['unit'];
+      if(units == 'tablespoon' || units == 'teaspoon'){
+        if(units == 'tablespoon'){
+          units = 'tbsp';
+        }
+        else{
+          units = 'tsp';
+        }
+      }
+      Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
     }
     //print(ingredients.toString());
@@ -86,8 +77,8 @@ class Recipe {
     }
 
     var instructionList = json["analyzedInstructions"][0][
-      "steps"];
-    
+    "steps"];
+
     for(Map<String,dynamic> step in instructionList){
       instructions.add(step["step"]);
     }
@@ -105,6 +96,7 @@ class Recipe {
   String toString() => """\n
       $title
       ----------------------------
+      id:         $id
       api:        $apiID
       image:      $imageURL
       servings:   $servings
@@ -132,7 +124,7 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-  
+
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -141,7 +133,7 @@ class Ingredient {
  * Description: Cuisine object containing its name, and id.
  */
 class Cuisine {
-  
+
   final int id;
   final String name;
 
@@ -186,7 +178,7 @@ class UserProfile {
 
   UserProfile({ int id, Diet diet, List<Map<String, dynamic>> allergens, List<Map<String, dynamic>> favorites }) : this.allergens = allergens, this.diet = diet, this.id = id;
   UserProfile.fromJSON(Map<String, dynamic> json) {
-    
+
     id = json['id'];
     var diet = json['diet'];
     if(diet != null)
@@ -243,26 +235,25 @@ class Date {
 
   final int _year, _month, _day;
   Date(int year, int month, int day) : _year = year, _month = month, _day = day;
-  Date.fromJSON(String json) : 
-    _year = int.tryParse(json.substring(0, 4)),
-    _month = int.tryParse(json.substring(5, 7)),
-    _day = int.tryParse(json.substring(8, 10));
+  Date.fromJSON(String json) :
+        _year = int.tryParse(json.substring(0, 4)),
+        _month = int.tryParse(json.substring(5, 7)),
+        _day = int.tryParse(json.substring(8, 10));
 
   String get getDate => "$_year-$_month-$_day";
   @override String toString() => getDate;
 }
 
 class Meal {
-
   final int _id;
   final Recipe _recipe;
   final Date _date;
-
-  Meal(int id, Recipe recipe, Date date) : _id = id, _recipe = recipe, _date = date;
-  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) : _recipe = recipe, _id = json['id'], _date = Date.fromJSON(json['date']);
-
-  int get id => _id;
+  Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
+        _id = json['id'],
+        _recipe = recipe,
+        _date = Date.fromJSON(json['date']);
   Recipe get recipe => _recipe;
+  int get id => _id;
   Date get date => _date;
-  @override String toString() => "Meal $_id is a ${_recipe.title} on ${_date.getDate}";
+  @override String toString() => "Meal ID $_id is a ${_recipe.title} on ${_date.getDate}";
 }
