@@ -266,7 +266,10 @@ class _SearchPageState extends State<SearchPage> {
 
   _getBCList() async {
     List<String> bcList = await scanButt.scanBarcodeNormal();
-    if (bcList != null) {
+    if(bcList.length == 100){
+
+    }
+    else if (bcList != null) {
       if (ingredientQuery == null) ingredientQuery = new List<String>();
       for (int i = 0; i < bcList.length; i++) {
         ingredientQuery.add(bcList[i]);

@@ -56,7 +56,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
   Widget shoppingListView(List<DB.ShoppingList> list) {
 
-    if (list.length == 0) {
+    if (list == null || list.length == 0) {
       return Center(
         child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

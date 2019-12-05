@@ -24,8 +24,13 @@ class Recipe {
   double calories;
   int popularity;
   Map<String, dynamic> _json;
-
-  Recipe(int id) : this.apiID = id, _complete = false;
+  
+  Recipe.simple(this.apiID, this.title, this.imageURL);
+  Recipe.simpleJSON(Map<String, dynamic> json) {
+    apiID = json['api_id'];
+    title = json['name'];
+    imageURL = json['url'];
+  }
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -58,8 +63,9 @@ class Recipe {
 
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
-      if(units == 'tablespoon' || units == 'teaspoon' || units == 'Tablespoon' || units == 'Teaspoon' || units == 'Tablespoons' || units == ' Teaspoons'){
-        if(units == 'tablespoon' || units == 'Tablespoon' || units == 'Tablespoons'){
+      units.toLowerCase();
+      if(units.contains('spoon') || units == ' teaspoons'){
+        if(units.contains('able')){
           units = 'tbsp';
         }
         else{
@@ -130,7 +136,6 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
