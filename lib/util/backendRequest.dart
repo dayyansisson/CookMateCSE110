@@ -393,7 +393,7 @@ class BackendRequest {
     final response = await http.post(
         "https://thecookmate.com/auth/user-profile/add-favorite/",
         headers: { "Authorization":"Token $_authToken" },
-        body: { "user":"$_userID", "recipe":"${recipe.apiID}", "name":"${recipe.title}", "url":"${recipe.image}" }
+        body: { "user":"$_userID", "recipe":"${recipe.apiID}", "name":"${recipe.title}", "url":"${recipe.imageURL}" }
     );
 
     // Validate return
