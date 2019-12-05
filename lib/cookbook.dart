@@ -24,8 +24,13 @@ class Recipe {
   double calories;
   int popularity;
   Map<String, dynamic> _json;
-
-  Recipe(int id) : this.apiID = id, _complete = false;
+  
+  Recipe.simple(this.apiID, this.title, this.imageURL);
+  Recipe.simpleJSON(Map<String, dynamic> json) {
+    apiID = json['api_id'];
+    title = json['name'];
+    imageURL = json['url'];
+  }
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -131,7 +136,6 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }

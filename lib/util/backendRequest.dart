@@ -842,7 +842,7 @@ class BackendRequest {
    *    - success: List of recipes with data for popular recipes
    *    - failure: null
    */
-  Future<List<String>> getPopularRecipes () async {
+  Future<List<Recipe>> getPopularRecipes () async {
 
     print("Getting full list of popular recipes...");
 
@@ -861,19 +861,20 @@ class BackendRequest {
       return null;
     }
 
-    var data = jsonDecode(response.body);
-    List<String> recipes = List<String>();
+    // Parse JSON & build simple recipe list
+    List<dynamic> data = jsonDecode(response.body);
+    List<Recipe> popRecipes = List<Recipe>();
+    Recipe popRecipe;
     int count = 0;
-    for(var recipe in data) {
-      if(count == 10) {
-        break;
-      }
-      recipes.add(recipe['api_id'].toString());
+    for(int i = 0; i < data.length; i++)
+    {
+      if(count == 10) break;
+      popRecipe = Recipe.simpleJSON(data[i]);
+      popRecipes.add(popRecipe);
       count++;
     }
-
-    print("Returning ${recipes.length} recipes!");
-    return recipes;
+    print("Returning ${popRecipes.length} popular recipes!");
+    return popRecipes;
   }
 
   /* Method: addMealToCalendar
@@ -898,7 +899,9 @@ class BackendRequest {
         body: {
           "user":"$_userID",
           "recipe":recipe.apiID.toString(),
-          "date":"${date.getDate}"
+          "date":"${date.getDate}",
+          'name':recipe.title,
+          'url':recipe.imageURL 
         }
     );
 

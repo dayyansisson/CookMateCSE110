@@ -22,8 +22,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   BackendRequest backend;
-  Future<List<String>> _popularIDs;
-  List<Future<Recipe>> _popularRecipes;
+  Future<List<Recipe>> _futurePopular;
+  List<Recipe> _popularRecipes;
   Future<List<db.Recipe>> _favoriteRecipeList;
   List<Future<Recipe>> _favoriteRecipes;
   db.DatabaseHelper database = db.DatabaseHelper.instance;
@@ -37,13 +37,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _getUserInfo().then((data) {
-      _popularRecipes = List<Future<Recipe>>();
-      _popularIDs = backend.getPopularRecipes();
-      _popularIDs.then((popular) {
+      _futurePopular = backend.getPopularRecipes();
+      _futurePopular.then((popular) {
         setState(() {
-          for (String recipeID in popular) {
-            _popularRecipes.add(backend.getRecipe(recipeID));
-          }
+          _popularRecipes = popular;
         });
       });
     });
@@ -90,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               FutureBuilder(
-                future: _popularIDs,
+                future: _futurePopular,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -140,8 +137,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _displayPopular() {
+
     List<Widget> recipeList = List<Widget>();
-    for (Future<Recipe> recipe in _popularRecipes) {
+    for (Recipe recipe in _popularRecipes) {
       recipeList.add(_buildItem(recipe));
     }
 
@@ -160,7 +158,7 @@ class _HomePageState extends State<HomePage> {
   Widget _displayFavorites() {
     List<Widget> recipeList = List<Widget>();
     for (Future<Recipe> recipe in _favoriteRecipes) {
-      recipeList.add(_buildItem(recipe));
+      recipeList.add(_buildItemFuture(recipe));
     }
 
     return Container(
@@ -175,7 +173,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildItem(Future<Recipe> recipe) {
+  Widget _buildItemFuture(Future<Recipe> recipe) {
     return FutureBuilder(
       future: recipe,
       builder: (context, snapshot) {
@@ -268,6 +266,86 @@ class _HomePageState extends State<HomePage> {
             return Text("error");
         }
       },
+    );
+  }
+
+  Widget _buildItem(Recipe recipe) {
+
+    return Padding(
+      padding: EdgeInsets.all(0.0),
+      child: Stack(
+        children: <Widget>[
+          FlatButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              print(
+                  "${recipe.title} and ${recipe.apiID}");
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecipeDisplay(
+                              recipe.apiID.toString())))
+                  .then((value) {
+                _updateFavorites();
+              });
+            },
+            child: Container(
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4.0,
+                  )
+                ],
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  height: 220,
+                  width: 200,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(recipe.imageURL))),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 190,
+            left: 10,
+            child: Container(
+              height: 80,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4.0,
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    recipe.title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: CookmateStyle.textGrey,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
