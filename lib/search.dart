@@ -171,7 +171,8 @@ class _SearchPageState extends State<SearchPage> {
   // Setters
   _setCuisine(String cuisine) {
     if (cuisine != null) cuisineQuery = cuisine;
-    if (cuisine == "none") cuisineQuery = null;
+    if (cuisine == "None") cuisineQuery = null;
+    print(cuisineQuery);
     print(cuisine);
   }
 
