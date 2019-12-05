@@ -32,7 +32,7 @@ class Recipe {
 // Store shopping list items locally
 class ShoppingList {
   String ingredient;
-  int quantity;
+  double quantity;
   bool purchased = false;
   String measurement;
 
