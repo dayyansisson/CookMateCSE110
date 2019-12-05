@@ -16,13 +16,11 @@ import 'cookbook.dart';
 */
 
 class HomePage extends StatefulWidget {
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
   BackendRequest backend;
   Future<List<String>> _popularIDs;
   List<Future<Recipe>> _popularRecipes;
@@ -31,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   db.DatabaseHelper database = db.DatabaseHelper.instance;
 
   Future<void> _getUserInfo() async {
-
     int userID = await LocalStorage.getUserID();
     String token = await LocalStorage.getAuthToken();
     backend = BackendRequest(token, userID);
@@ -39,42 +36,34 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-
-    _getUserInfo().then(
-      (data) {
-        _popularRecipes = List<Future<Recipe>>();
-        _popularIDs = backend.getPopularRecipes();
-        _popularIDs.then(
-          (popular) {
-            setState(() {
-              for(String recipeID in popular) {
-                _popularRecipes.add(backend.getRecipe(recipeID));
-              }
-            });
-          }
-        );
-      }
-    );
-
-    _favoriteRecipeList = database.recipes();
-    _favoriteRecipeList.then(
-      (list) {
-        _favoriteRecipes = List<Future<Recipe>>();
+    _getUserInfo().then((data) {
+      _popularRecipes = List<Future<Recipe>>();
+      _popularIDs = backend.getPopularRecipes();
+      _popularIDs.then((popular) {
         setState(() {
-          for(db.Recipe recipe in list) {
-            print("This recipe is a favorite: ${recipe.id}");
-            _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
+          for (String recipeID in popular) {
+            _popularRecipes.add(backend.getRecipe(recipeID));
           }
         });
-      }
-    );
+      });
+    });
+
+    _favoriteRecipeList = database.recipes();
+    _favoriteRecipeList.then((list) {
+      _favoriteRecipes = List<Future<Recipe>>();
+      setState(() {
+        for (db.Recipe recipe in list) {
+          print("This recipe is a favorite: ${recipe.id}");
+          _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
+        }
+      });
+    });
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
     double defaultScreenWidth = 400.0;
     double defaultScreenHeight = 810.0;
     ScreenUtil.instance = ScreenUtil(
@@ -88,129 +77,116 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget> [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
-                  child: Text(
-                    "Popular Today!",
-                    style: TextStyle(
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+                Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
+                child: Text(
+                  "Popular Today!",
+                  style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.w800,
-                      color: CookmateStyle.textGrey
-                    ),
-                  ),
+                      color: CookmateStyle.textGrey),
                 ),
-                FutureBuilder(
-                  future: _popularIDs,
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return Padding(
-                          padding: const EdgeInsets.all(100.0),
-                          child: CookmateStyle.loadingIcon("Loading popular..."),
-                        );
-                      case ConnectionState.done:
-                        return _displayPopular();
-                      default:
-                        return Text("error");
-                    }
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
-                  child: Text(
-                    "Your Favorites",
-                    style: TextStyle(
+              ),
+              FutureBuilder(
+                future: _popularIDs,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Padding(
+                        padding: const EdgeInsets.all(100.0),
+                        child: CookmateStyle.loadingIcon("Loading popular..."),
+                      );
+                    case ConnectionState.done:
+                      return _displayPopular();
+                    default:
+                      return Text("error");
+                  }
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20, bottom: 10, left: 20),
+                child: Text(
+                  "Your Favorites",
+                  style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.w800,
-                      color: CookmateStyle.textGrey
-                    ),
-                  ),
+                      color: CookmateStyle.textGrey),
                 ),
-                FutureBuilder(
-                  future: _favoriteRecipeList,
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return Padding(
-                          padding: const EdgeInsets.all(100.0),
-                          child: CookmateStyle.loadingIcon("Loading favorites..."),
-                        );
-                      case ConnectionState.done:
-                        return _displayFavorites();
-                      default:
-                        return Text("error");
-                    }
-                  },
-                ),
-              ]
-            )
+              ),
+              FutureBuilder(
+                future: _favoriteRecipeList,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Padding(
+                        padding: const EdgeInsets.all(100.0),
+                        child:
+                            CookmateStyle.loadingIcon("Loading favorites..."),
+                      );
+                    case ConnectionState.done:
+                      return _displayFavorites();
+                    default:
+                      return Text("error");
+                  }
+                },
+              ),
+            ])
           ],
         ),
       ),
     );
   }
 
-  Widget _displayPopular () {
-
+  Widget _displayPopular() {
     List<Widget> recipeList = List<Widget>();
-    for(Future<Recipe> recipe in _popularRecipes) {
+    for (Future<Recipe> recipe in _popularRecipes) {
       recipeList.add(_buildItem(recipe));
     }
 
     return Container(
       height: 280,
       child: Column(
-        children: <Widget> [
+        children: <Widget>[
           Flexible(
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: recipeList
-            )
-          ),
+              child: ListView(
+                  scrollDirection: Axis.horizontal, children: recipeList)),
         ],
       ),
     );
   }
 
-  Widget _displayFavorites () {
-
+  Widget _displayFavorites() {
     List<Widget> recipeList = List<Widget>();
-    for(Future<Recipe> recipe in _favoriteRecipes) {
+    for (Future<Recipe> recipe in _favoriteRecipes) {
       recipeList.add(_buildItem(recipe));
     }
 
     return Container(
       height: 280,
       child: Column(
-        children: <Widget> [
+        children: <Widget>[
           Flexible(
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: recipeList
-            )
-          ),
+              child: ListView(
+                  scrollDirection: Axis.horizontal, children: recipeList)),
         ],
       ),
     );
   }
 
-  Widget _buildItem (Future<Recipe> recipe) {
-
+  Widget _buildItem(Future<Recipe> recipe) {
     return FutureBuilder(
       future: recipe,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return SizedBox(
-              width: 220,
-              height: 240,
-              child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            );
+                width: 220,
+                height: 240,
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ));
           case ConnectionState.done:
             return Padding(
               padding: EdgeInsets.all(0.0),
@@ -219,11 +195,16 @@ class _HomePageState extends State<HomePage> {
                   FlatButton(
                     padding: EdgeInsets.zero,
                     onPressed: () {
-                      print("${snapshot.data.title} and ${snapshot.data.apiID}");
+                      print(
+                          "${snapshot.data.title} and ${snapshot.data.apiID}");
                       Navigator.push(
-                        context, 
-                        MaterialPageRoute(builder: (context) => RecipeDisplay(snapshot.data.apiID.toString()))
-                      );
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RecipeDisplay(
+                                      snapshot.data.apiID.toString())))
+                          .then((value) {
+                        _updateFavorites();
+                      });
                     },
                     child: Container(
                       margin: EdgeInsets.all(10),
@@ -242,11 +223,9 @@ class _HomePageState extends State<HomePage> {
                           height: 220,
                           width: 200,
                           decoration: BoxDecoration(
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(snapshot.data.imageURL)
-                            ) 
-                          ),
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(snapshot.data.imageURL))),
                         ),
                       ),
                     ),
@@ -274,10 +253,9 @@ class _HomePageState extends State<HomePage> {
                             snapshot.data.title,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: CookmateStyle.textGrey,
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16
-                            ),
+                                color: CookmateStyle.textGrey,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16),
                           ),
                         ),
                       ),
@@ -291,5 +269,20 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+  }
+
+  _updateFavorites() {
+    _favoriteRecipeList = database.recipes();
+    setState(() {
+      _favoriteRecipeList.then((list) {
+        _favoriteRecipes = List<Future<Recipe>>();
+        setState(() {
+          for (db.Recipe recipe in list) {
+            print("This recipe is a favorite: ${recipe.id}");
+            _favoriteRecipes.add(backend.getRecipe(recipe.id.toString()));
+          }
+        });
+      });
+    });
   }
 }

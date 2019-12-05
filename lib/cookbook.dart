@@ -58,8 +58,9 @@ class Recipe {
 
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
-      if(units == 'tablespoon' || units == 'teaspoon' || units == 'Tablespoon' || units == 'Teaspoon' || units == 'Tablespoons' || units == ' Teaspoons'){
-        if(units == 'tablespoon' || units == 'Tablespoon' || units == 'Tablespoons'){
+      units.toLowerCase();
+      if(units.contains('spoon') || units == ' teaspoons'){
+        if(units.contains('able')){
           units = 'tbsp';
         }
         else{
