@@ -428,6 +428,9 @@ class _SearchPageState extends State<SearchPage> {
                           child: Icon(Icons.search, color: Colors.white, size: 30),
                           elevation: 1,
                           onPressed: () {
+                            setState(() {
+                              items.clear();
+                            });
                             editingController.clear();
                             _routeRecipePage(context);
                           },
