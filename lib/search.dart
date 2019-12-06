@@ -301,7 +301,9 @@ class _SearchPageState extends State<SearchPage> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 onChanged: (value) {
-                  generateDropdown(value);
+                  setState(() {
+                    generateDropdown(value);
+                  });
                 },
                 controller: editingController,
                 decoration: InputDecoration(
@@ -311,9 +313,12 @@ class _SearchPageState extends State<SearchPage> {
                     suffixIcon: IconButton(
                         icon: Icon(Icons.camera_alt),
                         onPressed: () {
-                          _getBCList();
+                          setState(() {
+                            _getBCList();
+                          });
                         }),
                     border: OutlineInputBorder(
+                        borderSide: BorderSide(width: 0.5, color: CookmateStyle.iconGrey),
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
               ),
             ),

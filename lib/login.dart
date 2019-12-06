@@ -40,9 +40,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> _pullUserDataFromServer(BackendRequest backend) async {
+
     print("Pulling user data from server");
     UserProfile profile = await backend.getUserProfile();
     DB.DatabaseHelper database = DB.DatabaseHelper.instance;
+
     // Load diet fresh
     if(profile.diet != null) {
       LocalStorage.deleteDiet();
@@ -62,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
     if(profile.favorites != null) {
       database.clearRecipes();
       for(Map<String, dynamic> recipe in profile.favorites) {
-        database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: "n/a", img: "n/a"));
+        database.insertRecipe(DB.Recipe(id: recipe['api_id'], name: recipe['name'], img: recipe['url']));
         print("Loaded favorite recipe ${recipe['api_id']}");
       }
     }

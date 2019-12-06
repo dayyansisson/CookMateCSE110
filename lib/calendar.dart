@@ -328,12 +328,15 @@ class Calendar extends State<MyCalendar> {
               : Container(
           ),
         ),
-        Text(
-          "Scroll right for more meals >",
-          style: TextStyle(
-            fontSize: 14,
-            color: CookmateStyle.iconGrey,
-            fontWeight: FontWeight.w300
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Text(
+            "Scroll right for more meals >",
+            style: TextStyle(
+              fontSize: 14,
+              color: CookmateStyle.iconGrey,
+              fontWeight: FontWeight.w300
+            ),
           ),
         )
       ],
