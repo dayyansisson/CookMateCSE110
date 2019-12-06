@@ -494,7 +494,7 @@ class BackendRequest {
       return false;
     }
 
-    print("Remove allergen successfully!");
+    print("BACKEND: Removed allergen successfully!");
     return true;
   }
 

@@ -172,6 +172,29 @@ class Diet {
   }
 }
 
+/* Class: Allergen
+ * Description: Allergen object containing its name and id.
+ */
+class Allergen {
+
+  int id;
+  String name;
+  String summary;
+
+  Allergen ({int id, String name}) : this.id = id, this.name = name;
+
+  Allergen.fromJSON(Map<String, dynamic> json) {
+
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Allergen.forUP(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+}
+
 /* Class: UserProfile
  * Description: Diet object containing its name, summary, and id.
  */

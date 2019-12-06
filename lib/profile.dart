@@ -1,14 +1,15 @@
 import 'package:cookmate/cookbook.dart' as CB;
-import 'package:cookmate/cookbook.dart';
-import 'package:cookmate/homePage.dart';
 import 'package:cookmate/login.dart';
 import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:cookmate/util/backendRequest.dart';
 import 'package:cookmate/util/database_helpers.dart';
 import 'package:cookmate/util/localStorage.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cookmate/util/localStorage.dart' as LS;
+import 'package:cookmate/multiSelectDialog.dart';
+
 
 /*
   File: profile.dart
@@ -24,6 +25,9 @@ class UserPreferences extends StatefulWidget {
 }
 
 class _UserPreferences extends State<UserPreferences> {
+
+  GlobalKey _scaffold = GlobalKey();
+  
   // Backend request object
   BackendRequest request;
   // Local database object
@@ -43,10 +47,19 @@ class _UserPreferences extends State<UserPreferences> {
 
   // Page data
   List<String> diets = new List<String>();
-  List<String> allergens = new List<String>();
-  String userInfo = "";
+  List<String> allAllergens = new List<String>();
+  List<String> localAllergens = new List<String>();
+  List<String> displayAllergens = new List<String>();
+
+  String userName = "";
   List<DropdownMenuItem<int>> dietsDropDownList =
       new List<DropdownMenuItem<int>>();
+
+  @override
+  void initState() {
+    _initData();
+    super.initState();
+  }
 
   _initData() async {
     userID = await LS.LocalStorage.getUserID();
@@ -59,8 +72,33 @@ class _UserPreferences extends State<UserPreferences> {
     _getUserProfile();
     _getDiets();
     _getAllergens();
+
+    // Fetch locally stores user's allergens
+    _getLocalAllergens();
+    setState(() {
+      displayAllergens = localAllergens;
+    });
+
   }
 
+  /*
+    Clear the local storage of all user data
+  */
+  _clearLocal () {
+    LocalStorage.deleteAuthToken();
+    LocalStorage.deleteDiet();
+    LocalStorage.deleteUserID();
+    
+    database.clearShoppingList();
+    database.clearCalendars();
+    database.clearIngredients();
+    database.clearRecipes();
+    database.clearAllergens();
+  }
+
+  /*
+    Get the list of all diets
+  */
   _getDiets() async {
     _dietList = request.getDietList();
     _dietList.then((currList) {
@@ -78,40 +116,63 @@ class _UserPreferences extends State<UserPreferences> {
     });
   }
 
+  /*
+    Get the list of all allergens
+  */
   _getAllergens() async {
     _allergenList = request.getAllergenList(); 
     _allergenList.then((currList) {
       setState(() {
-        allergens.add("None");
+        // allAllergens = currList;
         for (int i = 0; i < currList.length; i++) {
           print("Allergen: " +
               currList[i].name +
               " id: " +
               currList[i].id.toString());
-          allergens.add(currList[i].name);
+          allAllergens.add(currList[i].name);
+        }
+        
+      });
+    });
+  }
+
+  /*
+    Get the current username
+  */
+  _getUserProfile() async {
+    _userName = request.getUserName(userID);
+    _userName.then((value) {
+      setState(() {
+        userName = value;
+      });
+    });
+  }
+
+  /*
+    Get the current allergens 
+  */
+  _getLocalAllergens() async {
+    _localAllergens = database.allergens();
+    _localAllergens.then((currList) {
+      setState(() {
+        //localAllergens = returnedList;
+        if (currList.length==0){
+          localAllergens.add("None");
+        }
+        for (int i = 0; i < currList.length; i++) {
+          print("Allergen: " +
+              currList[i].name +
+              " id: " +
+              currList[i].id.toString());
+          localAllergens.add(currList[i].name);
         }
       });
     });
   }
 
-  _getUserProfile() async {
-    _userName = request.getUserName(userID);
-    _userName.then((value) {
-      setState(() {
-        userInfo = value;
-      });
-    });
-  }
-
-  _updateUserName(String newUserName) async {
-    bool success = await request.updateUsername(userInfo, newUserName);
-    if (success) {
-      setState(() {
-        userInfo = newUserName;
-      });
-    }
-  }
-
+  /*
+    Update the diet set for this user profile
+  */
   _updateUserDiet(int newDiet) async {
     bool success = false;
     if(newDiet == 0) {
@@ -127,6 +188,70 @@ class _UserPreferences extends State<UserPreferences> {
     }
   }
 
+  /*
+    Update the username set for this user profile
+  */
+  Future<bool> _updateUserName(String newUserName) async {
+    bool success = await request.updateUsername(userName, newUserName);
+    if (success) {
+      setState(() {
+        userName = newUserName;
+      });
+    }
+    return success;
+  }
+
+  /*
+    Update the user's allergens locally and on server at same time
+    to match those in selectedAllergens
+  */
+  _updateUserAllergens(List<String> selectedAllergens){
+    for (int i = 0; i < allAllergens.length; i++){
+      String curr = allAllergens[i];
+      int id = i+1;
+      //print("CURR: " + curr + " ID: " + id.toString());
+      if (selectedAllergens==null){
+        if (localAllergens.contains(curr)){
+          // REMOVE allergens if previously added but not selected. 
+          Future<bool> result = request.removeAllergen(id); 
+          result.then((success){
+            if (success){
+              database.deleteAllergen(curr);
+              print("Removed " +  curr + " ID:" + id.toString()+  " from local and server.");
+            }
+          }); 
+        }
+      }
+      else if (!localAllergens.contains(curr) 
+        && selectedAllergens.contains(curr)){
+        // ADD allergens if selected and not already added. 
+        Future<bool> result = request.addAllergen(id); 
+        result.then((success){
+          if (success){
+            database.insertAllergen(new LocalAllergen(id: id, name: curr));
+            print("Added " + curr + " ID:" + id.toString()+ " to local and server.");
+          }
+        });
+      }
+      else if (localAllergens.contains(curr) 
+        && !selectedAllergens.contains(curr)){
+        // REMOVE allergens if previously added but not selected. 
+        Future<bool> result = request.removeAllergen(id); 
+        result.then((success){
+          if (success){
+            database.deleteAllergen(curr);
+            print("Removed " +  curr + " ID:" + id.toString()+  " from local and server.");
+          }
+        }); 
+      }
+      
+    }
+    
+  }
+
+  /*
+    Update the password for this user profile
+  */
   Future<bool> _updatePassword(String currPassword, String newPassword) async {
 
     print("Current Password: " + currPassword);
@@ -140,13 +265,26 @@ class _UserPreferences extends State<UserPreferences> {
     return success;
   }
 
-  @override
-  void initState() {
-    _initData();
-    super.initState();
+  /*
+    Delete this user profile
+  */
+  Future<bool> _deleteUser(String currPassword) async {
+
+    print("Current Password: " + currPassword);
+    bool success = await request.deleteUser(currPassword);
+    if (success) {
+      print("User successfully deleted");
+    } else {
+      print("Failed to delete user");
+    }
+    return success;
   }
 
+  /*
+    Creates username update dialog
+  */
   Future<String> _asyncUsernameInput(BuildContext context) async {
+
     String newUserName = '';
     return showDialog<String>(
       context: context,
@@ -174,7 +312,42 @@ class _UserPreferences extends State<UserPreferences> {
             FlatButton(
               child: Text('Update'),
               onPressed: () {
-                _updateUserName(newUserName);
+                _updateUserName(newUserName).then((value){
+                  if(value){
+                    Flushbar(
+                      flushbarPosition: FlushbarPosition.TOP,
+                      flushbarStyle: FlushbarStyle.FLOATING,
+                      borderWidth: 40,
+                      duration:  Duration(seconds: 3),
+                      messageText: Text(
+                        'Username successfully changed.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red[800],
+                    )..show(_scaffold.currentContext);
+                  }
+                  else{
+                    Flushbar(
+                      flushbarPosition: FlushbarPosition.TOP,
+                      flushbarStyle: FlushbarStyle.FLOATING,
+                      borderWidth: 40,
+                      duration:  Duration(seconds: 3),
+                      messageText: Text(
+                        'Invalid username change, please try again.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red[800],
+                    )..show(_scaffold.currentContext);
+                  }
+                });
                 Navigator.of(context).pop();
               },
             ),
@@ -195,9 +368,79 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
+  /*
+    Creates Allergens update dialog
+  */
+  Future<String> _asyncAllergenDialog(BuildContext context) async{
+
+    List<String> selectedAllergens;
+    return showDialog<String>(
+      context: context,
+      barrierDismissible:
+          true, // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Allergens'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: MultiSelectChip(
+            allAllergens, 
+            onSelectionChanged: (selectedList) {
+              setState(() {
+                selectedAllergens = selectedList;
+            });
+          }),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Update'),
+              onPressed: () {
+                _updateUserAllergens(selectedAllergens);
+
+                setState(() {
+                  localAllergens = selectedAllergens;
+                  if (selectedAllergens==null){
+                    displayAllergens = ["None"];
+                  }
+                  else{
+                    displayAllergens = selectedAllergens;
+                  } 
+                });
+
+                Navigator.of(context).pop();
+                /*
+                Navigator.push(
+                     context,
+                      MaterialPageRoute(builder: (context) => UserPreferences()),
+                    );
+                */
+              },
+            ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /*
+    Creates password update dialog
+  */
   Future<String> _asyncPasswordInput(BuildContext context) async {
+
     String currentPassword = '';
     String newPassword = '';
+    String newPasswordConfirm = '';
     return showDialog<String>(
       context: context,
       barrierDismissible:
@@ -223,14 +466,23 @@ class _UserPreferences extends State<UserPreferences> {
                   },
                 )),
                 new Expanded(
-                  child: new TextField(
+                  child: new TextFormField(
                   autofocus: true,
                   obscureText: true,
                   decoration: new InputDecoration(hintText: 'New Password'),
                   onChanged: (value) {
                     newPassword = value;
                   },
-                ))
+                )),
+                new Expanded(
+                  child: new TextFormField(
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'Confirm New Password'),
+                  onChanged: (value) {
+                    newPasswordConfirm = value;
+                  },
+                )),
               ],
             ),
           ),
@@ -238,11 +490,62 @@ class _UserPreferences extends State<UserPreferences> {
             FlatButton(
               child: Text('Update'),
               onPressed: () {
-                _updatePassword(currentPassword, newPassword).then((value) {
-                  if (value) {
-                    print("Success changing password");
-                  }
-                });
+                if (newPassword!=newPasswordConfirm){
+                  Flushbar(
+                    flushbarPosition: FlushbarPosition.TOP,
+                    flushbarStyle: FlushbarStyle.FLOATING,
+                    duration:  Duration(seconds: 3),
+                    borderWidth: 40,
+                    messageText: Text(
+                      "Please make sure your new passwords match.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    backgroundColor: Colors.red[800],
+                  )..show(_scaffold.currentContext);
+                } else {
+                  _updatePassword(currentPassword, newPassword).then((value) {
+                    if (value) {
+                      print("Success changing password");
+                      Flushbar(
+                        flushbarPosition: FlushbarPosition.TOP,
+                        flushbarStyle: FlushbarStyle.FLOATING,
+                        borderWidth: 40,
+                        duration:  Duration(seconds: 3),
+                        messageText: Text(
+                          'Password successfully changed.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red[800],
+                      )..show(_scaffold.currentContext);
+                    }
+                    else{
+                      Flushbar(
+                        flushbarPosition: FlushbarPosition.TOP,
+                        flushbarStyle: FlushbarStyle.FLOATING,
+                        duration:  Duration(seconds: 3),
+                        borderWidth: 40,
+                        messageText: Text(
+                          "Password change invalid, please try again.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red[800],
+                      )..show(_scaffold.currentContext);
+                    }
+                  });
+                }
+                
                 Navigator.of(context).pop();
               },
             ),
@@ -263,7 +566,76 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
+  /*
+    Creates delete user dialog
+  */
+  Future<String> _asyncDeleteUserInput(BuildContext context) async {
+
+    String currentPassword = '';
+    return showDialog<String>(
+      context: context,
+      barrierDismissible:
+          true, // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Password'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Container(
+            height: 125,
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text("CAUTION - This will delete all your user data."),
+                Text("Enter your password to continue:"),
+                new Expanded(
+                  child: new TextField(
+                  autofocus: true,
+                  obscureText: true,
+                  decoration: new InputDecoration(hintText: 'Password'),
+                  onChanged: (value) {
+                    currentPassword = value;
+                  },
+                )),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete User'),
+              onPressed: () {
+                _deleteUser(currentPassword).then((value) {
+                  if (value) {
+                    print("Success deleting user");
+                  }
+                });
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+              },
+            ),
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: CookmateStyle.textGrey,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /*
+    Creates username display
+  */
   Widget _displayUserName() {
+
     return Row(
       children: <Widget>[
         Icon(
@@ -282,7 +654,7 @@ class _UserPreferences extends State<UserPreferences> {
             ),
             Padding(padding: EdgeInsets.only(bottom: 2)),
             Text(
-              userInfo,
+              userName,
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w300
@@ -302,6 +674,9 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
+  /*
+    Creates password display
+  */
   Widget _displayPassword() {
 
     return Row(
@@ -322,7 +697,7 @@ class _UserPreferences extends State<UserPreferences> {
             ),
             Padding(padding: EdgeInsets.only(bottom: 5)),
             Text(
-              "******",
+              "*******",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w300
@@ -342,26 +717,53 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
-  // Widget _displayUserDiet() {
+  /*
+    Creates allergen display
+  */
+  Widget _displayAllergens() {
 
-  //   String currDiet;
-  //   if (userDiet == -1) {
-  //     currDiet = "No diet set";
-  //   } else {
-  //     currDiet = diets[userDiet - 1];
-  //   }
+    return Row(
+      children: <Widget>[
+          Icon(
+            Icons.block,
+            color: CookmateStyle.iconGrey,
+          ),
+          
+          Padding(padding: EdgeInsets.only(left: 30)),
+          
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "Allergens",
+                style: TextStyle(
+                  fontSize: 15
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(bottom: 2)),
+            ],
+          ),
+          
+          Spacer(),
+          Text(
+            "Tap to change",
+            style: TextStyle(
+              fontWeight: FontWeight.w200
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(right: 50)),
+        ],
+      );
+  }
 
-  //   return Padding(
-  //     padding: const EdgeInsets.all(20.0),
-  //     child: Text("Current Diet: " + currDiet),
-  //   );
-  // }
-
+  /* 
+    Display the user's Diet and open a dropdown to change diet. 
+  */
   Widget _displayDietList() {
 
     int dietKey = 0;
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(10.0),
       child: DropdownButton(
         hint: Row(
           children: <Widget> [
@@ -396,8 +798,10 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
+  /*
+    Creates Logout button
+  */
   Widget _buildLogoutBtn() {
-    
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: 120,
@@ -426,22 +830,42 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 
-  _clearLocal () {
-
-    LocalStorage.deleteAuthToken();
-    LocalStorage.deleteDiet();
-    LocalStorage.deleteUserID();
-    
-    database.clearShoppingList();
-    database.clearCalendars();
-    database.clearIngredients();
-    database.clearRecipes();
-    database.clearAllergens();
+  /*
+    Creates delete user button
+  */
+  Widget _buildDeleteUserBtn() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      width: 140,
+      child: RaisedButton(
+        elevation: 2,
+        onPressed: () {
+          _asyncDeleteUserInput(context);
+        },
+        padding: EdgeInsets.all(15.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        color: CookmateStyle.standardRed,
+        child: Text('DELETE USER',
+          style: TextStyle(
+            color: Colors.white,
+            letterSpacing: 1.5,
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+          )
+        ),
+      ),
+    );
   }
 
+  /*
+    Build the page
+  */
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      key: _scaffold,
       appBar: NavBar(title: "Settings", titleSize: 22, isUserPrefs: true),
       // MAIN BODY
       body: Column(
@@ -494,29 +918,74 @@ class _UserPreferences extends State<UserPreferences> {
                   },
                   child: _displayPassword()
                 ),
+                
+                OutlineButton(
+                  borderSide: BorderSide(
+                    width: 0.05,
+                  ),
+                  padding: EdgeInsets.all(20.0),
+                  onPressed: () {
+                    print("Change Allergens");
+                    _asyncAllergenDialog(context);
+                  },
+                  child: FutureBuilder(
+                    future: _allergenList,
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return Text("Loading Allergens");
+                        case ConnectionState.done:
+                          return _displayAllergens();
+                        default:
+                          return Text("Finding user preferences...");
+                      }
+                    }
+                  )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                ),
+                Column(
+                  children: <Widget>[
+                    Text("Current Allergens:"),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        displayAllergens.join(", "),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w300
+                        ),
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  ],
+                ),
+                
                 FutureBuilder(
                   future: _dietList,
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                         return Padding(
-                          padding: EdgeInsets.only(top: 20),
+                          padding: EdgeInsets.only(top: 10),
                           child: Center(child: Text("Loading Diet List")),
                         );
                       case ConnectionState.done:
                         return _displayDietList();
                       default:
                         return Padding(
-                          padding: EdgeInsets.only(top: 20),
+                          padding: EdgeInsets.only(top: 10),
                           child: Center(child: Text("Looking for your diet")),
                         );
                     }
                   }
                 ),
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    _buildLogoutBtn()
+                    _buildLogoutBtn(),
+                    _buildDeleteUserBtn()
                   ],
                 )
               ],
@@ -527,3 +996,4 @@ class _UserPreferences extends State<UserPreferences> {
     );
   }
 }
+
