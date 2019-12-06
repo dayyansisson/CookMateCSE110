@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /*
   File: cookbook.dart
-  Functionality: This file defines several classes and functions that are 
+  Functionality: This file defines several classes and functions that are
   used throughout the app.
 */
 
@@ -24,7 +24,7 @@ class Recipe {
   double calories;
   int popularity;
   Map<String, dynamic> _json;
-  
+
   Recipe.simple(this.apiID, this.title, this.imageURL);
   Recipe.simpleJSON(Map<String, dynamic> json) {
     apiID = json['api_id'];
@@ -71,7 +71,7 @@ class Recipe {
         else{
           units = 'tsp';
         }
-        
+
       }
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
@@ -259,6 +259,7 @@ class Meal {
   final int _id;
   final Recipe _recipe;
   final Date _date;
+  Meal(int id, Recipe recipe, Date date) : this._id  = id, this._recipe = recipe,this._date = date;
   Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
         _id = json['id'],
         _recipe = recipe,
