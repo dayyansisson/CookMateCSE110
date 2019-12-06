@@ -1,9 +1,3 @@
-/*
- * Author: Rayhan Kerawalla, Luis Jibaja
- * Description: this file is intend to implement search functionality
- *              for different types of ingredients and cuisines
- * Return: List of type recipe which contain information of different recipes
- */
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/database_helpers.dart' as DB;
@@ -32,8 +26,7 @@ class BackendRequest {
 
   final String _authToken;
   String _userID;
-  UserProfile _userProfile;
-  BackendRequest (String authToken, int userID, { UserProfile userProfile }) : _authToken = authToken, _userID = userID.toString(), _userProfile = userProfile;
+  BackendRequest (String authToken, int userID) : _authToken = authToken, _userID = userID.toString();
 
   /* Method: createUser
    * Arg(s):
@@ -338,8 +331,6 @@ class BackendRequest {
     print("User profile found, returning profile for $_userID");
     UserProfile profile = UserProfile.fromJSON(jsonDecode(response.body));
     print(profile.toString());
-
-    _userProfile = profile;
     return profile;
   }
 

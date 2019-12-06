@@ -92,7 +92,14 @@ class _HomePageState extends State<HomePage> {
                     case ConnectionState.done:
                       return _displayPopular();
                     default:
-                      return Text("error");
+                      return Center(
+                        child: Text(
+                          "Searching",
+                          style: TextStyle(
+                            color: CookmateStyle.iconGrey
+                          ),
+                        ),
+                      );
                   }
                 },
               ),
@@ -119,7 +126,17 @@ class _HomePageState extends State<HomePage> {
                     case ConnectionState.done:
                       return _displayFavorites();
                     default:
-                      return Text("error");
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 140),
+                          child: Text(
+                            "Searching",
+                            style: TextStyle(
+                              color: CookmateStyle.iconGrey
+                            ),
+                          ),
+                        ),
+                      );
                   }
                 },
               ),

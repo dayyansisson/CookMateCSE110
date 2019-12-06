@@ -18,6 +18,7 @@ import 'package:cookmate/util/localStorage.dart' as LS;
 
 // ignore: must_be_immutable
 class MyCalendar extends StatefulWidget {
+
   Recipe recipe;
   MyCalendar({Key key, this.recipe}): super(key: key);
   @override
@@ -84,9 +85,8 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isCalendar: true,),
-        body:
-        SingleChildScrollView(
+        appBar: NavBar(title: "Calendar", titleSize: 21, hasReturn: true, isCalendar: true,),
+        body: SingleChildScrollView(
           child:
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,13 +97,41 @@ class Calendar extends State<MyCalendar> {
                 initialSelectedDay: today,
                 startDay: start,
                 endDay: end,
+                daysOfWeekStyle: DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(
+                    fontSize: 15,
+                    color: CookmateStyle.textGrey,
+                    fontWeight: FontWeight.w300
+                  ),
+                  weekendStyle: TextStyle(
+                    fontSize: 15,
+                    color: CookmateStyle.textGrey,
+                    fontWeight: FontWeight.w200
+                  ),
+                ),
+
                 calendarStyle: CalendarStyle(
-                    selectedColor: Colors.redAccent
+                  selectedColor: Colors.redAccent,
+                  todayColor: Colors.red[100],
+                  weekdayStyle: TextStyle(
+                    color: CookmateStyle.textGrey
+                  ),
+                  weekendStyle: TextStyle(
+                    color: CookmateStyle.textGrey
+                  ),
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonShowsNext: false,
                   centerHeaderTitle: true,
                   formatButtonVisible: false,
+                  leftChevronIcon: Icon(Icons.chevron_left, color: CookmateStyle.iconGrey),
+                  rightChevronIcon: Icon(Icons.chevron_right, color: CookmateStyle.iconGrey),
+                  headerPadding: EdgeInsets.only(top: 10, bottom: 25),
+                  titleTextStyle: TextStyle(
+                    fontSize: 22,
+                    color: CookmateStyle.textGrey,
+                    fontWeight: FontWeight.w300
+                  ),
                 ),
                 onDaySelected: (date, events) {
                   setState(() {
@@ -120,17 +148,6 @@ class Calendar extends State<MyCalendar> {
                 },
               ),
               showTotalMeals(),
-              //showMeals(),
-              /*FloatingActionButton(
-                child: Icon(Icons.add),
-                backgroundColor: Colors.redAccent,
-                onPressed: (){
-                  Navigator.pop(context);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) =>
-                      new SearchPage()));
-                },
-              ),*/
             ],
           ),
         ));
@@ -152,7 +169,7 @@ class Calendar extends State<MyCalendar> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return CookmateStyle.loadingIcon("Getting meals ...");
+                      return Padding(padding: EdgeInsets.all(40), child: CookmateStyle.loadingIcon("Getting meals ..."));
                     case ConnectionState.done:
                       this.ml = snapshot.data;
                       if (ml.isNotEmpty) {
@@ -195,11 +212,32 @@ class Calendar extends State<MyCalendar> {
       children: <Widget>[
         Row(
           children: <Widget>[
-            Container(
-              height: 30,
-              margin: EdgeInsets.all(10),
-              child: Text("Total Meals: " +
-                  (dayML.isNotEmpty ? (dayML.length.toString()) : "0")),
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Container(
+                height: 30,
+                margin: EdgeInsets.all(20),
+                child: Row(
+                  children: <Widget> [ 
+                    Text(
+                      "Meals for the Day: ",
+                      style: TextStyle(
+                        color: CookmateStyle.textGrey,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400
+                      ),
+                    ),
+                    Text(
+                      dayML.isNotEmpty ? (dayML.length.toString()) : "0",
+                      style: TextStyle(
+                        color: CookmateStyle.textGrey,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w300
+                      ),
+                    ),
+                  ]
+                ),
+              ),
             ),
             Container(
               height: 30,
@@ -210,8 +248,11 @@ class Calendar extends State<MyCalendar> {
 
           ],
         ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Divider(),
+        ),
         Container(
-          //margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 5.00),
           height: 280,
           color: Colors.white,
           child: dayML.isNotEmpty
@@ -219,15 +260,26 @@ class Calendar extends State<MyCalendar> {
             itemCount: dayML.length,
             itemBuilder: (context, index) {
               return Container(
-                  padding: EdgeInsets.all(4.00),
-                  height: 250,
-                  width: 190,
-                  child: Column(
-                    children: <Widget>[
-                      FlatButton(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: dayML[index].recipe.image,
+                padding: EdgeInsets.all(4.00),
+                width: 266,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: FlatButton(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4.0,
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: dayML[index].recipe.image,
+                          ),
                         ),
                         onPressed: () {
                           Navigator.pop(context);
@@ -237,33 +289,51 @@ class Calendar extends State<MyCalendar> {
                           );
                         },
                       ),
-                      Text(dayML[index].recipe.title),
-                      FloatingActionButton(
-                        child: Wrap(
-                          children: <Widget>[
-                            Container(
-                              //margin: EdgeInsets.symmetric(vertical: 5.00, horizontal: 20.00),
-                              padding: EdgeInsets.all(4.0),
-                              child: Icon(Icons.remove, color: Colors.black,),
-                            )
-                          ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        dayML[index].recipe.title,
+                        style: TextStyle(
+                          color: CookmateStyle.textGrey,
+                          fontSize: 16
                         ),
-                        backgroundColor: Colors.white,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.zero,
+                      child: FlatButton(
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: CookmateStyle.standardRed
+                          ),
+                        ),
                         onPressed: () {
                           setState(() {
                             backendRequest.deleteMealFromCalendar(meal: dayML[index]);
                             ml.remove(dayML[index]);
                             dayML.removeAt(index);
                           });
-
                         },
                       ),
-                    ],
-                  ));
+                    )
+                  ],
+                )
+              );
             },
             scrollDirection: Axis.horizontal,
           )
               : Container(
+          ),
+        ),
+        Text(
+          "Scroll right for more meals >",
+          style: TextStyle(
+            fontSize: 14,
+            color: CookmateStyle.iconGrey,
+            fontWeight: FontWeight.w300
           ),
         )
       ],
