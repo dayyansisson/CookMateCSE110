@@ -55,7 +55,8 @@ class _SearchPageState extends State<SearchPage> {
 
   // Data containers
   var items = List<String>();
-  List<String> duplicateItems = new List<String>();
+  var selectedIngredients = List<String>();
+  List<String> copyOfIngredients = new List<String>();
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
   List<DropdownMenuItem<String>> dropDownCuisines = [];
@@ -72,8 +73,6 @@ class _SearchPageState extends State<SearchPage> {
   Future<List<CB.Recipe>> recipesResult;
 
 //**********Rayhan Code **********//
-  int _value = 2100;
-
 //********************************//
 
   @override
@@ -116,13 +115,13 @@ class _SearchPageState extends State<SearchPage> {
     if (ingredientQuery != null) ingredientQuery.clear();
     ingredientQuery = null;
     cuisineQuery = null;
-    maxCalories = _value;
   }
 
   _getCuisines() async {
     cuisinesList = request.getCuisineList();
     cuisinesList.then((currList){
       setState(() {
+        cuisines.add("None");
         for(int i  = 0; i < currList.length; i++){
           cuisines.add(currList[i].name);
         }
@@ -143,7 +142,7 @@ class _SearchPageState extends State<SearchPage> {
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     helper.ingredients().then((list) {
       for (int i = 0; i < list.length; i++) {
-        duplicateItems.add(list[i].name);
+        copyOfIngredients.add(list[i].name);
       }
     });
   }
@@ -173,13 +172,21 @@ class _SearchPageState extends State<SearchPage> {
   // Setters
   _setCuisine(String cuisine) {
     if (cuisine != null) cuisineQuery = cuisine;
+    if (cuisine == "None") cuisineQuery = null;
+    print(cuisineQuery);
     print(cuisine);
   }
 
   _addIngredientQuery(String ingredient) {
     print(ingredient);
+    bool same = false;
     if (ingredientQuery == null) ingredientQuery = new List<String>();
-    if (ingredient != null) {
+    for(int i = 0; i < ingredientQuery.length; i ++) {
+      if (ingredientQuery[i] == ingredient) {
+        same = true;
+      }
+    }
+    if (ingredient != null && same == false) {
       ingredientQuery.add(ingredient.toString());
       print(ingredientQuery);
     }
@@ -192,21 +199,21 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  void filterSearchResults(String query) {
-    List<String> dummySearchList = List<String>();
-    dummySearchList.addAll(duplicateItems);
+  void generateDropdown(String query) {
+    List<String> testList = List<String>();
+    testList.addAll(copyOfIngredients);
     int counter = 0;
     if (query.isNotEmpty) {
-      List<String> dummyListData = List<String>();
-      dummySearchList.forEach((item) {
+      List<String> dropdownData = List<String>();
+      testList.forEach((item) {
         if (item.contains(query) && counter < 10) {
-          dummyListData.add(item);
+          dropdownData.add(item);
           counter++;
         }
       });
       setState(() {
         items.clear();
-        items.addAll(dummyListData);
+        items.addAll(dropdownData);
       });
       return;
     } else {
@@ -259,7 +266,10 @@ class _SearchPageState extends State<SearchPage> {
 
   _getBCList() async {
     List<String> bcList = await scanButt.scanBarcodeNormal();
-    if (bcList != null) {
+    if(bcList.length == 100){
+
+    }
+    else if (bcList != null) {
       if (ingredientQuery == null) ingredientQuery = new List<String>();
       for (int i = 0; i < bcList.length; i++) {
         ingredientQuery.add(bcList[i]);
@@ -291,7 +301,9 @@ class _SearchPageState extends State<SearchPage> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 onChanged: (value) {
-                  filterSearchResults(value);
+                  setState(() {
+                    generateDropdown(value);
+                  });
                 },
                 controller: editingController,
                 decoration: InputDecoration(
@@ -299,11 +311,14 @@ class _SearchPageState extends State<SearchPage> {
                     hintText: "Search",
                     prefixIcon: Icon(Icons.search),
                     suffixIcon: IconButton(
-                        icon: Icon(Icons.camera),
+                        icon: Icon(Icons.camera_alt),
                         onPressed: () {
-                          _getBCList();
+                          setState(() {
+                            _getBCList();
+                          });
                         }),
                     border: OutlineInputBorder(
+                        borderSide: BorderSide(width: 0.5, color: CookmateStyle.iconGrey),
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
               ),
             ),
@@ -418,6 +433,9 @@ class _SearchPageState extends State<SearchPage> {
                           child: Icon(Icons.search, color: Colors.white, size: 30),
                           elevation: 1,
                           onPressed: () {
+                            setState(() {
+                              items.clear();
+                            });
                             editingController.clear();
                             _routeRecipePage(context);
                           },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /*
   File: cookbook.dart
-  Functionality: This file defines several classes and functions that are 
+  Functionality: This file defines several classes and functions that are
   used throughout the app.
 */
 
@@ -25,7 +25,12 @@ class Recipe {
   int popularity;
   Map<String, dynamic> _json;
 
-  Recipe(int id) : this.apiID = id, _complete = false;
+  Recipe.simple(this.apiID, this.title, this.imageURL);
+  Recipe.simpleJSON(Map<String, dynamic> json) {
+    apiID = json['api_id'];
+    title = json['name'];
+    imageURL = json['url'];
+  }
   Recipe.complete(Map<String, dynamic> json) : _json = json {
 
     apiID = json['id'];
@@ -58,14 +63,15 @@ class Recipe {
 
     for(int i =0; i < ingredientList.length; i++){
       String units = ingredientList[i]['unit'];
-      if(units == 'tablespoon' || units == 'teaspoon' || units == 'Tablespoon' || units == 'Teaspoon' || units == 'Tablespoons' || units == ' Teaspoons'){
-        if(units == 'tablespoon' || units == 'Tablespoon' || units == 'Tablespoons'){
+      units.toLowerCase();
+      if(units.contains('spoon') || units == ' teaspoons'){
+        if(units.contains('able')){
           units = 'tbsp';
         }
         else{
           units = 'tsp';
         }
-        
+
       }
       Ingredient ing = new Ingredient(ingredientList[i]['id'], ingredientList[i]['name'], ingredientList[i]['amount'], units);
       ingredients.add(ing);
@@ -130,7 +136,6 @@ class Ingredient {
     this.quantity = quantity;
     this.units = units;
   }
-
 
   Ingredient.fromJSON(Map<String, dynamic> json) : id = json['id'], name = json['name'];
 }
@@ -277,6 +282,7 @@ class Meal {
   final int _id;
   final Recipe _recipe;
   final Date _date;
+  Meal(int id, Recipe recipe, Date date) : this._id  = id, this._recipe = recipe,this._date = date;
   Meal.fromJSON(Recipe recipe, Map<String, dynamic> json) :
         _id = json['id'],
         _recipe = recipe,

@@ -38,8 +38,6 @@ dependencies:
   table_calendar: ^2.1.0
   email_validator: "0.1.4"
 
-
-
   provider:
 
 dev_dependencies:

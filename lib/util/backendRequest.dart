@@ -1,9 +1,3 @@
-/*
- * Author: Rayhan Kerawalla, Luis Jibaja
- * Description: this file is intend to implement search functionality
- *              for different types of ingredients and cuisines
- * Return: List of type recipe which contain information of different recipes
- */
 import 'dart:convert';
 import 'package:cookmate/cookbook.dart';
 import 'package:cookmate/util/database_helpers.dart' as DB;
@@ -12,9 +6,9 @@ import 'package:http/http.dart' as http;
 
 /*
   File: backendRequest.dart
-  Functionality: This is the one of Model classes for our app it handles 
-  all the communication between the frontend and our backend server. In 
-  this class are getter, post, and delete functions that make calls to 
+  Functionality: This is the one of Model classes for our app it handles
+  all the communication between the frontend and our backend server. In
+  this class are getter, post, and delete functions that make calls to
   our backend. To make a call we require a user ID and their respective
   authorization token which are both stored locally on the device.
 */
@@ -26,13 +20,13 @@ class BackendRequest {
   static const int _REDIRECT = 3;
   static const int _CLIENT = 4;
   static const int _SERVER = 5;
+  static const int _MAX_CALORIES = 10000;
 
   static const String _FAIL_LOGIN = "Unable to log in with provided credentials.";
 
   final String _authToken;
   String _userID;
-  UserProfile _userProfile;
-  BackendRequest (String authToken, int userID, { UserProfile userProfile }) : _authToken = authToken, _userID = userID.toString(), _userProfile = userProfile;
+  BackendRequest (String authToken, int userID) : _authToken = authToken, _userID = userID.toString();
 
   /* Method: createUser
    * Arg(s):
@@ -337,8 +331,6 @@ class BackendRequest {
     print("User profile found, returning profile for $_userID");
     UserProfile profile = UserProfile.fromJSON(jsonDecode(response.body));
     print(profile.toString());
-
-    _userProfile = profile;
     return profile;
   }
 
@@ -393,7 +385,7 @@ class BackendRequest {
     final response = await http.post(
         "https://thecookmate.com/auth/user-profile/add-favorite/",
         headers: { "Authorization":"Token $_authToken" },
-        body: { "user":_userID, "recipe":"${recipe.apiID}" }
+        body: { "user":"$_userID", "recipe":"${recipe.apiID}", "name":"${recipe.title}", "url":"${recipe.imageURL}" }
     );
 
     // Validate return
@@ -806,6 +798,7 @@ class BackendRequest {
     }
 
     int dietID = await LocalStorage.getDiet();
+    int maxCalories = _MAX_CALORIES;
     
     String allergenList;
     List<DB.LocalAllergen> allergens = await DB.DatabaseHelper.instance.allergens();
@@ -816,7 +809,8 @@ class BackendRequest {
       }
       allergenList = allergenList.substring(0, allergenList.length - 2);
     }
-    String diet = (await getDietList())[dietID].name;
+
+    String diet = (dietID < 0) ? 'None' : (await getDietList())[dietID].name;
 
     final body = {
       "cuisine":cuisine,
@@ -880,7 +874,7 @@ class BackendRequest {
    *    - success: List of recipes with data for popular recipes
    *    - failure: null
    */
-  Future<List<String>> getPopularRecipes () async {
+  Future<List<Recipe>> getPopularRecipes () async {
 
     print("Getting full list of popular recipes...");
 
@@ -899,19 +893,20 @@ class BackendRequest {
       return null;
     }
 
-    var data = jsonDecode(response.body);
-    List<String> recipes = List<String>();
+    // Parse JSON & build simple recipe list
+    List<dynamic> data = jsonDecode(response.body);
+    List<Recipe> popRecipes = List<Recipe>();
+    Recipe popRecipe;
     int count = 0;
-    for(var recipe in data) {
-      if(count == 10) {
-        break;
-      }
-      recipes.add(recipe['api_id'].toString());
+    for(int i = 0; i < data.length; i++)
+    {
+      if(count == 10) break;
+      popRecipe = Recipe.simpleJSON(data[i]);
+      popRecipes.add(popRecipe);
       count++;
     }
-
-    print("Returning ${recipes.length} recipes!");
-    return recipes;
+    print("Returning ${popRecipes.length} popular recipes!");
+    return popRecipes;
   }
 
   /* Method: addMealToCalendar
@@ -936,7 +931,9 @@ class BackendRequest {
         body: {
           "user":"$_userID",
           "recipe":recipe.apiID.toString(),
-          "date":"${date.getDate}"
+          "date":"${date.getDate}",
+          'name':recipe.title,
+          'url':recipe.imageURL
         }
     );
 
