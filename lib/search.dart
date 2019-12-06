@@ -397,7 +397,7 @@ class _SearchPageState extends State<SearchPage> {
                           showDialog(
                               context: context,
                               child: AlertDialog(
-                                title: Text("Selected Ingredients: "),
+                                title: Text("Selected Ingredients", textAlign: TextAlign.center),
                                 content: Text("$display", style: TextStyle(fontWeight: FontWeight.w300)),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
@@ -447,7 +447,7 @@ class _SearchPageState extends State<SearchPage> {
                             showDialog(
                                 context: context,
                                 child: AlertDialog(
-                                  title: Text("Ingredients"),
+                                  title: Text("Ingredients", textAlign: TextAlign.center),
                                   content: Text("$display", style: TextStyle(fontWeight: FontWeight.w300)),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
