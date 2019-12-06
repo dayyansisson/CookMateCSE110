@@ -185,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                               recipe.apiID.toString())))
                   .then((value) {
                 _updateFavorites();
+                _updatePopular();
               });
             },
             child: Container(
@@ -332,5 +333,14 @@ class _HomePageState extends State<HomePage> {
         _favoriteRecipes = list;
       }
     );
+  }
+
+  _updatePopular(){
+    _futurePopular = backend.getPopularRecipes();
+      _futurePopular.then((popular) {
+        setState(() {
+          _popularRecipes = popular;
+        });
+      });
   }
 }
