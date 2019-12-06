@@ -26,6 +26,7 @@ class BackendRequest {
   static const int _REDIRECT = 3;
   static const int _CLIENT = 4;
   static const int _SERVER = 5;
+  static const int _MAX_CALORIES = 10000;
 
   static const String _FAIL_LOGIN = "Unable to log in with provided credentials.";
 
@@ -767,6 +768,7 @@ class BackendRequest {
     }
 
     int dietID = await LocalStorage.getDiet();
+    int maxCalories = _MAX_CALORIES;
     
     String allergenList;
     List<DB.Allergen> allergens = await DB.DatabaseHelper.instance.allergens();

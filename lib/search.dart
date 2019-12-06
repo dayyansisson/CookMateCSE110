@@ -309,7 +309,7 @@ class _SearchPageState extends State<SearchPage> {
                     hintText: "Search",
                     prefixIcon: Icon(Icons.search),
                     suffixIcon: IconButton(
-                        icon: Icon(Icons.camera),
+                        icon: Icon(Icons.camera_alt),
                         onPressed: () {
                           _getBCList();
                         }),
