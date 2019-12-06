@@ -12,9 +12,9 @@ import 'package:http/http.dart' as http;
 
 /*
   File: backendRequest.dart
-  Functionality: This is the one of Model classes for our app it handles 
-  all the communication between the frontend and our backend server. In 
-  this class are getter, post, and delete functions that make calls to 
+  Functionality: This is the one of Model classes for our app it handles
+  all the communication between the frontend and our backend server. In
+  this class are getter, post, and delete functions that make calls to
   our backend. To make a call we require a user ID and their respective
   authorization token which are both stored locally on the device.
 */
@@ -779,7 +779,7 @@ class BackendRequest {
       }
       allergenList = allergenList.substring(0, allergenList.length - 2);
     }
-    
+
     String diet = (dietID < 0) ? 'None' : (await getDietList())[dietID].name;
 
     final body = {
@@ -903,7 +903,7 @@ class BackendRequest {
           "recipe":recipe.apiID.toString(),
           "date":"${date.getDate}",
           'name':recipe.title,
-          'url':recipe.imageURL 
+          'url':recipe.imageURL
         }
     );
 

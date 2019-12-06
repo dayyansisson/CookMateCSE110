@@ -28,14 +28,10 @@ class MyCalendar extends StatefulWidget {
 class Calendar extends State<MyCalendar> {
   CalendarController _controller;
   BackendRequest backendRequest;
-  BackendRequest request;
   Future <List<Meal>> mealFuture;
-  Future<Meal> mealListFuture;
-  Future<bool> deleteFuture;
   List<Meal> ml;
   List<Meal> todayMeals;
   List<Meal> dayML;
-  //bool isDateSet;
   Date st;
   Date en;
   Meal meal;
@@ -48,24 +44,23 @@ class Calendar extends State<MyCalendar> {
   DateTime end;
   String message = "Select a day";
   Recipe addRecipe;
-  _getUserInfo() async {
+  bool firstTime;
+  Future<bool>_getUserInfo() async {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();
     backendRequest= BackendRequest(token, userID);
-    this.ml = await backendRequest.getMeals();
-  }
-  _getMealsFromCalendar() async {
-      this.ml = await backendRequest.getMeals();
-
+    if (backendRequest == null) {
+      return false;
+    }
+    else {
+      return true;
+    }
   }
   Calendar(Recipe recipe) {
     if (recipe != null){
       this.addRecipe = recipe;
     }
-    _getUserInfo();
-    //_getMealsFromCalendar();
-    this.request =
-    new BackendRequest("e27dc27ab455de7a3afa076e09e0eacff2b8eefb", 6);
+    //firstTime = false;
     this.today = new DateTime.now();
     this.start = today.subtract(new Duration(days: 7));
     this.end = today.add(new Duration(days: 14));
@@ -73,14 +68,14 @@ class Calendar extends State<MyCalendar> {
     this.en = new Date(end.year, end.month, end.day);
     this.dayML = [];
     this.ml = [];
-
+    this.todayMeals = [];
   }
   @override
   void initState() {
     super.initState();
-    /*request.getMeals(startDate: st, endDate: en).then((list) {
-      ml = list;
-    });*/
+    this.firstTime = true;
+    selectedDay = new Date(today.year, today.month, today.day);
+    selectedDayString = "${today.year}-${today.month}-${today.day}";
     _controller = CalendarController();
   }
 
@@ -89,7 +84,7 @@ class Calendar extends State<MyCalendar> {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isCalendar: true),
+        appBar: NavBar(title: "Calendar", titleSize: 16, hasReturn: true, isCalendar: true,),
         body:
         SingleChildScrollView(
           child:
@@ -98,16 +93,12 @@ class Calendar extends State<MyCalendar> {
             children: <Widget>[
               TableCalendar(
                 calendarController: _controller,
-                initialCalendarFormat: CalendarFormat.week,
+                initialCalendarFormat: CalendarFormat.twoWeeks,
                 initialSelectedDay: today,
                 startDay: start,
                 endDay: end,
                 calendarStyle: CalendarStyle(
-                  //todayColor: Colors.green,
                     selectedColor: Colors.redAccent
-                ),
-                daysOfWeekStyle: DaysOfWeekStyle(
-
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonShowsNext: false,
@@ -115,186 +106,22 @@ class Calendar extends State<MyCalendar> {
                   formatButtonVisible: false,
                 ),
                 onDaySelected: (date, events) {
-                  if (addRecipe != null){
-                    backendRequest.addMealToCalendar(addRecipe, new Date(date.year, date.month, date.day)).then((meal){
-                      backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-                        setState(() {
-                          ml.clear();
-                          ml = list;
-                          this.dayML.clear();
-                          selectedDayString =
-                          "${date.year}-${date.month}-${date.day}";
-                          for (Meal meal in ml) {
-                            if (meal.date.getDate.compareTo(selectedDayString) == 0) {
-                              this.dayML.add(meal);
-                            }
-                          }
-                          addRecipe = null;
-                        });
-                      });
-                    });
-                  }
-                  else {
-                    setState(() {
-                      this.dayML.clear();
-                      selectedDayString =
-                      "${date.year}-${date.month}-${date.day}";
-                      for (Meal meal in ml) {
-                        if (meal.date.getDate.compareTo(selectedDayString) == 0) {
-                          this.dayML.add(meal);
-                        }
-                      }
-                    });
-                  }
-                },
-              ),
-
-              /*FutureBuilder(
-                future: mealFuture,
-                builder: (futureContext, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting: // this handles waiting for the async call
-                      return CookmateStyle.loadingIcon("Loading recipe...");
-                    case ConnectionState.done:
-                    default:
-                      return Text("error");
-                  }
-                },
-              ),*/
-              Row(
-                children: <Widget>[
-                  Container(
-                    height: 30,
-                    margin: EdgeInsets.all(10),
-                    child: Text("Total Meals: " + (dayML.isNotEmpty ? (dayML.length.toString()) : "0")),
-                  ),
-                  Container(
-                    height: 30,
-                    margin: EdgeInsets.all(10),
-                    child: (addRecipe != null) ? Text(message, style: TextStyle(fontSize: 14),): Text(""),
-                    //child: (addRecipe != null) ? showDialog(context: context, child :new AlertDialog(content: Text(message),)) : Text("")
-                  ),
-                ],
-              ),
-
-              Container(
-                //margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 5.00),
-                height: 280,
-                color: Colors.white,
-                child: dayML.isNotEmpty
-                    ? ListView.builder(
-                  itemCount: dayML.length,
-                  itemBuilder: (context, index) {
-                    print("In List view");
-                    print(dayML[0].date.getDate);
-                    print(dayML[index].recipe.imageURL);
-                    print(dayML[index].recipe.title);
-                    return Container(
-                        padding: EdgeInsets.all(4.00),
-                        height: 240,
-                        width: 182,
-                        child: Column(
-                          children: <Widget>[
-                            //Image.network(dayML[index].recipe.imageURL),
-                            FlatButton(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: dayML[index].recipe.image,
-                                /*child: Image.network(
-                                            dayML[index].recipe.imageURL,
-                                            width: 160
-                                        )*/
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => RecipeDisplay("${dayML[index].recipe.apiID}"))
-                                );
-                              },
-                            ),
-                            //dayML[index].recipe.image,
-                            Text(dayML[index].recipe.title),
-                            /*ListTile(
-                                    trailing: Icon(Icons.remove_circle),
-                                    onTap: (){
-                                      backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
-                                        print("deleted");
-                                        setState(() {
-                                          ml.remove(dayML[index]);
-                                          dayML.removeAt(index);
-                                        });
-                                      });
-                                    },
-                                  ),*/
-                            FloatingActionButton(
-                              child: Wrap(
-                                children: <Widget>[
-                                  Container(
-                                    //margin: EdgeInsets.symmetric(vertical: 5.00, horizontal: 20.00),
-                                    padding: EdgeInsets.all(4.0),
-                                    child: Icon(Icons.remove),
-                                  )
-                                  //,
-                                ],
-
-                              ),
-                              backgroundColor: Colors.redAccent,
-                              onPressed: () {
-                                backendRequest.deleteMealFromCalendar(meal: dayML[index]).then((deleted){
-                                  print("deleted");
-                                  setState(() {
-                                    ml.remove(dayML[index]);
-                                    dayML.removeAt(index);
-                                  });
-                                });
-                              },
-                            ),
-                          ],
-                        ));
-                  },
-                  scrollDirection: Axis.horizontal,
-                )
-                    : Container(
-                ),
-              ),
-              /*ListTile(
-                title: Text("Add Meals"),
-                onTap: () {
-                  Recipe recipe1 = new Recipe(716429);
-                  recipe1.title = "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs";
-                  recipe1.imageURL = "https://spoonacular.com/recipeImages/716429-312x231.jpg";
-                  Recipe recipe2 = new Recipe(73420);
-                  recipe2.title = "Apple Or Peach Strudel";
-                  recipe2.imageURL = "https://spoonacular.com/recipeImages/73420-312x231.jpg";
-                  DateTime dt1 = start.add(new Duration(days: 1));
-                  DateTime dt2 = start.add(new Duration(days: 2));
-                  DateTime dt3 = start.add(new Duration(days: 3));
-                  Date d1 = new Date(dt1.year, dt1.month, dt1.day);
-                  Date d2 = new Date(dt2.year, dt2.month, dt2.day);
-                  Date d3 = new Date(today.year, today.month, today.day);
-                  backendRequest.addMealToCalendar(recipe1, d1).then((meal){
-                    backendRequest.addMealToCalendar(recipe2, d2).then((meal){
-                      backendRequest.addMealToCalendar(recipe2, d3).then((meal){
-                        setState(() {
-                          ml.add(new Meal(recipe1.apiID, recipe1, d1));
-                          ml.add(new Meal(recipe2.apiID, recipe2, d2));
-                          ml.add(new Meal(recipe2.apiID, recipe2, d3));
-                          backendRequest.getMeals(startDate: st, endDate: en).then((list) {
-                            ml.clear();
-                            dayML.clear();
-                            for (int i = 0; i < list.length; i++) {
-                              Meal m = new Meal(list[i].id, list[i].recipe, list[i].date);
-                              ml.add(m);
-                            }
-                          });
-                        });
-                      });
-                    });
+                  setState(() {
+                    selectedDay = new Date(date.year, date.month, date.day);
+                    if (addRecipe != null){
+                      backendRequest.addMealToCalendar(addRecipe, selectedDay);
+                      ml.add(new Meal(99, addRecipe, selectedDay));
+                      addRecipe = null;
+                    }
+                    this.firstTime = false;
+                    this.selectedDayString =
+                    "${date.year}-${date.month}-${date.day}";
                   });
                 },
-              ),*/
-              FloatingActionButton(
+              ),
+              showTotalMeals(),
+              //showMeals(),
+              /*FloatingActionButton(
                 child: Icon(Icons.add),
                 backgroundColor: Colors.redAccent,
                 onPressed: (){
@@ -303,12 +130,145 @@ class Calendar extends State<MyCalendar> {
                       MaterialPageRoute(builder: (context) =>
                       new SearchPage()));
                 },
-              ),
-              /*Container(
-                child: (widget.recipe != null) ? widget.recipe.image : Text("No Image"),
-              )*/
+              ),*/
             ],
           ),
         ));
   }
+
+  Widget showTotalMeals() {
+    print(selectedDayString);
+    if (firstTime) {
+      return FutureBuilder(
+        future: _getUserInfo(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return CookmateStyle.loadingIcon("Checking user ...");
+            case ConnectionState.done:
+              return FutureBuilder(
+                future: this.backendRequest.getMeals(
+                    startDate: st, endDate: en),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return CookmateStyle.loadingIcon("Getting meals ...");
+                    case ConnectionState.done:
+                      this.ml = snapshot.data;
+                      if (ml.isNotEmpty) {
+                        print("MEAL LIST SIZE: " + ml.length.toString());
+                      }
+                      this.todayString =
+                      "${today.year}-${today.month}-${today.day}";
+                      for (Meal meal in this.ml){
+                        if (meal.date.getDate.compareTo(todayString) == 0) {
+                          this.todayMeals.add(meal);
+                        }
+                      }
+                      if (this.todayMeals.isNotEmpty) {
+                        print("TODAY LIST SIZE: " + todayMeals.length.toString());
+                      }
+                      return showAll();
+                    default:
+                      return Text("error");
+                  }
+                },
+              );
+            default:
+              return Text("error");
+          }
+        },
+      );
+    }
+    else {
+      return showAll();
+    }
+  }
+  Widget showAll(){
+    dayML.clear();
+    for (Meal meal in ml) {
+      if (meal.date.getDate.compareTo(selectedDayString) == 0) {
+        dayML.add(meal);
+      }
+    }
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Container(
+              height: 30,
+              margin: EdgeInsets.all(10),
+              child: Text("Total Meals: " +
+                  (dayML.isNotEmpty ? (dayML.length.toString()) : "0")),
+            ),
+            Container(
+              height: 30,
+              margin: EdgeInsets.all(10),
+              child: (addRecipe != null) ? Text(
+                message, style: TextStyle(fontSize: 14),) : Text(""),
+            ),
+
+          ],
+        ),
+        Container(
+          //margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 5.00),
+          height: 280,
+          color: Colors.white,
+          child: dayML.isNotEmpty
+              ? ListView.builder(
+            itemCount: dayML.length,
+            itemBuilder: (context, index) {
+              return Container(
+                  padding: EdgeInsets.all(4.00),
+                  height: 250,
+                  width: 190,
+                  child: Column(
+                    children: <Widget>[
+                      FlatButton(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: dayML[index].recipe.image,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => RecipeDisplay("${dayML[index].recipe.apiID}"))
+                          );
+                        },
+                      ),
+                      Text(dayML[index].recipe.title),
+                      FloatingActionButton(
+                        child: Wrap(
+                          children: <Widget>[
+                            Container(
+                              //margin: EdgeInsets.symmetric(vertical: 5.00, horizontal: 20.00),
+                              padding: EdgeInsets.all(4.0),
+                              child: Icon(Icons.remove, color: Colors.black,),
+                            )
+                          ],
+                        ),
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          setState(() {
+                            backendRequest.deleteMealFromCalendar(meal: dayML[index]);
+                            ml.remove(dayML[index]);
+                            dayML.removeAt(index);
+                          });
+
+                        },
+                      ),
+                    ],
+                  ));
+            },
+            scrollDirection: Axis.horizontal,
+          )
+              : Container(
+          ),
+        )
+      ],
+    );
+  }
 }
+
+
