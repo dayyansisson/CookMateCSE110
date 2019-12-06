@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     if(profile.allergens != null) {
       database.clearAllergens();
       for(Map<String, dynamic> allergen in profile.allergens) {
-        database.insertAllergen(DB.Allergen(id: allergen['id'], name: allergen['name']));
+        database.insertAllergen(DB.LocalAllergen(id: allergen['id'], name: allergen['name']));
         print("Loaded allergen ${allergen['id']}");
       }
     }
