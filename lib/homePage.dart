@@ -127,8 +127,8 @@ class _HomePageState extends State<HomePage> {
                       return _displayFavorites();
                     default:
                       return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 140),
+                        child: SizedBox(
+                          height: 100,
                           child: Text(
                             "Searching",
                             style: TextStyle(

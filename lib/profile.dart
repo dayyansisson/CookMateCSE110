@@ -385,7 +385,8 @@ class _UserPreferences extends State<UserPreferences> {
             borderRadius: BorderRadius.circular(20),
           ),
           content: MultiSelectChip(
-            allAllergens, 
+            allAllergens,
+            localAllergens,
             onSelectionChanged: (selectedList) {
               setState(() {
                 selectedAllergens = selectedList;
@@ -408,12 +409,6 @@ class _UserPreferences extends State<UserPreferences> {
                 });
 
                 Navigator.of(context).pop();
-                /*
-                Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => UserPreferences()),
-                    );
-                */
               },
             ),
             FlatButton(
@@ -587,8 +582,17 @@ class _UserPreferences extends State<UserPreferences> {
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text("CAUTION - This will delete all your user data."),
-                Text("Enter your password to continue:"),
+                Text(
+                  "WARNING - This will delete all your user data.", 
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: CookmateStyle.standardRed
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 8),
+                  child: Text("Enter your password to continue:", textAlign: TextAlign.center),
+                ),
                 new Expanded(
                   child: new TextField(
                   autofocus: true,
@@ -763,7 +767,7 @@ class _UserPreferences extends State<UserPreferences> {
 
     int dietKey = 0;
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(15),
       child: DropdownButton(
         hint: Row(
           children: <Widget> [
@@ -943,11 +947,11 @@ class _UserPreferences extends State<UserPreferences> {
                   )
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(top: 20),
                 ),
                 Column(
                   children: <Widget>[
-                    Text("Current Allergens:"),
+                    Text("Current Allergens"),
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: Text(

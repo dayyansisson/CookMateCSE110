@@ -1,14 +1,18 @@
+import 'package:cookmate/util/cookmateStyle.dart';
 import 'package:flutter/material.dart';
 
 /// We followed this tutorial to create the dialog for selecting allergens
 /// https://medium.com/@KarthikPonnam/flutter-multi-select-choicechip-244ea016b6fa
 
 class MultiSelectChip extends StatefulWidget {
+
   final List<String> allAllergens;
+  final List<String> currentAllergens;
   final Function(List<String>) onSelectionChanged;
   MultiSelectChip(
       this.allAllergens,
-      {this.onSelectionChanged} 
+      this.currentAllergens,
+      {this.onSelectionChanged}
       );
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
@@ -16,7 +20,14 @@ class MultiSelectChip extends StatefulWidget {
 
 class _MultiSelectChipState extends State<MultiSelectChip> {
 
-  List<String> selectedAllergens = List();
+  List<String> selectedAllergens;
+
+  initState() {
+
+    selectedAllergens = widget.currentAllergens;
+    super.initState();
+  }
+
   _buildChoiceList() {
     List<Widget> choices = List();
     widget.allAllergens.forEach((item) {

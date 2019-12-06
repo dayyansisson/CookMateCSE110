@@ -240,6 +240,40 @@ class _SearchPageState extends State<SearchPage> {
     return display;
   }
 
+  Widget itemList () {
+
+    return Container(
+      height: 60,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: ingredientQuery == null ? 0 : ingredientQuery.length,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 6.0, right: 4.0),
+            child: RawChip(
+              selected: true,
+              selectedColor: Color.fromRGBO(255, 0, 0, 0.4),
+              showCheckmark: false,
+              onPressed: () {
+                setState(() {
+                  ingredientQuery.removeAt(index);
+                });
+              },
+              label: Text(
+                ingredientQuery[index],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget cuisineButton() {
 
     return Padding(
@@ -356,13 +390,15 @@ class _SearchPageState extends State<SearchPage> {
                           color: Colors.redAccent,
                         ),
                         onTap: () {
-                          _addIngredientQuery('${items[index]}');
+                          setState(() {
+                            _addIngredientQuery('${items[index]}');
+                          });
                           String display = displayIngredients(ingredientQuery);
                           showDialog(
                               context: context,
                               child: AlertDialog(
                                 title: Text("Selected Ingredients: "),
-                                content: Text("$display"),
+                                content: Text("$display", style: TextStyle(fontWeight: FontWeight.w300)),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -377,9 +413,19 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
-            new Divider(
-              color: Colors.grey,
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Swipe right for more ingredients >",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: CookmateStyle.iconGrey,
+                  fontWeight: FontWeight.w300
+                ),
+              ),
             ),
+            itemList(),
             new Container(
               margin: new EdgeInsets.all(20.0),
               child: new Row(
@@ -402,7 +448,7 @@ class _SearchPageState extends State<SearchPage> {
                                 context: context,
                                 child: AlertDialog(
                                   title: Text("Ingredients"),
-                                  content: Text("$display"),
+                                  content: Text("$display", style: TextStyle(fontWeight: FontWeight.w300)),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -413,7 +459,7 @@ class _SearchPageState extends State<SearchPage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "Ingredients",
+                          "Full List",
                           style: TextStyle(
                             fontSize: 15,
                             color: CookmateStyle.textGrey

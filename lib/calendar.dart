@@ -46,6 +46,7 @@ class Calendar extends State<MyCalendar> {
   String message = "Select a day";
   Recipe addRecipe;
   bool firstTime;
+
   Future<bool>_getUserInfo() async {
     int userID = await LS.LocalStorage.getUserID();
     String token = await LS.LocalStorage.getAuthToken();
@@ -134,23 +135,26 @@ class Calendar extends State<MyCalendar> {
                   ),
                 ),
                 onDaySelected: (date, events) {
-                  setState(() {
-                    selectedDay = new Date(date.year, date.month, date.day);
-                    if (addRecipe != null){
-                      backendRequest.addMealToCalendar(addRecipe, selectedDay);
-                      ml.add(new Meal(99, addRecipe, selectedDay));
-                      addRecipe = null;
-                    }
-                    this.firstTime = false;
-                    this.selectedDayString =
-                    "${date.year}-${date.month}-${date.day}";
-                  });
+                  if(mealFuture == null) {
+                    setState(() {
+                      selectedDay = new Date(date.year, date.month, date.day);
+                      if (addRecipe != null){
+                        backendRequest.addMealToCalendar(addRecipe, selectedDay);
+                        ml.add(new Meal(99, addRecipe, selectedDay));
+                        addRecipe = null;
+                      }
+                      this.firstTime = false;
+                      this.selectedDayString =
+                      "${date.year}-${date.month}-${date.day}";
+                    });
+                  }
                 },
               ),
               showTotalMeals(),
             ],
           ),
-        ));
+        )
+      );
   }
 
   Widget showTotalMeals() {
@@ -163,14 +167,16 @@ class Calendar extends State<MyCalendar> {
             case ConnectionState.waiting:
               return CookmateStyle.loadingIcon("Checking user ...");
             case ConnectionState.done:
+              mealFuture = this.backendRequest.getMeals(
+                    startDate: st, endDate: en);
               return FutureBuilder(
-                future: this.backendRequest.getMeals(
-                    startDate: st, endDate: en),
+                future: mealFuture,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Padding(padding: EdgeInsets.all(40), child: CookmateStyle.loadingIcon("Getting meals ..."));
                     case ConnectionState.done:
+                      mealFuture = null;
                       this.ml = snapshot.data;
                       if (ml.isNotEmpty) {
                         print("MEAL LIST SIZE: " + ml.length.toString());
@@ -201,6 +207,7 @@ class Calendar extends State<MyCalendar> {
       return showAll();
     }
   }
+  
   Widget showAll(){
     dayML.clear();
     for (Meal meal in ml) {
@@ -258,10 +265,10 @@ class Calendar extends State<MyCalendar> {
           child: dayML.isNotEmpty
               ? ListView.builder(
             itemCount: dayML.length,
+            padding: EdgeInsets.all(5),
             itemBuilder: (context, index) {
               return Container(
-                padding: EdgeInsets.all(4.00),
-                width: 266,
+                width: 240,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -294,6 +301,7 @@ class Calendar extends State<MyCalendar> {
                       padding: EdgeInsets.only(top: 20.0),
                       child: Text(
                         dayML[index].recipe.title,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: CookmateStyle.textGrey,
                           fontSize: 16
