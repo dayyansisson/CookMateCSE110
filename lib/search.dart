@@ -361,7 +361,7 @@ class _SearchPageState extends State<SearchPage> {
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: CircularProgressIndicator(strokeWidth: 2),
                     );
                   }
@@ -427,7 +427,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             itemList(),
             new Container(
-              margin: new EdgeInsets.all(20.0),
+              margin: new EdgeInsets.all(5.0),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
@@ -457,7 +457,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(3.0),
                         child: Text(
                           "Full List",
                           style: TextStyle(
@@ -488,7 +488,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(3.0),
                         child: Text(
                           "Search",
                           style: TextStyle(
