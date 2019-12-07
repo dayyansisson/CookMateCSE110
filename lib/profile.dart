@@ -400,6 +400,7 @@ class _UserPreferences extends State<UserPreferences> {
                   localAllergens = selectedAllergens;
                   if (selectedAllergens==null){
                     displayAllergens = ["None"];
+                    localAllergens = ["None"];
                   }
                   else{
                     displayAllergens = selectedAllergens;
@@ -475,13 +476,15 @@ class _UserPreferences extends State<UserPreferences> {
                 )),
                 new Expanded(
                   child: new TextFormField(
-                  autofocus: true,
-                  obscureText: true,
-                  decoration: new InputDecoration(hintText: 'Confirm New Password'),
-                  onChanged: (value) {
-                    newPasswordConfirm = value;
-                  },
-                )),
+                    autofocus: true,
+                    obscureText: true,
+                    decoration: new InputDecoration(
+                      hintText: 'Confirm New Password',
+                    ),
+                    onChanged: (value) {
+                      newPasswordConfirm = value;
+                  },)
+                ),
               ],
             ),
           ),
@@ -613,13 +616,31 @@ class _UserPreferences extends State<UserPreferences> {
             FlatButton(
               child: Text('Delete User'),
               onPressed: () {
-                _deleteUser(currentPassword).then((value) {
-                  if (value) {
+                _deleteUser(currentPassword).then((success) {
+                  if (success) {
                     print("Success deleting user");
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                   }
+                  else {
+                    Flushbar(
+                        flushbarPosition: FlushbarPosition.TOP,
+                        flushbarStyle: FlushbarStyle.FLOATING,
+                        duration:  Duration(seconds: 3),
+                        borderWidth: 40,
+                        messageText: Text(
+                          "Unable to delete user, please enter the correct password.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red[800],
+                      )..show(_scaffold.currentContext);
+                  }
+                  print("Failed to delete user");
                 });
-                Navigator.popUntil(context, ModalRoute.withName('/'));
-                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
               },
             ),
             FlatButton(
