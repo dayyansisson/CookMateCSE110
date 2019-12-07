@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 /// https://medium.com/@KarthikPonnam/flutter-multi-select-choicechip-244ea016b6fa
 
 class MultiSelectChip extends StatefulWidget {
+  
   final List<String> allAllergens;
   final Function(List<String>) onSelectionChanged;
   MultiSelectChip(

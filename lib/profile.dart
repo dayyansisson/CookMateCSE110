@@ -74,13 +74,7 @@ class _UserPreferences extends State<UserPreferences> {
     _getAllergens();
 
     // Fetch locally stores user's allergens
-    _getLocalAllergens().then(
-      () {
-        setState(() {
-          displayAllergens = localAllergens;
-        });
-      }
-    );
+    _getLocalAllergens();
   }
 
   /*
@@ -111,7 +105,6 @@ class _UserPreferences extends State<UserPreferences> {
               currList[i].name +
               " id: " +
               currList[i].id.toString());
-          //diets[currList[i].id] = currList[i].name;
           diets.add(currList[i].name);
         }
       });
@@ -133,7 +126,7 @@ class _UserPreferences extends State<UserPreferences> {
               currList[i].id.toString());
           allAllergens.add(currList[i].name);
         }
-        
+        displayAllergens = localAllergens;
       });
     });
   }
@@ -384,7 +377,7 @@ class _UserPreferences extends State<UserPreferences> {
             borderRadius: BorderRadius.circular(20),
           ),
           content: MultiSelectChip(
-            allAllergens, 
+            allAllergens,
             onSelectionChanged: (selectedList) {
               setState(() {
                 selectedAllergens = selectedList;
@@ -395,7 +388,6 @@ class _UserPreferences extends State<UserPreferences> {
               child: Text('Update'),
               onPressed: () {
                 _updateUserAllergens(selectedAllergens);
-
                 setState(() {
                   localAllergens = selectedAllergens;
                   if (selectedAllergens==null){
@@ -864,7 +856,6 @@ class _UserPreferences extends State<UserPreferences> {
   */
   Widget _buildDeleteUserBtn() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.0),
       width: 140,
       child: RaisedButton(
         elevation: 2,
@@ -875,7 +866,7 @@ class _UserPreferences extends State<UserPreferences> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        color: CookmateStyle.standardRed,
+        color: CookmateStyle.iconGrey,
         child: Text('DELETE USER',
           style: TextStyle(
             color: Colors.white,

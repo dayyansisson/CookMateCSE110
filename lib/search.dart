@@ -56,7 +56,7 @@ class _SearchPageState extends State<SearchPage> {
   // Data containers
   var items = List<String>();
   var selectedIngredients = List<String>();
-  List<String> copyOfIngredients = new List<String>();
+  List<String> copyOfIngredients = List<String>();
   List<String> diets = new List<String>();
   List<String> cuisines = new List<String>();
   List<DropdownMenuItem<String>> dropDownCuisines = [];
@@ -141,9 +141,11 @@ class _SearchPageState extends State<SearchPage> {
   _getIngredients() async {
     DB.DatabaseHelper helper = DB.DatabaseHelper.instance;
     helper.ingredients().then((list) {
-      for (int i = 0; i < list.length; i++) {
-        copyOfIngredients.add(list[i].name);
-      }
+      setState(() {
+        for (int i = 0; i < list.length; i++) {
+          copyOfIngredients.add(list[i].name);
+        }
+      });
     });
   }
 
@@ -333,7 +335,7 @@ class _SearchPageState extends State<SearchPage> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
+              child: copyOfIngredients.length > 0 ? TextField(
                 onChanged: (value) {
                   setState(() {
                     generateDropdown(value);
@@ -354,7 +356,7 @@ class _SearchPageState extends State<SearchPage> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(width: 0.5, color: CookmateStyle.iconGrey),
                         borderRadius: BorderRadius.all(Radius.circular(20.0)))),
-              ),
+              ) : CircularProgressIndicator(strokeWidth: 1),
             ),
             FutureBuilder(
                 future: cuisinesList,
@@ -417,7 +419,7 @@ class _SearchPageState extends State<SearchPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Swipe right for more ingredients >",
+                ingredientQuery != null && ingredientQuery.isNotEmpty && ingredientQuery.length > 3 ? "Swipe right for more ingredients >" : "Tap to remove",
                 style: TextStyle(
                   fontSize: 14,
                   color: CookmateStyle.iconGrey,
