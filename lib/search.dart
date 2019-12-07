@@ -245,7 +245,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget itemList () {
 
     return Container(
-      height: 60,
+      height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: ingredientQuery == null ? 0 : ingredientQuery.length,

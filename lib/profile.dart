@@ -365,7 +365,8 @@ class _UserPreferences extends State<UserPreferences> {
   */
   Future<String> _asyncAllergenDialog(BuildContext context) async{
 
-    List<String> selectedAllergens;
+    List<String> selectedAllergens = List();
+    selectedAllergens.addAll(localAllergens);
     return showDialog<String>(
       context: context,
       barrierDismissible:
@@ -378,6 +379,7 @@ class _UserPreferences extends State<UserPreferences> {
           ),
           content: MultiSelectChip(
             allAllergens,
+            selectedAllergens,
             onSelectionChanged: (selectedList) {
               setState(() {
                 selectedAllergens = selectedList;
