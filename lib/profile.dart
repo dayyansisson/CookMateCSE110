@@ -857,25 +857,28 @@ class _UserPreferences extends State<UserPreferences> {
     Creates delete user button
   */
   Widget _buildDeleteUserBtn() {
-    return Container(
-      width: 140,
-      child: RaisedButton(
-        elevation: 2,
-        onPressed: () {
-          _asyncDeleteUserInput(context);
-        },
-        padding: EdgeInsets.all(15.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        color: CookmateStyle.iconGrey,
-        child: Text('DELETE USER',
-          style: TextStyle(
-            color: Colors.white,
-            letterSpacing: 1.5,
-            fontSize: 14.0,
-            fontWeight: FontWeight.bold,
-          )
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        width: 140,
+        child: RaisedButton(
+          elevation: 2,
+          onPressed: () {
+            _asyncDeleteUserInput(context);
+          },
+          padding: EdgeInsets.all(15.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          color: CookmateStyle.iconGrey,
+          child: Text('DELETE USER',
+            style: TextStyle(
+              color: Colors.white,
+              letterSpacing: 1.5,
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
+            )
+          ),
         ),
       ),
     );
