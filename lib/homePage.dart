@@ -63,7 +63,14 @@ class _HomePageState extends State<HomePage> {
       allowFontScaling: true,
     )..init(context);
 
-    return Scaffold(
+  return WillPopScope(//forbidden swipe in iOS(my ThemeData(platform: TargetPlatform.iOS,)
+    onWillPop: () async {
+      if (Navigator.of(context).userGestureInProgress)
+        return false;
+      else
+        return true;
+      },
+      child: Scaffold(
       appBar: NavBar(title: "Home", hasReturn: false, isHome: true),
       body: SingleChildScrollView(
         child: Column(
@@ -127,8 +134,8 @@ class _HomePageState extends State<HomePage> {
                       return _displayFavorites();
                     default:
                       return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 140),
+                        child: SizedBox(
+                          height: 100,
                           child: Text(
                             "Searching",
                             style: TextStyle(
@@ -144,7 +151,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _displayPopular() {

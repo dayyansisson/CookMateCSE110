@@ -74,11 +74,13 @@ class _UserPreferences extends State<UserPreferences> {
     _getAllergens();
 
     // Fetch locally stores user's allergens
-    _getLocalAllergens();
-    setState(() {
-      displayAllergens = localAllergens;
-    });
-
+    _getLocalAllergens().then(
+      () {
+        setState(() {
+          displayAllergens = localAllergens;
+        });
+      }
+    );
   }
 
   /*
@@ -156,9 +158,6 @@ class _UserPreferences extends State<UserPreferences> {
     _localAllergens.then((currList) {
       setState(() {
         //localAllergens = returnedList;
-        if (currList.length==0){
-          localAllergens.add("None");
-        }
         for (int i = 0; i < currList.length; i++) {
           print("Allergen: " +
               currList[i].name +
@@ -377,7 +376,7 @@ class _UserPreferences extends State<UserPreferences> {
     return showDialog<String>(
       context: context,
       barrierDismissible:
-          true, // dialog is dismissible with a tap on the barrier
+          false, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Select Allergens'),
@@ -590,8 +589,17 @@ class _UserPreferences extends State<UserPreferences> {
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text("CAUTION - This will delete all your user data."),
-                Text("Enter your password to continue:"),
+                Text(
+                  "WARNING - This will delete all your user data.", 
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: CookmateStyle.standardRed
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 8),
+                  child: Text("Enter your password to continue:", textAlign: TextAlign.center),
+                ),
                 new Expanded(
                   child: new TextField(
                   autofocus: true,
@@ -784,7 +792,7 @@ class _UserPreferences extends State<UserPreferences> {
 
     int dietKey = 0;
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(15),
       child: DropdownButton(
         hint: Row(
           children: <Widget> [
@@ -964,15 +972,16 @@ class _UserPreferences extends State<UserPreferences> {
                   )
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(top: 20),
                 ),
                 Column(
                   children: <Widget>[
-                    Text("Current Allergens:"),
+                    Text("Current Allergens"),
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: Text(
-                        displayAllergens.join(", "),
+                        displayAllergens.length == 0 ? "None" : displayAllergens.join(",  "),
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w300
