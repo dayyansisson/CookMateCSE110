@@ -159,10 +159,13 @@ class _SearchPageState extends State<SearchPage> {
       // gets ingredient list from server
       // adds them to locally if not exist
       await request.getIngredientList().then((ingList) {
-        for (dynamic ing in ingList) {
-          DB.Ingredient newIng = DB.Ingredient(name: ing.name, id: ing.id);
-          helper.insertIngredient(newIng);
-        }
+        setState(() {
+          for (dynamic ing in ingList) {
+            DB.Ingredient newIng = DB.Ingredient(name: ing.name, id: ing.id);
+            helper.insertIngredient(newIng);
+          }
+          _getIngredients();
+        });
       });
       // display all ingredients...
 //      print(await helper.ingredients());// returns a list of all ingredients
