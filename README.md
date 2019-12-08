@@ -10,6 +10,8 @@ A Flutter project aimed at helping college students learn to cook by allowing th
 
 3. Tap View in TestFlight or Start Testing. This should prompt you to install the application and then you'll be able to access our app! We hope you enjoy it!
 
+NOTE: An internet connection is REQUIRED for use
+
 Additional Info: We fixed a lot of the bugs in the calendar page that we noted in the project details but we also discovered a few additional. In addition the video is currently being uploaded to youtube and we will post an additional comment with the link when it is finished before you start testing. 
 
 1. There is a bug on the login screen, if you swipe right it will take you to an infinite loading screen. This is solved by 
