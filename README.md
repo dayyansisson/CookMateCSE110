@@ -28,6 +28,5 @@ the latest build and we weren't able to figure it out.
 
 7. There is a bug if the api does not provide us with an image URL, it will show error messages on the page.
 
-# Video
-Watch the video on YouTube here: https://youtu.be/9vMCFFaaY0U
-Or watch it on Google Drive: https://drive.google.com/open?id=1sSXCvvO9AR5mZQ_MIbazx4Zij97ZppOB
+## Video
+Watch the video on YouTube here: https://youtu.be/9vMCFFaaY0U. Or watch it on Google Drive: https://drive.google.com/open?id=1sSXCvvO9AR5mZQ_MIbazx4Zij97ZppOB
